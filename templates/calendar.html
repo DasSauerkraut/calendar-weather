@@ -1,0 +1,75 @@
+<style>
+	#calendar{
+	position: fixed;
+  bottom: 12px;
+  right: 320px;
+	width: 200px;
+	height: fit-content;
+  margin: 0;
+  padding: 0;
+	border: 1px solid #000;
+	border-radius: 3%;
+	background: rgba(0, 0, 0, 0.5);;
+	}
+	#calendar-hdr{
+	font-size: 16px;
+	margin: 3px;
+  padding: 4px;
+	color: #CCC;
+	text-align: center;
+	border-bottom: 1px solid #111;
+	}
+	.calendar-text{
+		float: left;
+		width: 75%;
+		text-align: center;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		margin: auto;
+	}
+	.calendar-container{
+		padding-top: 3px;
+		padding-bottom: 20px;
+	}
+	.fa-chevron-left{
+		float: left; 
+		width: 10%;
+		height: fit-content;
+		text-align: center; 
+		vertical-align: center;
+	}
+	.fa-chevron-left:hover {
+		color: #FFF;
+		border: 0px solid #000;
+		cursor: pointer;
+	}
+	.fa-chevron-right{
+		float: right; 
+		width: 10%;
+		height: fit-content;
+		text-align: center; 
+		vertical-align: center;
+	}
+	.fa-chevron-right:hover {
+		color: #FFF;
+		border: 0px solid #000;
+		cursor: pointer;
+	}
+</style>
+<div id="calendar">
+	<h3 id="calendar-hdr">
+		<i class="far fa-calendar-alt"></i>
+		Calendar
+	</h3>
+	<div class="calendar-container">
+		<!-- <button id="calendar-btn-left" class="calendar-btn"> -->
+		<i id="calendar-btn-left" class="fas fa-chevron-left" ></i>
+		<!-- </button> -->
+		<p class="calendar-text">
+			{{month}}/{{day}}/{{year}}
+		</p>
+		<!-- <button id="calendar-btn-right" class="calendar-btn"> -->
+		<i id="calendar-btn-right" class="fas fa-chevron-right"></i>
+		<!-- </button> -->
+	 </div>
+</div>

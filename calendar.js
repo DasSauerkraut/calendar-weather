@@ -17,7 +17,8 @@ class Calendar extends Application {
   populateData(){
     let newMonth1 = new Month("Month 1", 1, true);
     templateData.dt.addMonth(newMonth1);
-    let newMonth2 = new Month("Month 2", 2, true);
+    let newMonth2 = new Month("Month 2", 5, false);
+    newMonth2.setAbbrev("M2");
     templateData.dt.addMonth(newMonth2);
     let newMonth3 = new Month("Wow look at this incredibly long month name", 11, true);
     templateData.dt.addMonth(newMonth3);
@@ -34,7 +35,8 @@ class Calendar extends Application {
   }
 
   updateDisplay(){
-    document.getElementById("calendar-text").innerHTML = templateData.dt.dateWordy;
+    document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
+    document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
     document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
     document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
   }
@@ -42,6 +44,7 @@ class Calendar extends Application {
   activateListeners(html){
     const nextDay = '#calendar-btn-day';
     const quickAction = '#calendar-btn-quick';
+    const calendarSetup = '#calendar-date';
     const longAction = '#calendar-btn-long';
     const nightSkip = '#calendar-btn-night';
     this.updateDisplay()
@@ -65,6 +68,11 @@ class Calendar extends Application {
       templateData.dt.advanceNight();
       this.updateDisplay();
     });
+    html.find(calendarSetup).click(ev => {
+      ev.preventDefault();
+      templateData.dt.advanceNight();
+      this.updateDisplay();
+    });
   }
 }
 class Month {
@@ -77,6 +85,9 @@ class Month {
     this.length = length;
     this.isNumbered = isNumbered;
   }
+
+  setAbbrev(abbrev){this.abbrev = abbrev};
+  getAbbrev(){return this.abbrev};
 }
 
 class DateTime {
@@ -93,6 +104,7 @@ class DateTime {
   hours = 0;
   dayLength = 0;
   timeDisp = "";
+  dateNum = "";
 
   addMonth(month){this.months.push(month)};
   addWeekday(day){this.daysOfTheWeek.push(day)};
@@ -103,12 +115,31 @@ class DateTime {
 
   setTimeDisp(){
     let minDisp = ""
+    let sunDisp = ""
+    if(6 <= this.hours && this.hours <= 11){
+      sunDisp = "Morning";
+    } else if(this.hours == 12){
+      sunDisp = "Noon";
+    } else if (13 <= this.hours && this.hours <= 16){
+      sunDisp = "Afternoon";
+    } else if (17 <= this.hours && this.hours <= 21){
+      sunDisp = "Evening";
+    } else if (22 <= this.hours && this.hours <= 24){
+      sunDisp = "Night";
+    } else if (this.hours == 0){
+      sunDisp = "Midnight";
+    } else if (1 <= this.hours && this.hours <= 3){
+      sunDisp = "Night";
+    } else if (4 <= this.hours && this.hours <= 5){
+      sunDisp = "Early Morning";
+    }
+
     if(this.minutes == 0){
       minDisp = "00";
     } else {
       minDisp = this.minutes * 15;
     }
-    this.timeDisp = this.hours + ":" + minDisp;
+    this.timeDisp = this.hours + ":" + minDisp + ", " + sunDisp;
   }
 
   quickAction(){
@@ -158,6 +189,14 @@ class DateTime {
     }
     this.dateWordy = this.day + dayAppendage + " of " 
       + this.months[this.currentMonth].name + ", " + this.year + " " + this.era;
+    
+    let monthNum = "";
+    if(this.months[this.currentMonth].isNumbered){
+      monthNum = this.currentMonth + 1;
+    } else {
+      monthNum = this.months[this.currentMonth].getAbbrev()
+    }
+    this.dateNum = this.day + "/" + monthNum + "/" + this.year + " " + this.era;
   }
 
   advanceDay(){

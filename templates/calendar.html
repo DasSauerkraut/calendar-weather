@@ -22,8 +22,9 @@
 		width: fit-content;
 		min-width: 200px;
 		border-bottom: 1px solid #111;
+		cursor: pointer;
 	}
-	#calendar-text{
+	#calendar-date{
 		grid-row: 1;
 		grid-column: 2;
 		float: left;
@@ -32,6 +33,28 @@
 		padding-bottom: 0px;
 		margin-bottom: 5px;
 		color: #CCC;
+	}
+	#calendar-date,
+	#calendar-date-num {
+		transition: 0.2s;
+	}
+	#calendar-date-num {
+		grid-row: 1;
+		grid-column: 2;
+		float: left;
+		text-align: center;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		margin-bottom: 5px;
+		color: #CCC;
+		opacity: 0;
+	}
+
+	#calendar-hdr:hover #calendar-date {
+		opacity: 0;
+	}
+	#calendar-hdr:hover #calendar-date-num{
+		opacity: 1;
 	}
 	.fa-calendar-alt{
 		grid-row: 1;
@@ -150,7 +173,7 @@
 <div id="calendar">
 	<h3 id="calendar-hdr">
 		<i id=calendar-events class="far fa-calendar-alt" title="Events"></i>
-		<span id="calendar-text">Date</span>
+		<span id="calendar-date">Date</span><span id="calendar-date-num">DateNum</span>
 		<i id=calendar-weather class="fas fa-cloud-sun" title="Weather"></i>
 	</h3>
 	<div class="calendar-container">

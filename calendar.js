@@ -14,24 +14,47 @@ class Calendar extends Application {
     return templateData;
   }
 
+  loadSettings(){
+    let data = game.settings.get('calendar-weather', 'dateTime');
+    templateData.dt.months = data.default.months;
+    templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
+    templateData.dt.year = data.default.year;
+    templateData.dt.day = data.default.day;
+    templateData.dt.numDayOfTheWeek = data.default.numDayOfTheWeek;
+    templateData.dt.currentMonth = data.default.currentMonth;
+    templateData.dt.currentWeekday = data.default.currentWeekday;
+    templateData.dt.dateWordy = data.default.dateWordy;
+    templateData.dt.era = data.default.era;
+    templateData.dt.minutes = data.default.minutes;
+    templateData.dt.hours = data.default.hours;
+    templateData.dt.dayLength = data.default.dayLength;
+    templateData.dt.timeDisp = data.default.timeDisp;
+    templateData.dt.dateNum = data.default.dateNum;
+  }
+
   populateData(){
-    let newMonth1 = new Month("Month 1", 1, true);
-    templateData.dt.addMonth(newMonth1);
-    let newMonth2 = new Month("Month 2", 5, false);
-    newMonth2.setAbbrev("M2");
-    templateData.dt.addMonth(newMonth2);
-    let newMonth3 = new Month("Wow look at this incredibly long month name", 11, true);
-    templateData.dt.addMonth(newMonth3);
-    templateData.dt.addWeekday("Monday");
-    templateData.dt.addWeekday("Tuesday");
-    templateData.dt.addWeekday("Wednesday");
-    templateData.dt.addWeekday("Thursday");
-    templateData.dt.setYear(1234);
-    templateData.dt.setEra("IC");
-    templateData.dt.setWeekday("Monday")
-    templateData.dt.setTimeDisp();
-    templateData.dt.setDayLength(24);
-    templateData.dt.genDateWordy();
+      let newMonth1 = new Month("Month 1", 30, true);
+      templateData.dt.addMonth(newMonth1);
+      templateData.dt.addWeekday("Monday");
+      templateData.dt.addWeekday("Tuesday");
+      templateData.dt.addWeekday("Wednesday");
+      templateData.dt.addWeekday("Thursday");
+      templateData.dt.setYear(2020);
+      templateData.dt.setEra("AD");
+      templateData.dt.setWeekday("Monday")
+      templateData.dt.setTimeDisp();
+      templateData.dt.setDayLength(24);
+      templateData.dt.genDateWordy();
+  }
+
+  updateSettings(){
+    game.settings.update('calendar-weather.dateTime', {
+      name: "Date/Time Data",
+      scope: 'world',
+      config: false,
+      default: this.toObject(),
+      type: Object,
+    });
   }
 
   updateDisplay(){
@@ -39,6 +62,25 @@ class Calendar extends Application {
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
     document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
     document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
+  }
+
+  toObject(){
+    return {
+      months: templateData.dt.months,
+      daysOfTheWeek: templateData.dt.daysOfTheWeek,
+      year: templateData.dt.year,
+      day: templateData.dt.day,
+      numDayOfTheWeek: templateData.dt.numDayOfTheWeek,
+      currentMonth: templateData.dt.currentMonth,
+      currentWeekday : templateData.dt.currentWeekday,
+      dateWordy: templateData.dt.dateWordy,
+      era : templateData.dt.era,
+      minutes: templateData.dt.minutes,
+      hours: templateData.dt.hours,
+      dayLength: templateData.dt.dayLength,
+      timeDisp : templateData.dt.timeDisp,
+      dateNum : templateData.dt.dateNum,
+    }
   }
 
   activateListeners(html){
@@ -51,27 +93,32 @@ class Calendar extends Application {
     html.find(nextDay).click(ev => {
       ev.preventDefault();
       templateData.dt.advanceMorning();
-      this.updateDisplay()
+      this.updateDisplay();
+      this.updateSettings();
     });
     html.find(quickAction).click(ev => {
       ev.preventDefault();
       templateData.dt.quickAction();
       this.updateDisplay();
+      this.updateSettings();
     });
     html.find(longAction).click(ev => {
       ev.preventDefault();
       templateData.dt.advanceHour();
       this.updateDisplay();
+      this.updateSettings();
     });
     html.find(nightSkip).click(ev => {
       ev.preventDefault();
       templateData.dt.advanceNight();
       this.updateDisplay();
+      this.updateSettings();
     });
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
       templateData.dt.advanceNight();
       this.updateDisplay();
+      this.updateSettings();
     });
   }
 }
@@ -243,24 +290,22 @@ $(document).ready(() => {
   }
 
   let c = new Calendar();
-  c.populateData();
   // Settings
   Hooks.on('init', ()=> {
-    game.settings.register('calendar-weather', 'Calendar Config', {
-      name: "Calendar Configuration",
-      hint: "Enter your months, days etc WIP",
+    c.populateData();
+    game.settings.register('calendar-weather', 'dateTime', {
+      name: "Date/Time Data",
       scope: 'world',
-      config: true,
-      default: false,
-      type: Boolean,
+      config: false,
+      default: c.toObject(),
+      type: Object,
     });
+    c.loadSettings();
   });
 
   Hooks.on('ready', ()=> {
     renderTemplate(templatePath, templateData).then(html => {
       c.render(true);
     });
-  });
-
-  
+  });  
 });

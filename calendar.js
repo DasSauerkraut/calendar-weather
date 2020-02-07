@@ -1,8 +1,37 @@
-class Calendar extends Application {
+class CalendarForm extends FormApplication {
+  
+  static get defaultOptions() {
+    const options = super.defaultOptions;
+    options.template = "modules/calendar-weather/templates/calendar-form.html";
+    options.width = 600;
+    options.height = "auto";
+    return options;
+  }
 
-  /**
-   * Define default options for the Calendar application
-   */
+  activateListeners(html){
+    const nextDay = '#calendar-keys';
+    //Next Morning
+    html.find(nextDay).click(ev => {
+      ev.preventDefault();
+      console.log("CLICKY");
+    });
+  }
+  
+  getData(){
+    return {};
+  }
+
+  renderForm(){
+    let templatePath = "modules/calendar-weather/templates/calendar-form.html";
+    let templateData = {}
+    renderTemplate(templatePath, templateData).then(html => {
+      this.render(true);
+    });
+  }
+
+}
+
+class Calendar extends Application {
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -87,38 +116,49 @@ class Calendar extends Application {
     const nextDay = '#calendar-btn-day';
     const quickAction = '#calendar-btn-quick';
     const calendarSetup = '#calendar-date';
+    const calendarSetupOverlay = '#calendar-date-num'
     const longAction = '#calendar-btn-long';
     const nightSkip = '#calendar-btn-night';
     this.updateDisplay()
+    let form = new CalendarForm();
+    //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
       templateData.dt.advanceMorning();
       this.updateDisplay();
       this.updateSettings();
     });
+    //Quick Action
     html.find(quickAction).click(ev => {
       ev.preventDefault();
       templateData.dt.quickAction();
       this.updateDisplay();
       this.updateSettings();
     });
+    //Long Action
     html.find(longAction).click(ev => {
       ev.preventDefault();
       templateData.dt.advanceHour();
       this.updateDisplay();
       this.updateSettings();
     });
+    //To Midnight
     html.find(nightSkip).click(ev => {
       ev.preventDefault();
       templateData.dt.advanceNight();
       this.updateDisplay();
       this.updateSettings();
     });
+    //Launch Calendar Form
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
-      templateData.dt.advanceNight();
-      this.updateDisplay();
-      this.updateSettings();
+      console.log("-------DISPLAYING CALENDAR FORM----------")
+      form.renderForm(true);
+    });
+    html.find(calendarSetupOverlay).click(ev => {
+      ev.preventDefault();
+      console.log("-------DISPLAYING CALENDAR FORM----------")
+      form.renderForm(true);
     });
   }
 }
@@ -283,14 +323,13 @@ class DateTime {
 
 $(document).ready(() => {
   const templatePath = "modules/calendar-weather/templates/calendar.html";
-  
-  
+
   templateData = {
     dt: new DateTime()
   }
 
   let c = new Calendar();
-  // Settings
+  // Init settings so they can be wrote to later
   Hooks.on('init', ()=> {
     c.populateData();
     game.settings.register('calendar-weather', 'dateTime', {

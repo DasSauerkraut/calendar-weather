@@ -1,5 +1,8 @@
 class CalendarForm extends FormApplication {
-  
+  constructor(data){
+    super();
+    this.data = data;
+  }
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar-form.html";
@@ -9,26 +12,29 @@ class CalendarForm extends FormApplication {
   }
 
   activateListeners(html){
-    const nextDay = '#calendar-keys';
-    //Next Morning
-    html.find(nextDay).click(ev => {
+    const submit = '#calendar-form-submit';
+    const addWeekday = '#calendar-form-add-weekday';
+    html.find(submit).click(ev => {
       ev.preventDefault();
-      console.log("CLICKY");
+      this.close();
+    });
+    html.find(addWeekday).click(ev => {
+      ev.preventDefault();
+      // this.data.
     });
   }
   
   getData(){
-    return {};
+    return this.data;
   }
 
-  renderForm(){
+  renderForm(newData){
     let templatePath = "modules/calendar-weather/templates/calendar-form.html";
-    let templateData = {}
-    renderTemplate(templatePath, templateData).then(html => {
+    this.data = newData;
+    renderTemplate(templatePath, this.data).then(html => {
       this.render(true);
     });
   }
-
 }
 
 class Calendar extends Application {
@@ -120,7 +126,7 @@ class Calendar extends Application {
     const longAction = '#calendar-btn-long';
     const nightSkip = '#calendar-btn-night';
     this.updateDisplay()
-    let form = new CalendarForm();
+    let form = new CalendarForm(this.toObject());
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
@@ -152,13 +158,11 @@ class Calendar extends Application {
     //Launch Calendar Form
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
-      console.log("-------DISPLAYING CALENDAR FORM----------")
-      form.renderForm(true);
+      form.renderForm(this.toObject());
     });
     html.find(calendarSetupOverlay).click(ev => {
       ev.preventDefault();
-      console.log("-------DISPLAYING CALENDAR FORM----------")
-      form.renderForm(true);
+      form.renderForm(this.toObject());
     });
   }
 }

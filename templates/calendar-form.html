@@ -1,24 +1,55 @@
+<style>
+    .calendar-form-label{
+        margin-left: 1%;
+    }
+    #calendar-form-year-input{
+        width: 18%;
+    }
+    #calendar-form-era-input,
+    #calendar-form-cMonth-input,
+    #calendar-form-cDay-input{
+        width: 7%;
+    }
+    #calendar-form-hour-input{
+        width: 4%;
+    }
+    #calendar-form-minute-input{
+        width: 4%;
+    }
+    
+</style>
 <form autocomplete="off" onsubmit="event.preventDefault();">
-  <p class="notes">Instructions</p>
-  <h3>Header</h3>
-  <ol class="hotkey-list">
-      <li>
-          <h4>Menu</h4>
-          <div id="calendar-keys">
-              <span class="key">Esc</span>
-          </div>
-      </li>
-      <li>
-          <h4>Close</h4>
-          <div class="keys">
-              <span class="key">Esc</span>
-          </div>
-      </li>
-      <li>
-          <h4>Pause</h4>
-          <div class="keys">
-              <span class="key">Space</span>
-          </div>
-      </li>
-  </ol>
+    <h1>Calendar Settings</h1>
+    <div id="calendar-form-year">
+        <label>Current Day: </label><input value="{{day}}" type="number" min="1" placeholder="14" id="calendar-form-cDay-input">
+        <label class="calendar-form-label">Current Month: </label><input value="{{currentMonth}}" type="text" placeholder="12" id="calendar-form-cMonth-input" maxlength="2">
+        <label class="calendar-form-label">Year: </label><input type="number" min="1" value="{{year}}" placeholder="2020" id="calendar-form-year-input">
+        <label class="calendar-form-label">Era: </label><input value="{{era}}" type="text" placeholder="AD" id="calendar-form-era-input" maxlength="3">
+        <label class="calendar-form-label">Time: </label><input value="{{hours}}" type="text" placeholder="7" id="calendar-form-hour-input" max="24">:<input value="{{minutes}}" type="text" placeholder="15" id="calendar-form-minute-input" max="60">
+    </div>
+    <h2>Weekdays</h2>
+    <ol>
+        {{#each daysOfTheWeek as |item|}}
+        <li><input value="{{item}}" type="text" placeholder="October" id="calendar-form-weekday-{{@index}}"></li>
+        {{/each}}
+    </ol>
+    <button id="calendar-form-add-weekday" name="add-weekday" title="Add a new day of the week">
+        <i class="fas fa-plus"></i> Add Weekday
+    </button>
+    <h2>Months</h2>
+    <ol>
+        {{#each months as |month|}}
+        <li>
+            {{month.name}}
+        </li>
+        {{/each}}
+    </ol>
+    <button id="calendar-form-add-month" name="add-month" title="Add a new month">
+        <i class="fas fa-plus"></i> Add Month
+    </button>
+  <footer>
+    <button id="calendar-form-submit" type="submit" name="submit" title="Save Calendar Settings">
+        <i class="far fa-save"></i> Save Calendar
+    </button>
+  </footer>
 </form>

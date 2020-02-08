@@ -3,7 +3,7 @@
         margin-left: 1%;
     }
     #calendar-form-year-input{
-        width: 18%;
+        width: 15%;
     }
     #calendar-form-era-input,
     #calendar-form-cMonth-input,
@@ -15,6 +15,50 @@
     }
     #calendar-form-minute-input{
         width: 4%;
+    }
+
+    .calendar-form-weekday-container{
+        display: grid;
+        border-bottom: 1px solid rgb(116, 0, 0);
+        margin-bottom: 5px;
+        align-items: center;
+    }
+
+    .calendar-form-weekday-label-container{
+        display: grid;
+        margin-bottom: 5px;
+        align-items: center;
+    }
+
+    .calendar-form-weekday-input{
+        grid-row: 1;
+        grid-column: 1;
+        width: 150px;
+    }
+
+    .calendar-form-weekday-radio{
+        grid-column: 2;
+        grid-row: 1;
+        margin: auto;
+    }
+
+    .calendar-form-weekday-input-label{
+        grid-row: 1;
+        grid-column: 1;
+        width: 150px;
+    }
+
+    .calendar-form-weekday-radio-label{
+        grid-column: 2;
+        grid-row: 1;
+        margin: auto;
+    }
+
+    .calendar-form-weekday-del{
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+        width: 40px;
     }
     
 </style>
@@ -28,10 +72,41 @@
         <label class="calendar-form-label">Time: </label><input value="{{hours}}" type="text" placeholder="7" id="calendar-form-hour-input" max="24">:<input value="{{minutes}}" type="text" placeholder="15" id="calendar-form-minute-input" max="60">
     </div>
     <h2>Weekdays</h2>
+    <div class="calendar-form-weekday-label-container">
+        <span class="calendar-form-weekday-input-label">
+            Name
+        </span>
+        <span class="calendar-form-weekday-radio-label">
+            Current Weekday
+        </span>
+        <span class="calendar-form-weekday-del">
+            Delete
+        </span>
+    </div>
     <ol>
         {{#each daysOfTheWeek as |item|}}
-        <li><input value="{{item}}" type="text" placeholder="October" id="calendar-form-weekday-{{@index}}"></li>
+        <li>
+            <div class="calendar-form-weekday-container">
+                <input class="calendar-form-weekday-input" value="{{item}}" name="input-weekday-{{@index}}" type="text" placeholder="Tuesday" id="calendar-form-weekday-{{@index}}">
+                <input class="calendar-form-weekday-radio" type="radio" name="current-weekday" value="{{@index}}" checked>
+                <button class="calendar-form-weekday-del" id="calendar-form-del-weekday-{{@index}}" name="del-weekday-{{@index}}" title="Delete a Weekday">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </li>
         {{/each}}
+        <input id="numDayOfTheWeek" value={{numDayOfTheWeek}} hidden></input>
+        <script>
+            newWeekdays = document.getElementsByClassName("calendar-form-weekday-radio");
+            for(var i = 0, max=newWeekdays.length; i < max; i++){
+                if(i == document.getElementById('numDayOfTheWeek').value){
+                    newWeekdays[i].checked = true;
+                    break;
+                } else {
+                    newWeekdays[i].checked = false;
+                }
+            }
+        </script>
     </ol>
     <button id="calendar-form-add-weekday" name="add-weekday" title="Add a new day of the week">
         <i class="fas fa-plus"></i> Add Weekday

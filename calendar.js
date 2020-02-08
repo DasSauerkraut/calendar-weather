@@ -1,8 +1,22 @@
 class CalendarForm extends FormApplication {
-  constructor(data){
+  data = {};
+  constructor(newData){
     super();
-    this.data = data;
+    newData = JSON.parse(newData);
+    this.data = {
+      months: newData.months,
+      daysOfTheWeek: newData.daysOfTheWeek,
+      year: newData.year,
+      day: newData.day,
+      numDayOfTheWeek: newData.numDayOfTheWeek,
+      currentMonth: newData.currentMonth,
+      currentWeekday: newData.currentWeekday,
+      era: newData.era,
+      minutes: newData.minutes,
+      hours: newData.hours,
+    };
   }
+
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar-form.html";
@@ -11,16 +25,77 @@ class CalendarForm extends FormApplication {
     return options;
   }
 
+  saveData(){
+    let savedData = new DateTime();
+    savedData.year = document.getElementById("calendar-form-year-input").value;
+    savedData.era = document.getElementById("calendar-form-era-input").value;
+    savedData.day = parseInt(document.getElementById("calendar-form-cDay-input").value);
+    savedData.currentMonth = document.getElementById("calendar-form-cMonth-input").value;
+    savedData.hours = parseInt(document.getElementById("calendar-form-hour-input").value);
+    let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
+    for(var i = 0, max=newWeekdays.length; i < max; i++){
+      savedData.addWeekday(newWeekdays[i].value);
+    }
+    let weekdayTarget = 0;
+    if(document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null){
+      weekdayTarget = savedData.daysOfTheWeek.length-1
+    } else {
+      weekdayTarget = document.querySelector('input[class="calendar-form-weekday-radio"]:checked').value;
+    }
+
+    savedData.currentWeekday = savedData.daysOfTheWeek[weekdayTarget];
+    savedData.numDayOfTheWeek = weekdayTarget;
+    // savedData.setTimeDisp();
+    // savedData.setDayLength(24);
+    // savedData.genDateWordy();
+    let returnData = {
+      months: savedData.months,
+      daysOfTheWeek: savedData.daysOfTheWeek,
+      year: savedData.year,
+      day: savedData.day,
+      numDayOfTheWeek: savedData.numDayOfTheWeek,
+      currentMonth: savedData.currentMonth,
+      currentWeekday : savedData.currentWeekday,
+      dateWordy: savedData.dateWordy,
+      era : savedData.era,
+      minutes: savedData.minutes,
+      hours: savedData.hours,
+      dayLength: savedData.dayLength,
+      timeDisp : savedData.timeDisp,
+      dateNum : savedData.dateNum,
+    }
+    return JSON.stringify(returnData);
+  }
+  
+  
+
   activateListeners(html){
     const submit = '#calendar-form-submit';
     const addWeekday = '#calendar-form-add-weekday';
+    const addMonth = '#calendar-form-add-month';
+    const delWeekday = "button[class='calendar-form-weekday-del']";
     html.find(submit).click(ev => {
       ev.preventDefault();
       this.close();
+      Hooks.callAll("calendarSettingsClose", this.saveData());
     });
     html.find(addWeekday).click(ev => {
       ev.preventDefault();
-      // this.data.
+      this.data.daysOfTheWeek.push("");
+      this.render(true)
+    });
+    html.find(addMonth).click(ev => {
+      ev.preventDefault();
+      let newMonth = new Month("newMonth", 30, true);
+      this.data.months.push(newMonth);
+      this.render(true)
+    });
+    html.find(delWeekday).click(ev => {
+      ev.preventDefault();
+      const targetName = ev.currentTarget.name.split("-");
+      const index = targetName[targetName.length - 1];
+      this.data.daysOfTheWeek.splice(index, 1);
+      this.render(true)
     });
   }
   
@@ -30,14 +105,16 @@ class CalendarForm extends FormApplication {
 
   renderForm(newData){
     let templatePath = "modules/calendar-weather/templates/calendar-form.html";
-    this.data = newData;
+    this.data = newData = JSON.parse(newData);
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true);
     });
+    Hooks.callAll("calendarSettingsOpen");
   }
 }
 
 class Calendar extends Application {
+  isOpen = false;
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -45,12 +122,14 @@ class Calendar extends Application {
     options.resizable = false;
     return options;
   }
+
   getData() {
     return templateData;
   }
 
   loadSettings(){
     let data = game.settings.get('calendar-weather', 'dateTime');
+    console.log(data);
     templateData.dt.months = data.default.months;
     templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
     templateData.dt.year = data.default.year;
@@ -80,6 +159,29 @@ class Calendar extends Application {
       templateData.dt.setTimeDisp();
       templateData.dt.setDayLength(24);
       templateData.dt.genDateWordy();
+  }
+
+  settingsOpen(isOpen){
+    this.isOpen = isOpen;
+  }
+
+  rebuild(obj){
+    if(obj.months.length != 0){templateData.dt.months = obj.months;}
+    if(obj.daysOfTheWeek != []){templateData.dt.daysOfTheWeek = obj.daysOfTheWeek;}
+    if(obj.year != 0){templateData.dt.year = obj.year;}
+    if(obj.day != 0){templateData.dt.day = obj.day;}
+    templateData.dt.numDayOfTheWeek = obj.numDayOfTheWeek;
+    templateData.dt.currentMonth = obj.currentMonth;
+    if(obj.currentWeekday != ""){templateData.dt.currentWeekday = obj.currentWeekday;}
+    if(obj.dateWordy != ""){ttemplateData.dthis.dateWordy = obj.dateWordy;}
+    if(obj.era != ""){templateData.dt.era = obj.era;}
+    templateData.dt.minutes = obj.minutes;
+    templateData.dt.hours = obj.hours;
+    if(obj.dayLength != 0){templateData.dt.dayLength = obj.dayLength;}
+    if(obj.timeDisp != ""){templateData.dt.timeDisp = obj.timeDisp;}
+    if(obj.dateNum != ""){templateData.dt.dateNum = obj.dateNum;}
+    templateData.dt.setTimeDisp();
+    templateData.dt.genDateWordy();
   }
 
   updateSettings(){
@@ -126,44 +228,53 @@ class Calendar extends Application {
     const longAction = '#calendar-btn-long';
     const nightSkip = '#calendar-btn-night';
     this.updateDisplay()
-    let form = new CalendarForm(this.toObject());
+    let form = new CalendarForm(JSON.stringify(this.toObject()));
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
-      templateData.dt.advanceMorning();
-      this.updateDisplay();
-      this.updateSettings();
+      if(!this.isOpen){
+        templateData.dt.advanceMorning();
+        this.updateDisplay();
+        this.updateSettings();
+      }
     });
     //Quick Action
     html.find(quickAction).click(ev => {
       ev.preventDefault();
-      templateData.dt.quickAction();
-      this.updateDisplay();
-      this.updateSettings();
+      if(!this.isOpen){
+        templateData.dt.quickAction();
+        this.updateDisplay();
+        this.updateSettings();
+      }
     });
     //Long Action
     html.find(longAction).click(ev => {
       ev.preventDefault();
-      templateData.dt.advanceHour();
-      this.updateDisplay();
-      this.updateSettings();
+      if(!this.isOpen){
+        templateData.dt.advanceHour();
+        this.updateDisplay();
+        this.updateSettings();
+      }
     });
     //To Midnight
     html.find(nightSkip).click(ev => {
       ev.preventDefault();
-      templateData.dt.advanceNight();
-      this.updateDisplay();
-      this.updateSettings();
+      if(!this.isOpen){
+        templateData.dt.advanceNight();
+        this.updateDisplay();
+        this.updateSettings();
+      }
     });
     //Launch Calendar Form
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
-      form.renderForm(this.toObject());
+      form.renderForm(JSON.stringify(this.toObject()));
     });
     html.find(calendarSetupOverlay).click(ev => {
       ev.preventDefault();
-      form.renderForm(this.toObject());
+      form.renderForm(JSON.stringify(this.toObject()));
     });
+    
   }
 }
 class Month {
@@ -171,10 +282,11 @@ class Month {
   length = 0;
   isNumbered = true;
   abbrev = "";
-  constructor(name, length, isNumbered){
+  constructor(name = "", length = 0, isNumbered = true, abbrev = ""){
     this.name = name;
     this.length = length;
     this.isNumbered = isNumbered;
+    this.abbrev = abbrev;
   }
 
   setAbbrev(abbrev){this.abbrev = abbrev};
@@ -323,6 +435,7 @@ class DateTime {
       this.currentMonth += 1;
     }
   }
+
 }
 
 $(document).ready(() => {
@@ -343,7 +456,21 @@ $(document).ready(() => {
       default: c.toObject(),
       type: Object,
     });
+    console.log(c.toObject());
     c.loadSettings();
+  });
+
+  Hooks.on('calendarSettingsOpen', ()=> {
+    console.log("Hook fired! Calendar Settings is open.")
+    c.settingsOpen(true);
+  });
+
+  Hooks.on('calendarSettingsClose', (updatedData)=> {
+    console.log("Hook fired! Calendar Settings is closed.");
+    c.rebuild(JSON.parse(updatedData));
+    c.updateDisplay();
+    c.updateSettings();
+    c.settingsOpen(false);
   });
 
   Hooks.on('ready', ()=> {

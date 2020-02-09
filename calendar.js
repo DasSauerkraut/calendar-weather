@@ -27,27 +27,50 @@ class CalendarForm extends FormApplication {
 
   saveData(){
     let savedData = new DateTime();
-    savedData.year = document.getElementById("calendar-form-year-input").value;
+    savedData.year = parseInt(document.getElementById("calendar-form-year-input").value);
     savedData.era = document.getElementById("calendar-form-era-input").value;
     savedData.day = parseInt(document.getElementById("calendar-form-cDay-input").value);
-    savedData.currentMonth = document.getElementById("calendar-form-cMonth-input").value;
     savedData.hours = parseInt(document.getElementById("calendar-form-hour-input").value);
+    
     let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
     for(var i = 0, max=newWeekdays.length; i < max; i++){
       savedData.addWeekday(newWeekdays[i].value);
     }
+
     let weekdayTarget = 0;
     if(document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null){
       weekdayTarget = savedData.daysOfTheWeek.length-1
     } else {
       weekdayTarget = document.querySelector('input[class="calendar-form-weekday-radio"]:checked').value;
     }
-
     savedData.currentWeekday = savedData.daysOfTheWeek[weekdayTarget];
     savedData.numDayOfTheWeek = weekdayTarget;
-    // savedData.setTimeDisp();
-    // savedData.setDayLength(24);
-    // savedData.genDateWordy();
+    
+    let newMonthsName = document.getElementsByClassName("calendar-form-month-input");
+    let newMonthsLength = document.getElementsByClassName("calendar-form-month-length-input");
+    let newMonthsIsNum = document.getElementsByClassName("calendar-form-month-isnum");
+    let newMonthsAbbrev = document.getElementsByClassName("calendar-form-month-abbrev");
+    let tempMonth = new Month("Month 1", 30, true);
+    for(var i = 0, max = newMonthsName.length; i < max; i++){
+      tempMonth.name = newMonthsName[i].value;
+      tempMonth.length = newMonthsLength[i].value;
+      tempMonth.isNumbered = !newMonthsIsNum[i].checked;
+      tempMonth.abbrev = newMonthsAbbrev[i].value;
+      savedData.addMonth(tempMonth);
+      tempMonth = new Month("Month 1", 30, true);
+    }
+
+    let monthTarget = 0;
+    if(document.querySelector('input[class="calendar-form-month-radio"]:checked') == null){
+      monthTarget = savedData.months.length-1
+    } else {
+      monthTarget = document.querySelector('input[class="calendar-form-month-radio"]:checked').value;
+    }
+    savedData.currentMonth = monthTarget;
+    savedData.setTimeDisp();
+    savedData.setDayLength(24);
+    savedData.genDateWordy();
+    savedData.genAbbrev();
     let returnData = {
       months: savedData.months,
       daysOfTheWeek: savedData.daysOfTheWeek,
@@ -64,6 +87,7 @@ class CalendarForm extends FormApplication {
       timeDisp : savedData.timeDisp,
       dateNum : savedData.dateNum,
     }
+    console.log(returnData);
     return JSON.stringify(returnData);
   }
   
@@ -74,6 +98,7 @@ class CalendarForm extends FormApplication {
     const addWeekday = '#calendar-form-add-weekday';
     const addMonth = '#calendar-form-add-month';
     const delWeekday = "button[class='calendar-form-weekday-del']";
+    const delMonth = "button[class='calendar-form-month-del']"
     html.find(submit).click(ev => {
       ev.preventDefault();
       this.close();
@@ -82,33 +107,85 @@ class CalendarForm extends FormApplication {
     html.find(addWeekday).click(ev => {
       ev.preventDefault();
       this.data.daysOfTheWeek.push("");
-      this.render(true)
+      this.render(true);
+      this.checkBoxes();
     });
     html.find(addMonth).click(ev => {
       ev.preventDefault();
-      let newMonth = new Month("newMonth", 30, true);
+      let newMonth = new Month("", 30, true);
       this.data.months.push(newMonth);
-      this.render(true)
+      this.render(true);
+      this.checkBoxes();
     });
     html.find(delWeekday).click(ev => {
       ev.preventDefault();
       const targetName = ev.currentTarget.name.split("-");
       const index = targetName[targetName.length - 1];
       this.data.daysOfTheWeek.splice(index, 1);
-      this.render(true)
+      this.render(true);
+      this.checkBoxes();
+    });
+    html.find(delMonth).click(ev => {
+      ev.preventDefault();
+      const targetName = ev.currentTarget.name.split("-");
+      const index = targetName[targetName.length - 1];
+      this.data.months.splice(index, 1);
+      this.render(true);
+      this.checkBoxes();
     });
   }
   
   getData(){
     return this.data;
   }
+  
+  formLoaded(){
+    return new Promise(resolve => {
+      function check() {
+        if(document.getElementById('calendar-form-submit')){
+          resolve();
+        } else {
+          setTimeout(check, 30);
+        }
+      }
+      check();
+    })
+  }
+
+  async checkBoxes() {
+    await this.formLoaded();
+    let weekdays = document.getElementsByClassName("calendar-form-weekday-radio");
+    let monthsNum = document.getElementsByClassName("calendar-form-month-isnum");
+    let monthsAbbrev = document.getElementsByClassName("calendar-form-month-abbrev");
+    let months = document.getElementsByClassName("calendar-form-month-radio");
+    for(var i = 0, max=weekdays.length; i < max; i++){
+      if(i == this.data.numDayOfTheWeek){
+        weekdays[i].checked = true;
+        break;
+      } else {
+        weekdays[i].checked = false;
+      }
+    }
+
+    for(var i = 0, max=monthsNum.length; i < max; i++){
+      monthsNum[i].checked = !this.data.months[i].isNumbered;
+      if(monthsNum[i].checked){
+        monthsAbbrev[i].disabled = false; 
+        monthsAbbrev[i].style.cursor ='auto'
+      }
+      if(i == this.data.currentMonth){
+        months[i].checked = true;
+      }
+    }
+  }
 
   renderForm(newData){
     let templatePath = "modules/calendar-weather/templates/calendar-form.html";
     this.data = newData = JSON.parse(newData);
     renderTemplate(templatePath, this.data).then(html => {
-      this.render(true);
-    });
+      this.render(true)
+    }).then(this.checkBoxes());
+
     Hooks.callAll("calendarSettingsOpen");
   }
 }
@@ -129,7 +206,6 @@ class Calendar extends Application {
 
   loadSettings(){
     let data = game.settings.get('calendar-weather', 'dateTime');
-    console.log(data);
     templateData.dt.months = data.default.months;
     templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
     templateData.dt.year = data.default.year;
@@ -173,7 +249,7 @@ class Calendar extends Application {
     templateData.dt.numDayOfTheWeek = obj.numDayOfTheWeek;
     templateData.dt.currentMonth = obj.currentMonth;
     if(obj.currentWeekday != ""){templateData.dt.currentWeekday = obj.currentWeekday;}
-    if(obj.dateWordy != ""){ttemplateData.dthis.dateWordy = obj.dateWordy;}
+    if(obj.dateWordy != ""){templateData.dt.dateWordy = obj.dateWordy;}
     if(obj.era != ""){templateData.dt.era = obj.era;}
     templateData.dt.minutes = obj.minutes;
     templateData.dt.hours = obj.hours;
@@ -316,6 +392,16 @@ class DateTime {
   setDayLength(length) {this.dayLength = length}
   setWeekday(day){this.currentWeekday = day}
 
+  genAbbrev(){
+    let monthNum = 1;
+    for(var i = 0, max=this.months.length; i < max; i++){
+      if(this.months[i].isNumbered){
+        this.months[i].abbrev = monthNum;
+        monthNum += 1;
+      }
+    }
+  }
+
   setTimeDisp(){
     let minDisp = ""
     let sunDisp = ""
@@ -393,13 +479,7 @@ class DateTime {
     this.dateWordy = this.day + dayAppendage + " of " 
       + this.months[this.currentMonth].name + ", " + this.year + " " + this.era;
     
-    let monthNum = "";
-    if(this.months[this.currentMonth].isNumbered){
-      monthNum = this.currentMonth + 1;
-    } else {
-      monthNum = this.months[this.currentMonth].getAbbrev()
-    }
-    this.dateNum = this.day + "/" + monthNum + "/" + this.year + " " + this.era;
+    this.dateNum = this.day + "/" + this.months[this.currentMonth].abbrev + "/" + this.year + " " + this.era;
   }
 
   advanceDay(){
@@ -427,12 +507,12 @@ class DateTime {
   }
 
   advanceMonth(){
-    let lookforward = this.currentMonth+1;
-    if(this.months[lookforward] == null){
+    let lookforward = parseInt(this.currentMonth) + 1;
+    if(lookforward == this.months.length){
       this.currentMonth = 0;
       this.year += 1;
     } else {
-      this.currentMonth += 1;
+      this.currentMonth = parseInt(this.currentMonth) + 1;
     }
   }
 
@@ -456,7 +536,7 @@ $(document).ready(() => {
       default: c.toObject(),
       type: Object,
     });
-    console.log(c.toObject());
+    // console.log(c.toObject());
     c.loadSettings();
   });
 

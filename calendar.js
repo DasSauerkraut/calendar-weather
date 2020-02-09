@@ -108,14 +108,12 @@ class CalendarForm extends FormApplication {
       ev.preventDefault();
       this.data.daysOfTheWeek.push("");
       this.render(true);
-      this.checkBoxes();
     });
     html.find(addMonth).click(ev => {
       ev.preventDefault();
       let newMonth = new Month("", 30, true);
       this.data.months.push(newMonth);
       this.render(true);
-      this.checkBoxes();
     });
     html.find(delWeekday).click(ev => {
       ev.preventDefault();
@@ -123,7 +121,6 @@ class CalendarForm extends FormApplication {
       const index = targetName[targetName.length - 1];
       this.data.daysOfTheWeek.splice(index, 1);
       this.render(true);
-      this.checkBoxes();
     });
     html.find(delMonth).click(ev => {
       ev.preventDefault();
@@ -131,7 +128,6 @@ class CalendarForm extends FormApplication {
       const index = targetName[targetName.length - 1];
       this.data.months.splice(index, 1);
       this.render(true);
-      this.checkBoxes();
     });
   }
   

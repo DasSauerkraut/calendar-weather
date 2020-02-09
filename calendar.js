@@ -304,7 +304,7 @@ class Calendar extends Application {
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
-      if(!this.isOpen){
+      if(!this.isOpen && game.user.isGM){
         templateData.dt.advanceMorning();
         this.updateDisplay();
         this.updateSettings();
@@ -313,7 +313,7 @@ class Calendar extends Application {
     //Quick Action
     html.find(quickAction).click(ev => {
       ev.preventDefault();
-      if(!this.isOpen){
+      if(!this.isOpen && game.user.isGM){
         templateData.dt.quickAction();
         this.updateDisplay();
         this.updateSettings();
@@ -322,7 +322,7 @@ class Calendar extends Application {
     //Long Action
     html.find(longAction).click(ev => {
       ev.preventDefault();
-      if(!this.isOpen){
+      if(!this.isOpen && game.user.isGM){
         templateData.dt.advanceHour();
         this.updateDisplay();
         this.updateSettings();
@@ -331,7 +331,7 @@ class Calendar extends Application {
     //To Midnight
     html.find(nightSkip).click(ev => {
       ev.preventDefault();
-      if(!this.isOpen){
+      if(!this.isOpen && game.user.isGM){
         templateData.dt.advanceNight();
         this.updateDisplay();
         this.updateSettings();
@@ -340,11 +340,16 @@ class Calendar extends Application {
     //Launch Calendar Form
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
-      form.renderForm(JSON.stringify(this.toObject()));
+      if(!this.isOpen && game.user.isGM){
+        form.renderForm(JSON.stringify(this.toObject()));
+      }
+      
     });
     html.find(calendarSetupOverlay).click(ev => {
       ev.preventDefault();
-      form.renderForm(JSON.stringify(this.toObject()));
+      if(!this.isOpen && game.user.isGM){
+        form.renderForm(JSON.stringify(this.toObject()));
+      }
     });
     
   }

@@ -216,6 +216,8 @@ class Calendar extends Application {
     templateData.dt.dayLength = data.default.dayLength;
     templateData.dt.timeDisp = data.default.timeDisp;
     templateData.dt.dateNum = data.default.dateNum;
+    templateData.dt.weather = data.default.weather;
+    console.log(templateData.dt.getWeatherObj())
   }
 
   populateData(){
@@ -289,6 +291,7 @@ class Calendar extends Application {
       dayLength: templateData.dt.dayLength,
       timeDisp : templateData.dt.timeDisp,
       dateNum : templateData.dt.dateNum,
+      weather: templateData.dt.weather
     }
   }
 
@@ -340,14 +343,14 @@ class Calendar extends Application {
     //Launch Calendar Form
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
-      if(!this.isOpen && game.user.isGM){
+      if(game.user.isGM){
         form.renderForm(JSON.stringify(this.toObject()));
       }
       
     });
     html.find(calendarSetupOverlay).click(ev => {
       ev.preventDefault();
-      if(!this.isOpen && game.user.isGM){
+      if(game.user.isGM){
         form.renderForm(JSON.stringify(this.toObject()));
       }
     });
@@ -370,6 +373,112 @@ class Month {
   getAbbrev(){return this.abbrev};
 }
 
+class WeatherTracker {
+  humidity = 0;
+  temp = 0;
+  lastTemp = 70;
+  seasonTemp = 0;
+  seasonHumidity = 0;
+  climateTemp = 0;
+  climateHumidity = 0;
+  precipitation = "";
+
+  rand(min, max){
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  extremeWeather(){
+    let roll = this.rand(1,5);
+    let event = "";
+    switch(roll){
+      case 1:
+        event = "Tornado";
+        break;
+      case 2:
+        event = "Hurricane or large amounts of flooding";
+        break;
+      case 3:
+        event = "Drought";
+        this.humidity = -5;
+        break;
+      case 4:
+        event = "Baseball-sized hail";
+        break;
+      case 5:
+        if(this.temp <= 32){
+          event = "Extreme blizzard"
+        } else {
+          event = "Monsoon-like rainfall"
+        }
+        break;
+    }
+    return event;
+  }
+
+  genPrecip(roll){
+    if(roll < 1){
+      roll = this.rand(1, 6);
+    }
+    if(roll <= 3){
+      return "Clear sky today.";
+    } else if (roll <= 6){
+      this.humidity += 1;
+      return "Scattered clouds, but mostly clear today."
+    } else if (roll == 7){
+      if(this.temp < 25){
+        return "Completely overcast with some snow flurries possible.";
+      } else if(this.temp < 32){
+        return "Completely overcast with light freezing rain possible.";
+      } else {
+        return "Completely overcast; light drizzles possible.";
+      }
+    } else if (roll == 8){
+      this.humidity -= 1;
+      if(this.temp < 25){
+        return "A light to moderate amount of snow today.";
+      } else if(this.temp < 32){
+        return "Light to moderate freezing rain today.";
+      } else {
+        return "Light to moderate rain today.";
+      }
+    } else if (roll == 9){
+      this.humidity -= 2;
+      if(this.temp < 25){
+        return "Large amount of snowfall today.";
+      } else if(this.temp < 32){
+        return "Large amount of freezing rain today.";
+      } else {
+        return "Heavy Rain today.";
+      }
+    } else if (roll >= 10){
+      if(this.rand(1,20) == 20){
+        return this.extremeWeather();
+      } else {
+        this.humidity -= 2;
+        if(this.temp < 25){
+          return "Blizzard today.";
+        } else if(this.temp < 32){
+          return "Icestorm today.";
+        } else {
+          return "Torrential rains today.";
+        }
+      }
+    }
+  }
+  
+  generate(){
+    let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
+    if(this.rand(1,5) >= 5){
+      this.temp = this.rand(20,60) + this.seasonTemp + this.climateTemp;
+      this.lastTemp = this.temp;
+    } else {
+      this.temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
+      this.lastTemp = this.temp;
+    }
+    this.precipitation = this.genPrecip(roll);
+  }
+}
+
 class DateTime {
   months = [];
   daysOfTheWeek = [];
@@ -385,6 +494,7 @@ class DateTime {
   dayLength = 0;
   timeDisp = "";
   dateNum = "";
+  weather = new WeatherTracker();
 
   addMonth(month){this.months.push(month)};
   addWeekday(day){this.daysOfTheWeek.push(day)};
@@ -392,6 +502,19 @@ class DateTime {
   setEra(era){this.era = era}
   setDayLength(length) {this.dayLength = length}
   setWeekday(day){this.currentWeekday = day}
+
+  getWeatherObj(){
+    return {
+      temp: this.weather.temp,
+      humidity: this.weather.humidity,
+      lastTemp: this.weather.lastTemp,
+      seasonTemp: this.weather.seasonTemp,
+      seasonHumidity: this.weather.seasonHumidity,
+      climateTemp: this.weather.climateTemp,
+      climateHumidity: this.weather.climateHumidity,
+      precipitation: this.weather.precipitation
+    }
+  }
 
   genAbbrev(){
     let monthNum = 1;
@@ -504,6 +627,8 @@ class DateTime {
         this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
       }
     }
+    this.weather.generate();
+    console.log(this.weather.temp + " " + this.weather.precipitation);
     this.genDateWordy()
   }
 

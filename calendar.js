@@ -188,6 +188,10 @@ class CalendarForm extends FormApplication {
 
 class Calendar extends Application {
   isOpen = false;
+  clockIsRunning = true;
+  weather = new WeatherTracker();
+  lastUpdate = ["", ""];
+
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -249,7 +253,7 @@ class Calendar extends Application {
     } else {
       dayAppendage = "th";
     }
-    return day + dayAppendage + " of " + month + ", " + year;
+    return day + dayAppendage + " of " + month + ", " + parseInt(year);
   }
 
   getWeekday(){
@@ -273,6 +277,12 @@ class Calendar extends Application {
     document.getElementById("calendar-date-num").innerHTML = game.Gametime.DTNow().shortDate().date;
     document.getElementById("calendar-weekday").innerHTML = this.getWeekday();
     document.getElementById("calendar-time").innerHTML = this.getAMPMTime();
+    let split = game.Gametime.DTNow().longDate().date.split(" ");
+    if(this.lastUpdate[0] != split[1] || this.lastUpdate[1] != split[2]){
+      this.weather.generate();
+    }
+    this.lastUpdate[0] = split[1];
+    this.lastUpdate[1] = split[2];
   }
 
   toObject(){
@@ -431,7 +441,44 @@ class Calendar extends Application {
       ev.preventDefault();
       if(game.user.isGM){
         this.updateDisplay();
+        const  GregorianCalendar = {
+          // month lengths in days - first number is non-leap year, second is leapy year
+          "month_len": {
+              "January": [31,31],
+              "February": [28, 29],
+              "March": [31,31],
+              "April": [30,30],
+              "May": [31,31],
+              "June": [30,30],
+              "July": [31,31],
+              "August": [31,31],
+              "September": [30,30],
+              "October": [31,31],
+              "November": [30,30],
+              "December": [31,31],
+          },
+          // a function to return the number of leap years from 0 to the specified year. 
+          "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
+          // names of the days of the week. It is assumed weeklengths don't change
+          "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          // year when the clock starts and time is recorded as seconds from this 1/1/clock_start_year 00:00:00. If is set to 1970 as a unix joke. you can set it to 0.
+          "clock_start_year": 1970,
+          // day of the week of 0/0/0 00:00:00
+          "first_day": 6,
+          "notes": {},
+          "hours_per_day": 24,
+          "seconds_per_minute": 60,
+          "minutes_per_hour": 60,
+          // Is there a year 0 in the calendar? Gregorian goes from -1BC to 1CE with no 0 in between.
+          "has_year_0": false
+        }
+        let newDTC = new game.Gametime.DTC();
+        console.log(newDTC);
+        // console.log(newDTC.daysInYear();
+        newDTC._createFromData();
+
       }
+
       
     });
     html.find(calendarSetupOverlay).click(ev => {
@@ -596,7 +643,6 @@ class WeatherTracker {
   }
   
   generate(){
-    this.setClimate("volcanic")
     let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
     if(this.rand(1,5) >= 5){
       this.temp = this.rand(20,60) + this.seasonTemp + this.climateTemp;
@@ -606,15 +652,14 @@ class WeatherTracker {
       this.lastTemp = this.temp;
     }
     this.precipitation = this.genPrecip(roll);
+    console.log(this.temp + " " + this.precipitation);
   }
 }
 
 $(document).ready(() => {
   const templatePath = "modules/calendar-weather/templates/calendar.html";
 
-  templateData = {
-    clockIsRunning: true,
-  }
+  templateData = {};
 
   const  GregorianCalendar = {
     // month lengths in days - first number is non-leap year, second is leapy year

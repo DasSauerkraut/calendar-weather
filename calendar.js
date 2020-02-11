@@ -200,42 +200,6 @@ class Calendar extends Application {
     return templateData;
   }
 
-  loadSettings(){
-    let data = game.settings.get('calendar-weather', 'dateTime');
-    templateData.dt.months = data.default.months;
-    templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
-    templateData.dt.year = data.default.year;
-    templateData.dt.day = data.default.day;
-    templateData.dt.numDayOfTheWeek = data.default.numDayOfTheWeek;
-    templateData.dt.currentMonth = data.default.currentMonth;
-    templateData.dt.currentWeekday = data.default.currentWeekday;
-    templateData.dt.dateWordy = data.default.dateWordy;
-    templateData.dt.era = data.default.era;
-    templateData.dt.minutes = data.default.minutes;
-    templateData.dt.hours = data.default.hours;
-    templateData.dt.dayLength = data.default.dayLength;
-    templateData.dt.timeDisp = data.default.timeDisp;
-    templateData.dt.dateNum = data.default.dateNum;
-    templateData.dt.weather = data.default.weather;
-    console.log(templateData.dt.getWeatherObj())
-  }
-
-  populateData(){
-      let newMonth1 = new Month("Month 1", 30, true);
-      templateData.dt.addMonth(newMonth1);
-      templateData.dt.addWeekday("Monday");
-      templateData.dt.addWeekday("Tuesday");
-      templateData.dt.addWeekday("Wednesday");
-      templateData.dt.addWeekday("Thursday");
-      templateData.dt.setYear(2020);
-      templateData.dt.setEra("AD");
-      templateData.dt.setWeekday("Monday")
-      templateData.dt.setTimeDisp();
-      templateData.dt.setDayLength(24);
-      templateData.dt.genDateWordy();
-      templateData.dt.weather.generate();
-  }
-
   settingsOpen(isOpen){
     this.isOpen = isOpen;
   }
@@ -269,11 +233,15 @@ class Calendar extends Application {
     });
   }
 
+  getFancyDate(){
+
+  }
+
   updateDisplay(){
-    document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
-    document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
-    document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
-    document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
+    document.getElementById("calendar-date").innerHTML = game.Gametime.DTNow().longDate().date;
+    document.getElementById("calendar-date-num").innerHTML = game.Gametime.DTNow().shortDate().date;
+    // document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
+    document.getElementById("calendar-time").innerHTML = game.Gametime.getTimeString();
   }
 
   toObject(){
@@ -304,14 +272,16 @@ class Calendar extends Application {
     const longAction = '#calendar-btn-long';
     const nightSkip = '#calendar-btn-night';
     this.updateDisplay()
-    let form = new CalendarForm(JSON.stringify(this.toObject()));
+    // let form = new CalendarForm(JSON.stringify(this.toObject()));
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
-        templateData.dt.advanceMorning();
-        this.updateDisplay();
-        this.updateSettings();
+        // templateData.dt.advanceMorning();
+        console.log("calendar-weather | To morning.");
+        game.Gametime.advanceTime({days: 1, hours: 0, minutes: 0, seconds: 0})
+        // this.updateDisplay();
+        // this.updateSettings();
       }
     });
     //Quick Action
@@ -320,7 +290,7 @@ class Calendar extends Application {
       if(!this.isOpen && game.user.isGM){
         templateData.dt.quickAction();
         this.updateDisplay();
-        this.updateSettings();
+        // this.updateSettings();
       }
     });
     //Long Action
@@ -329,7 +299,7 @@ class Calendar extends Application {
       if(!this.isOpen && game.user.isGM){
         templateData.dt.advanceHour();
         this.updateDisplay();
-        this.updateSettings();
+        // this.updateSettings();
       }
     });
     //To Midnight
@@ -338,40 +308,25 @@ class Calendar extends Application {
       if(!this.isOpen && game.user.isGM){
         templateData.dt.advanceNight();
         this.updateDisplay();
-        this.updateSettings();
+        // this.updateSettings();
       }
     });
     //Launch Calendar Form
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
       if(game.user.isGM){
-        form.renderForm(JSON.stringify(this.toObject()));
+        // form.renderForm(JSON.stringify(this.toObject()));
       }
       
     });
     html.find(calendarSetupOverlay).click(ev => {
       ev.preventDefault();
       if(game.user.isGM){
-        form.renderForm(JSON.stringify(this.toObject()));
+        // form.renderForm(JSON.stringify(this.toObject()));
       }
     });
     
   }
-}
-class Month {
-  name = "";
-  length = 0;
-  isNumbered = true;
-  abbrev = "";
-  constructor(name = "", length = 0, isNumbered = true, abbrev = ""){
-    this.name = name;
-    this.length = length;
-    this.isNumbered = isNumbered;
-    this.abbrev = abbrev;
-  }
-
-  setAbbrev(abbrev){this.abbrev = abbrev};
-  getAbbrev(){return this.abbrev};
 }
 
 class WeatherTracker {
@@ -538,190 +493,47 @@ class WeatherTracker {
   }
 }
 
-class DateTime {
-  months = [];
-  daysOfTheWeek = [];
-  year = 0;
-  day = 0;
-  numDayOfTheWeek = 0;
-  currentMonth = 0;
-  currentWeekday = "";
-  dateWordy ="";
-  era = "";
-  minutes = 0;
-  hours = 0;
-  dayLength = 0;
-  timeDisp = "";
-  dateNum = "";
-  weather = new WeatherTracker();
-
-  addMonth(month){this.months.push(month)};
-  addWeekday(day){this.daysOfTheWeek.push(day)};
-  setYear(year){this.year = year}
-  setEra(era){this.era = era}
-  setDayLength(length) {this.dayLength = length}
-  setWeekday(day){this.currentWeekday = day}
-
-  getWeatherObj(){
-    return {
-      temp: this.weather.temp,
-      humidity: this.weather.humidity,
-      lastTemp: this.weather.lastTemp,
-      seasonTemp: this.weather.seasonTemp,
-      seasonHumidity: this.weather.seasonHumidity,
-      climateTemp: this.weather.climateTemp,
-      climateHumidity: this.weather.climateHumidity,
-      precipitation: this.weather.precipitation
-    }
-  }
-
-  genAbbrev(){
-    let monthNum = 1;
-    for(var i = 0, max=this.months.length; i < max; i++){
-      if(this.months[i].isNumbered){
-        this.months[i].abbrev = monthNum;
-        monthNum += 1;
-      }
-    }
-  }
-
-  setTimeDisp(){
-    let minDisp = ""
-    let sunDisp = ""
-    if(6 <= this.hours && this.hours <= 11){
-      sunDisp = "Morning";
-    } else if(this.hours == 12){
-      sunDisp = "Noon";
-    } else if (13 <= this.hours && this.hours <= 16){
-      sunDisp = "Afternoon";
-    } else if (17 <= this.hours && this.hours <= 21){
-      sunDisp = "Evening";
-    } else if (22 <= this.hours && this.hours <= 24){
-      sunDisp = "Night";
-    } else if (this.hours == 0){
-      sunDisp = "Midnight";
-    } else if (1 <= this.hours && this.hours <= 3){
-      sunDisp = "Night";
-    } else if (4 <= this.hours && this.hours <= 5){
-      sunDisp = "Early Morning";
-    }
-
-    if(this.minutes == 0){
-      minDisp = "00";
-    } else {
-      minDisp = this.minutes * 15;
-    }
-    this.timeDisp = this.hours + ":" + minDisp + ", " + sunDisp;
-  }
-
-  quickAction(){
-    if(this.minutes == 3){
-      this.advanceHour()
-      this.minutes = 0;
-    } else {
-      this.minutes += 1;
-    }
-    this.setTimeDisp();
-  }
-
-  advanceHour(){
-    if(this.hours == this.dayLength - 1){
-      this.advanceDay();
-      this.hours = 0;
-    } else {
-      this.hours += 1;
-    }
-    this.setTimeDisp();
-  }
-
-  advanceNight(){
-    this.advanceDay();
-    this.hours = 0;
-    this.minutes = 0;
-    this.setTimeDisp();
-  }
-
-  advanceMorning(){
-    this.advanceDay();
-    this.hours = 7;
-    this.minutes = 0;
-    this.setTimeDisp();
-  }
-
-  genDateWordy(){
-    let dayAppendage = "";
-    if(this.day % 10 == 1 && this.day != 11){
-      dayAppendage = "st";
-    } else if (this.day % 10 == 2) {
-      dayAppendage = "nd";
-    } else if (this.day % 10 == 3) {
-      dayAppendage = "rd";
-    } else {
-      dayAppendage = "th";
-    }
-    this.dateWordy = this.day + dayAppendage + " of " 
-      + this.months[this.currentMonth].name + ", " + this.year + " " + this.era;
-    
-    this.dateNum = this.day + "/" + this.months[this.currentMonth].abbrev + "/" + this.year + " " + this.era;
-  }
-
-  advanceDay(){
-    if (this.day == this.months[this.currentMonth].length){
-      this.day = 1;
-      this.advanceMonth();
-      if(this.daysOfTheWeek[this.numDayOfTheWeek+1] == null){
-        this.numDayOfTheWeek = 0;
-        this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
-      } else {
-        this.numDayOfTheWeek += 1;
-        this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
-      }
-    } else {
-      this.day += 1;
-      if(this.daysOfTheWeek[this.numDayOfTheWeek+1] == null){
-        this.numDayOfTheWeek = 0;
-        this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
-      } else {
-        this.numDayOfTheWeek += 1;
-        this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
-      }
-    }
-    this.weather.generate();
-    console.log(this.weather.temp + " " + this.weather.precipitation);
-    this.genDateWordy()
-  }
-
-  advanceMonth(){
-    let lookforward = parseInt(this.currentMonth) + 1;
-    if(lookforward == this.months.length){
-      this.currentMonth = 0;
-      this.year += 1;
-    } else {
-      this.currentMonth = parseInt(this.currentMonth) + 1;
-    }
-  }
-
-}
-
 $(document).ready(() => {
   const templatePath = "modules/calendar-weather/templates/calendar.html";
 
-  templateData = {
-    dt: new DateTime()
+  templateData = {}
+
+  const  GregorianCalendar = {
+    // month lengths in days - first number is non-leap year, second is leapy year
+    "month_len": {
+        "January": [31,31],
+        "February": [28, 29],
+        "March": [31,31],
+        "April": [30,30],
+        "May": [31,31],
+        "June": [30,30],
+        "July": [31,31],
+        "August": [31,31],
+        "September": [30,30],
+        "October": [31,31],
+        "November": [30,30],
+        "December": [31,31],
+    },
+    // a function to return the number of leap years from 0 to the specified year. 
+    "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
+    // names of the days of the week. It is assumed weeklengths don't change
+    "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    // year when the clock starts and time is recorded as seconds from this 1/1/clock_start_year 00:00:00. If is set to 1970 as a unix joke. you can set it to 0.
+    "clock_start_year": 2000,
+    // day of the week of 0/0/0 00:00:00
+    "first_day": 6,
+    "notes": {},
+    "hours_per_day": 24,
+    "seconds_per_minute": 60,
+    "minutes_per_hour": 60,
+    // Is there a year 0 in the calendar? Gregorian goes from -1BC to 1CE with no 0 in between.
+    "has_year_0": false
   }
 
   let c = new Calendar();
   // Init settings so they can be wrote to later
   Hooks.on('init', ()=> {
-    c.populateData();
-    game.settings.register('calendar-weather', 'dateTime', {
-      name: "Date/Time Data",
-      scope: 'world',
-      config: false,
-      default: c.toObject(),
-      type: Object,
-    });
-    c.loadSettings();
+    // game.Gametime.DTC()._createFromData(GregorianCalendar);
   });
 
   Hooks.on('calendarSettingsOpen', ()=> {
@@ -733,7 +545,7 @@ $(document).ready(() => {
     console.log("Hook fired! Calendar Settings is closed.");
     c.rebuild(JSON.parse(updatedData));
     c.updateDisplay();
-    c.updateSettings();
+    // c.updateSettings();
     c.settingsOpen(false);
   });
 
@@ -746,5 +558,14 @@ $(document).ready(() => {
     renderTemplate(templatePath, templateData).then(html => {
       c.render(true);
     });
-  });  
+    CONFIG.debug.hooks = true;
+    game.Gametime.startRunning();
+    console.log("AYYYYYYYYYYYYYYYYYYYYYYY");
+    console.log(game.Gametime.getTimeString());
+    game.Gametime.advanceTime({days: 1, hours: 0, minutes: 0, seconds: 0})
+    console.log(game.Gametime.DTNow().longDate());
+  });
+  Hooks.on("clockUpdate", ()=>{
+    c.updateDisplay();
+  })
 });

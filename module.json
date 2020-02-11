@@ -1,10 +1,10 @@
 {
   "name": "calendar-weather",
   "title": "Calendar/Weather",
-  "description": "Adds a customizable calendar with events and weather.",
+  "description": "Adds a customizable calendar with events and weather. Requires about-time by tposney.",
   "version": "0.1",
   "minimumCoreVersion": "0.4.5",
-  "author": "Michael Sebelski [DasSauerkraut#3215]",
+  "author": "Michael Sebelski [DasSauerkraut#3215], tposney#1462",
   "url": "n/a",
   "manifest": "n/a",
   "download": "n/a",

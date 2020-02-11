@@ -39,6 +39,7 @@
 		color: #CCC;
 		cursor: pointer;
 	}
+
 	#calendar-date,
 	#calendar-date-num {
 		transition: 0.2s;
@@ -94,51 +95,114 @@
 		padding-top: 3px;
 		padding-bottom: 20px;
 	}
+	.calendar-btn-container-left{
+		width: 20%;
+		display: grid;
+		float: left;
+		margin: 2px;
+		grid-row-gap: 3px;
+	}
+	.calendar-btn-container-right{
+		width: 20%;
+		display: grid;
+		float: right;
+		margin: 2px;
+		grid-row-gap: 3px;
+	}
 	.fa-angle-right{
-		float: left; 
-		width: 10%;
+		grid-row: 1;
+		grid-column: 1;
+		margin: auto;
+		color: rgba(0, 0, 0, 0.5);
+		cursor: not-allowed;
+	}
+
+	.fa-angle-double-right{
+		grid-row: 1;
+		grid-column: 2;
+		margin: auto;
+		color: rgba(0, 0, 0, 0.5);
+		cursor: not-allowed;
+	}
+	.fa-play{
+		grid-row: 2;
+		grid-column: 1;
+		margin-left: 10px;
+	}
+
+	.fa-step-forward{
+		grid-row: 2;
+		grid-column: 2;
+		margin-left: 10px;
+	}
+
+	.fa-moon{
+		grid-row: 1;
+		grid-column: 1;
 		height: fit-content;
 		text-align: center; 
 		vertical-align: center;
 	}
 
-	.fa-angle-double-right{
-		float: left; 
-		width: 10%;
+	.fa-sun{
+		grid-row: 1;
+		grid-column: 2;
+		height: fit-content;
+		text-align: center; 
+		vertical-align: center;
+	}
+
+	.fa-forward{
+		grid-row: 2;
+		grid-column: 1;
 		height: fit-content;
 		text-align: center; 
 		vertical-align: center;
 	}
 
 	.fa-fast-forward{
-		float: right; 
-		width: 10%;
-		height: fit-content;
-		text-align: center; 
-		vertical-align: center;
-	}
-
-	.fa-moon{
-		float: right; 
-		width: 10%;
+		grid-row: 2;
+		grid-column: 2;
 		height: fit-content;
 		text-align: center; 
 		vertical-align: center;
 	}
 
 	.fa-angle-right:hover {
+		border: 0px solid #000;
+		cursor: not-allowed;
+	}
+
+	.fa-angle-double-right:hover {
+		border: 0px solid #000;
+		cursor: not-allowed;
+	}
+
+	.fa-play:hover {
 		color: #FFF;
 		border: 0px solid #000;
 		cursor: pointer;
 	}
 
-	.fa-angle-double-right:hover {
+	.fa-step-forward:hover {
+		color: #FFF;
+		border: 0px solid #000;
+		cursor: pointer;
+	}
+
+	.fa-forward:hover {
 		color: #FFF;
 		border: 0px solid #000;
 		cursor: pointer;
 	}
 
 	.fa-fast-forward:hover {
+		color: #FFF;
+		border: 0px solid #000;
+		cursor: pointer;
+	}
+
+	.fa-sun:hover {
 		color: #FFF;
 		border: 0px solid #000;
 		cursor: pointer;
@@ -172,18 +236,8 @@
 		padding-top: 1px;
 		text-align: center; 
 		margin: auto;
+		cursor: pointer;
 	}
-	
-	/* .calendar-weather{
-		width: 200px;
-		height: 200px;
-		grid-row: 1;
-		grid-column: 2;
-		background-color: navy;
-		position: relative;
-		left: 200px
-	} */
-
 </style>
 <div id="calendar-weather-container">
 	<div id="calendar">
@@ -193,15 +247,23 @@
 			<i id=calendar-weather class="fas fa-cloud-sun" title="Weather - Under Construction"></i>
 		</h3>
 		<div class="calendar-container">
-			<i id="calendar-btn-quick" class="fas fa-angle-right" title="Advance 15 minutes" ></i>
-			<i id="calendar-btn-long" class="fas fa-angle-double-right" title="Advance 1 hour" ></i>
+			<div class="calendar-btn-container-left">
+				<i id="calendar-btn-sec" class="fas fa-angle-right" title="Advance 1 second" disabled></i>
+				<i id="calendar-btn-halfMin" class="fas fa-angle-double-right" title="Advance 30 seconds" disabled></i>
+				<i id="calendar-btn-min" class="fas fa-play" title="Advance 1 minute"></i>
+				<i id="calendar-btn-fiveMin" class="fas fa-step-forward" title="Advance 5 minutes"></i>
+			</div>
 			<div class="calendar-weekday-time">
 				<p id="calendar-weekday">Day of the Week</p>
-				<p id="calendar-time">Time</p>
+				<p id="calendar-time" title="Stop/start psuedo real time clock.">Time</p>
 			</div>
-			<i id="calendar-btn-day" class="fas fa-fast-forward" title="Advance to 7am the next day"></i>
-			<i id="calendar-btn-night" class="fas fa-moon" title="Advance to midnight"></i>
-		 </div>
+			<div class="calendar-btn-container-right">
+				<i id="calendar-btn-quick" class="fas fa-forward" title="Advance 15 minutes" ></i>
+				<i id="calendar-btn-long" class="fas fa-fast-forward" title="Advance 1 hour" ></i>
+				<i id="calendar-btn-day" class="fas fa-sun" title="Advance to 7am the next day"></i>
+				<i id="calendar-btn-night" class="fas fa-moon" title="Advance to midnight"></i>
+			</div>
+		</div>
 	</div>
 	<div class="calendar-weather">
 		

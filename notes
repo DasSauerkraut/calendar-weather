@@ -3,3 +3,6 @@ game.Gametime.DTNow().longDate() returns object with "date" being a wordy repres
     being HH:MM:SS
 game.Gametime.DTNow().shortDate() returns object with "date" being YYYY/MM/DD, and "time" 
     being HH:MM:SS
+
+Realtime MP - How fast time goes in game 1 = real time.
+Realtime interval - how often it updates the ingame clock.

@@ -233,15 +233,46 @@ class Calendar extends Application {
     });
   }
 
-  getFancyDate(){
+  getFormattedDate(){
+    let date = game.Gametime.DTNow().longDate().date.split(" ");
+    let month = date[1];
+    let day = date[2];
+    let year = date[3];
+    let dayAppendage = "";
+    day = parseInt(day);
+    if(day % 10 == 1 && day != 11){
+      dayAppendage = "st";
+    } else if (day % 10 == 2) {
+      dayAppendage = "nd";
+    } else if (day % 10 == 3) {
+      dayAppendage = "rd";
+    } else {
+      dayAppendage = "th";
+    }
+    return day + dayAppendage + " of " + month + ", " + year;
+  }
 
+  getWeekday(){
+    let date = game.Gametime.DTNow().longDate().date.split(" ")
+    return date[0];
+  }
+
+  getAMPMTime(){
+    let longTime = game.Gametime.DTNow().shortDate().time;
+    longTime = longTime.split(":");
+    let hours = longTime[0];
+    let minutes = longTime[1];
+    let sec = longTime[2];
+    let AmOrPm = hours >= 12 ? 'PM' : 'AM';
+    hours = (hours % 12) || 12;
+    return hours + ":" + minutes + ":" + sec + " " + AmOrPm;
   }
 
   updateDisplay(){
-    document.getElementById("calendar-date").innerHTML = game.Gametime.DTNow().longDate().date;
+    document.getElementById("calendar-date").innerHTML = this.getFormattedDate();
     document.getElementById("calendar-date-num").innerHTML = game.Gametime.DTNow().shortDate().date;
-    // document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
-    document.getElementById("calendar-time").innerHTML = game.Gametime.getTimeString();
+    document.getElementById("calendar-weekday").innerHTML = this.getWeekday();
+    document.getElementById("calendar-time").innerHTML = this.getAMPMTime();
   }
 
   toObject(){
@@ -267,55 +298,139 @@ class Calendar extends Application {
   activateListeners(html){
     const nextDay = '#calendar-btn-day';
     const quickAction = '#calendar-btn-quick';
+    const oneSec = '#calendar-btn-sec';
+    const halfMin = '#calendar-btn-halfMin';
+    const min = '#calendar-btn-min';
+    const fiveMin = '#calendar-btn-fiveMin';
     const calendarSetup = '#calendar-date';
     const calendarSetupOverlay = '#calendar-date-num'
     const longAction = '#calendar-btn-long';
     const nightSkip = '#calendar-btn-night';
+    const toggleClock = '#calendar-time';
+    this.clockIsRunning = true;
+    
     this.updateDisplay()
-    // let form = new CalendarForm(JSON.stringify(this.toObject()));
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
-        // templateData.dt.advanceMorning();
         console.log("calendar-weather | To morning.");
-        game.Gametime.advanceTime({days: 1, hours: 0, minutes: 0, seconds: 0})
-        // this.updateDisplay();
-        // this.updateSettings();
+        game.Gametime.advanceTime({days: 1})
       }
     });
     //Quick Action
     html.find(quickAction).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
-        templateData.dt.quickAction();
-        this.updateDisplay();
-        // this.updateSettings();
+        console.log("calendar-weather | Advancing 15 min.");
+        game.Gametime.advanceTime({minutes: 15})
+      }
+    });
+    //1 sec advance
+    html.find(oneSec).click(ev => {
+      ev.preventDefault();
+      if(!this.isOpen && game.user.isGM && !this.clockIsRunning){
+        console.log("calendar-weather | Advancing 1 sec.");
+        game.Gametime.advanceClock(1)
+      }
+    });
+    //advance 30s
+    html.find(halfMin).click(ev => {
+      ev.preventDefault();
+      if(!this.isOpen && game.user.isGM && !this.clockIsRunning){
+        console.log("calendar-weather | Advancing 30 sec");
+        game.Gametime.advanceClock(30)
+      }
+    });
+    //advance 1 min
+    html.find(min).click(ev => {
+      ev.preventDefault();
+      if(!this.isOpen && game.user.isGM){
+        console.log("calendar-weather | Advancing 1 min.");
+        game.Gametime.advanceTime({minutes: 1})
+      }
+    });
+    //advance 5 min
+    html.find(fiveMin).click(ev => {
+      ev.preventDefault();
+      if(!this.isOpen && game.user.isGM){
+        console.log("calendar-weather | Advancing 5 min.");
+        game.Gametime.advanceTime({minutes: 5})
       }
     });
     //Long Action
     html.find(longAction).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
-        templateData.dt.advanceHour();
-        this.updateDisplay();
-        // this.updateSettings();
+        console.log("calendar-weather | Advancing 1 hr.");
+        game.Gametime.advanceTime({hours: 1})
       }
     });
     //To Midnight
     html.find(nightSkip).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
-        templateData.dt.advanceNight();
-        this.updateDisplay();
-        // this.updateSettings();
+        console.log("calendar-weather | Advancing to midnight.");
+        game.Gametime.advanceTime({days: 1})
+      }
+    });
+    //toggles real time clock on off, disabling granular controls
+    html.find(toggleClock).click(ev => {
+      ev.preventDefault();
+      if(!this.isOpen && game.user.isGM){
+        if(this.clockIsRunning){
+          console.log("calendar-weather | Stopping about-time pseudo clock.");
+          this.clockIsRunning = false;
+          game.Gametime.stopRunning();
+          document.getElementById('calendar-btn-sec').disabled = false;
+          document.getElementById('calendar-btn-halfMin').disabled = false;
+          document.getElementById('calendar-btn-sec').style.cursor = 'pointer';
+          document.getElementById('calendar-btn-halfMin').style.cursor = 'pointer';
+          document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
+          document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
+        } else {
+          console.log("calendar-weather | Starting about-time pseudo clock.");
+          this.clockIsRunning = true;
+          game.Gametime.startRunning();
+          document.getElementById('calendar-btn-sec').disabled = true;
+          document.getElementById('calendar-btn-halfMin').disabled = true;
+          document.getElementById('calendar-btn-sec').style.cursor = 'not-allowed';
+          document.getElementById('calendar-btn-halfMin').style.cursor = 'not-allowed';
+          document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
+          document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
+        }
+      }
+    });
+    //handles hover events because can't access css hover property
+    html.find(oneSec).mouseover(ev => {
+      ev.preventDefault();
+      if(!this.clockIsRunning){
+        document.getElementById('calendar-btn-sec').style.color = "#FFF"
+      }
+    });
+    html.find(oneSec).mouseleave(ev => {
+      ev.preventDefault();
+      if(!this.clockIsRunning){
+        document.getElementById('calendar-btn-sec').style.color = "#000"
+      }
+    });
+    html.find(halfMin).mouseover(ev => {
+      ev.preventDefault();
+      if(!this.clockIsRunning){
+        document.getElementById('calendar-btn-halfMin').style.color = "#FFF"
+      }
+    });
+    html.find(halfMin).mouseleave(ev => {
+      ev.preventDefault();
+      if(!this.clockIsRunning){
+        document.getElementById('calendar-btn-halfMin').style.color = "#000"
       }
     });
     //Launch Calendar Form
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
       if(game.user.isGM){
-        // form.renderForm(JSON.stringify(this.toObject()));
+        this.updateDisplay();
       }
       
     });
@@ -323,6 +438,7 @@ class Calendar extends Application {
       ev.preventDefault();
       if(game.user.isGM){
         // form.renderForm(JSON.stringify(this.toObject()));
+        this.updateDisplay();
       }
     });
     
@@ -496,7 +612,9 @@ class WeatherTracker {
 $(document).ready(() => {
   const templatePath = "modules/calendar-weather/templates/calendar.html";
 
-  templateData = {}
+  templateData = {
+    clockIsRunning: true,
+  }
 
   const  GregorianCalendar = {
     // month lengths in days - first number is non-leap year, second is leapy year
@@ -545,7 +663,6 @@ $(document).ready(() => {
     console.log("Hook fired! Calendar Settings is closed.");
     c.rebuild(JSON.parse(updatedData));
     c.updateDisplay();
-    // c.updateSettings();
     c.settingsOpen(false);
   });
 
@@ -558,14 +675,9 @@ $(document).ready(() => {
     renderTemplate(templatePath, templateData).then(html => {
       c.render(true);
     });
-    CONFIG.debug.hooks = true;
     game.Gametime.startRunning();
-    console.log("AYYYYYYYYYYYYYYYYYYYYYYY");
-    console.log(game.Gametime.getTimeString());
-    game.Gametime.advanceTime({days: 1, hours: 0, minutes: 0, seconds: 0})
-    console.log(game.Gametime.DTNow().longDate());
   });
-  Hooks.on("clockUpdate", ()=>{
+  Hooks.on("pseudoclockSet", ()=>{
     c.updateDisplay();
   })
 });

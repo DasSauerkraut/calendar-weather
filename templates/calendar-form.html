@@ -140,10 +140,13 @@
         grid-row: 1;
     }
 
+    .calendar-form-container{
+        background: #c9c7b8;
+    }
     
     
 </style>
-<form autocomplete="off" onsubmit="event.preventDefault();">
+<form autocomplete="off" onsubmit="event.preventDefault();" class="calendar-form-container">
     <h1>Calendar Settings</h1>
     <div id="calendar-form-year">
         <label>Current Day: </label><input value="{{day}}" type="number" min="1" placeholder="14" id="calendar-form-cDay-input">

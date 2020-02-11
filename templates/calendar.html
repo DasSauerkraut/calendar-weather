@@ -1,9 +1,14 @@
 <style>
+	#calendar-weather-container{
+		position: fixed;
+		bottom: 75px;
+		left: 223px;
+		display: grid;
+	}
 	#calendar{
-	position: fixed;
-	bottom: 75px;
-	left: 223px;
 	min-width: 150px;
+	grid-row: 1;
+	grid-column: 1;
 	width: fit-content;
 	height: fit-content;
 	margin: 0;
@@ -169,22 +174,36 @@
 		margin: auto;
 	}
 	
+	/* .calendar-weather{
+		width: 200px;
+		height: 200px;
+		grid-row: 1;
+		grid-column: 2;
+		background-color: navy;
+		position: relative;
+		left: 200px
+	} */
 
 </style>
-<div id="calendar">
-	<h3 id="calendar-hdr">
-		<i id=calendar-events class="far fa-calendar-alt" title="Events - Under Construction"></i>
-		<span id="calendar-date" title="Edit Calendar">Date</span><span title="Edit Calendar" id="calendar-date-num">DateNum</span>
-		<i id=calendar-weather class="fas fa-cloud-sun" title="Weather - Under Construction"></i>
-	</h3>
-	<div class="calendar-container">
-		<i id="calendar-btn-quick" class="fas fa-angle-right" title="Advance 15 minutes" ></i>
-		<i id="calendar-btn-long" class="fas fa-angle-double-right" title="Advance 1 hour" ></i>
-		<div class="calendar-weekday-time">
-			<p id="calendar-weekday">Day of the Week</p>
-			<p id="calendar-time">Time</p>
-		</div>
-		<i id="calendar-btn-day" class="fas fa-fast-forward" title="Advance to 7am the next day"></i>
-		<i id="calendar-btn-night" class="fas fa-moon" title="Advance to midnight"></i>
-	 </div>
+<div id="calendar-weather-container">
+	<div id="calendar">
+		<h3 id="calendar-hdr">
+			<i id=calendar-events class="far fa-calendar-alt" title="Events - Under Construction"></i>
+			<span id="calendar-date" title="Edit Calendar">Date</span><span title="Edit Calendar" id="calendar-date-num">DateNum</span>
+			<i id=calendar-weather class="fas fa-cloud-sun" title="Weather - Under Construction"></i>
+		</h3>
+		<div class="calendar-container">
+			<i id="calendar-btn-quick" class="fas fa-angle-right" title="Advance 15 minutes" ></i>
+			<i id="calendar-btn-long" class="fas fa-angle-double-right" title="Advance 1 hour" ></i>
+			<div class="calendar-weekday-time">
+				<p id="calendar-weekday">Day of the Week</p>
+				<p id="calendar-time">Time</p>
+			</div>
+			<i id="calendar-btn-day" class="fas fa-fast-forward" title="Advance to 7am the next day"></i>
+			<i id="calendar-btn-night" class="fas fa-moon" title="Advance to midnight"></i>
+		 </div>
+	</div>
+	<div class="calendar-weather">
+		
+	</div>
 </div>

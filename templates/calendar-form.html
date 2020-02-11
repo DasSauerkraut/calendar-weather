@@ -4,16 +4,28 @@
     }
     #calendar-form-year-input{
         width: 15%;
+        border: 1px solid grey;
+        border-radius: 10%;
     }
     #calendar-form-era-input,
     #calendar-form-cMonth-input,
     #calendar-form-cDay-input{
+        background-color: white;
+        border: 1px solid grey;
+        border-radius: 10%;
         width: 7%;
     }
     #calendar-form-hour-input{
+        background-color: white;
+        background-origin: content-box;
+        border: 1px solid grey;
+        border-radius: 20%;
         width: 4%;
     }
     #calendar-form-minute-input{
+        background-color: white;
+        border: 1px solid grey;
+        border-radius: 20%;
         width: 4%;
     }
 
@@ -141,7 +153,9 @@
     }
 
     .calendar-form-container{
-        background: #c9c7b8;
+        background: url(../ui/parchment.jpg) repeat;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     
     
@@ -150,7 +164,6 @@
     <h1>Calendar Settings</h1>
     <div id="calendar-form-year">
         <label>Current Day: </label><input value="{{day}}" type="number" min="1" placeholder="14" id="calendar-form-cDay-input">
-        <!-- <label class="calendar-form-label">Current Month: </label><input value="{{currentMonth}}" type="text" placeholder="12" id="calendar-form-cMonth-input" maxlength="2"> -->
         <label class="calendar-form-label">Year: </label><input type="number" min="1" value="{{year}}" placeholder="2020" id="calendar-form-year-input">
         <label class="calendar-form-label">Era: </label><input value="{{era}}" type="text" placeholder="AD" id="calendar-form-era-input" maxlength="3">
         <label class="calendar-form-label">Time: </label><input value="{{hours}}" type="text" placeholder="7" id="calendar-form-hour-input" max="24">:<input value="{{minutes}}" type="text" placeholder="15" id="calendar-form-minute-input" max="60">

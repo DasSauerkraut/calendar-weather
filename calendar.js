@@ -233,6 +233,7 @@ class Calendar extends Application {
       templateData.dt.setTimeDisp();
       templateData.dt.setDayLength(24);
       templateData.dt.genDateWordy();
+      templateData.dt.weather.generate();
   }
 
   settingsOpen(isOpen){
@@ -382,6 +383,7 @@ class WeatherTracker {
   climateTemp = 0;
   climateHumidity = 0;
   precipitation = "";
+  isVolcanic = false;
 
   rand(min, max){
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -390,6 +392,9 @@ class WeatherTracker {
   extremeWeather(){
     let roll = this.rand(1,5);
     let event = "";
+    if(this.isVolcanic){
+      return "Volcano Erupts!";
+    }
     switch(roll){
       case 1:
         event = "Tornado";
@@ -415,16 +420,60 @@ class WeatherTracker {
     return event;
   }
 
+  setClimate(climate){
+    this.isVolcanic = false;
+    switch(climate){
+      case "temperate":
+        this.climateHumidity = 0;
+        this.climateTemp = 0;
+        break;
+      case "tempMountain":
+        this.climateHumidity = 0;
+        this.climateTemp = -10;
+        break;
+      case "desert":
+        this.climateHumidity = -1;
+        this.climateTemp = 20;
+        break;
+      case "tundra":
+        this.climateHumidity = 0;
+        this.climateTemp = -20;
+        break;
+      case "tropical":
+        this.climateHumidity = 1;
+        this.climateTemp = 10;
+        break;
+      case "taiga":
+        this.climateHumidity = -1;
+        this.climateTemp = -20;
+        break;
+      case "volcanic":
+        this.climateHumidity = 0;
+        this.climateTemp = 40;
+        this.isVolcanic = true;
+        break;
+    }
+  }
+
   genPrecip(roll){
     if(roll < 1){
       roll = this.rand(1, 6);
     }
     if(roll <= 3){
+      if(this.isVolcanic){
+        return "Ashen skies today";
+      }
       return "Clear sky today.";
     } else if (roll <= 6){
       this.humidity += 1;
+      if(this.isVolcanic){
+        return "Dark, smokey skies today";
+      }
       return "Scattered clouds, but mostly clear today."
     } else if (roll == 7){
+      if(this.isVolcanic){
+        return "The sun is completely obscured by ash, possible ashfall today";
+      }
       if(this.temp < 25){
         return "Completely overcast with some snow flurries possible.";
       } else if(this.temp < 32){
@@ -434,6 +483,9 @@ class WeatherTracker {
       }
     } else if (roll == 8){
       this.humidity -= 1;
+      if(this.isVolcanic){
+        return "Large ashfall today.";
+      }
       if(this.temp < 25){
         return "A light to moderate amount of snow today.";
       } else if(this.temp < 32){
@@ -443,6 +495,9 @@ class WeatherTracker {
       }
     } else if (roll == 9){
       this.humidity -= 2;
+      if(this.isVolcanic){
+        return "Firey rain today, take cover.";
+      }
       if(this.temp < 25){
         return "Large amount of snowfall today.";
       } else if(this.temp < 32){
@@ -455,6 +510,9 @@ class WeatherTracker {
         return this.extremeWeather();
       } else {
         this.humidity -= 2;
+        if(this.isVolcanic){
+          return "Earthquake, firey rain, and toxic gases today.";
+        }
         if(this.temp < 25){
           return "Blizzard today.";
         } else if(this.temp < 32){
@@ -467,6 +525,7 @@ class WeatherTracker {
   }
   
   generate(){
+    this.setClimate("volcanic")
     let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
     if(this.rand(1,5) >= 5){
       this.temp = this.rand(20,60) + this.seasonTemp + this.climateTemp;
@@ -662,7 +721,6 @@ $(document).ready(() => {
       default: c.toObject(),
       type: Object,
     });
-    // console.log(c.toObject());
     c.loadSettings();
   });
 
@@ -676,6 +734,11 @@ $(document).ready(() => {
     c.rebuild(JSON.parse(updatedData));
     c.updateDisplay();
     c.updateSettings();
+    c.settingsOpen(false);
+  });
+
+  Hooks.on('closeCalendarForm', ()=> {
+    console.log("Hook fired! Calendar Settings is closed.");
     c.settingsOpen(false);
   });
 

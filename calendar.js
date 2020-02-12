@@ -1,22 +1,5 @@
 class CalendarForm extends FormApplication {
   data = {};
-  constructor(newData){
-    super();
-    newData = JSON.parse(newData);
-    this.data = {
-      months: newData.months,
-      daysOfTheWeek: newData.daysOfTheWeek,
-      year: newData.year,
-      day: newData.day,
-      numDayOfTheWeek: newData.numDayOfTheWeek,
-      currentMonth: newData.currentMonth,
-      currentWeekday: newData.currentWeekday,
-      era: newData.era,
-      minutes: newData.minutes,
-      hours: newData.hours,
-    };
-  }
-
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar-form.html";
@@ -26,15 +9,44 @@ class CalendarForm extends FormApplication {
   }
 
   saveData(){
-    let savedData = new DateTime();
-    savedData.year = parseInt(document.getElementById("calendar-form-year-input").value);
-    savedData.era = document.getElementById("calendar-form-era-input").value;
-    savedData.day = parseInt(document.getElementById("calendar-form-cDay-input").value);
-    savedData.hours = parseInt(document.getElementById("calendar-form-hour-input").value);
+    let newCalendar = {
+      // month lengths in days - first number is non-leap year, second is leapy year
+      "month_len": {
+          "January": [31,31],
+          "February": [28, 29],
+          "March": [31,31],
+          "April": [30,30],
+          "May": [31,31],
+          "June": [30,30],
+          "July": [31,31],
+          "August": [31,31],
+          "September": [30,30],
+          "October": [31,31],
+          "November": [30,30],
+          "December": [31,31],
+      },
+      // a function to return the number of leap years from 0 to the specified year. 
+      "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
+      // names of the days of the week. It is assumed weeklengths don't change
+      "weekdays": [],
+      // year when the clock starts and time is recorded as seconds from this 1/1/clock_start_year 00:00:00. If is set to 1970 as a unix joke. you can set it to 0.
+      "clock_start_year": parseInt(document.getElementById("calendar-form-year-input").value),
+      // day of the week of 0/0/0 00:00:00
+      "first_day": 6,
+      "notes": {},
+      "hours_per_day": 24,
+      "seconds_per_minute": 60,
+      "minutes_per_hour": 60,
+      // Is there a year 0 in the calendar? Gregorian goes from -1BC to 1CE with no 0 in between.
+      "has_year_0": false
+    }
+    // savedData.era = document.getElementById("calendar-form-era-input").value;
+    let day = parseInt(document.getElementById("calendar-form-cDay-input").value);
+    let hours = parseInt(document.getElementById("calendar-form-hour-input").value);
     
     let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
     for(var i = 0, max=newWeekdays.length; i < max; i++){
-      savedData.addWeekday(newWeekdays[i].value);
+      newCalendar.weekdays.push(newWeekdays[i].value);
     }
 
     let weekdayTarget = 0;
@@ -43,23 +55,16 @@ class CalendarForm extends FormApplication {
     } else {
       weekdayTarget = document.querySelector('input[class="calendar-form-weekday-radio"]:checked').value;
     }
-    savedData.currentWeekday = savedData.daysOfTheWeek[weekdayTarget];
-    savedData.numDayOfTheWeek = weekdayTarget;
+    newCalendar.first_day = weekdayTarget;
     
     let newMonthsName = document.getElementsByClassName("calendar-form-month-input");
     let newMonthsLength = document.getElementsByClassName("calendar-form-month-length-input");
     let newMonthsIsNum = document.getElementsByClassName("calendar-form-month-isnum");
     let newMonthsAbbrev = document.getElementsByClassName("calendar-form-month-abbrev");
-    let tempMonth = new Month("Month 1", 30, true);
     for(var i = 0, max = newMonthsName.length; i < max; i++){
-      tempMonth.name = newMonthsName[i].value;
-      tempMonth.length = newMonthsLength[i].value;
-      tempMonth.isNumbered = !newMonthsIsNum[i].checked;
-      tempMonth.abbrev = newMonthsAbbrev[i].value;
-      savedData.addMonth(tempMonth);
-      tempMonth = new Month("Month 1", 30, true);
+      newCalendar.month_len[newMonthsName[i].value] = [newMonthsLength[i].value, newMonthsLength[i].value];
     }
-
+    console.log(newCalendar);
     let monthTarget = 0;
     if(document.querySelector('input[class="calendar-form-month-radio"]:checked') == null){
       monthTarget = savedData.months.length-1
@@ -67,10 +72,7 @@ class CalendarForm extends FormApplication {
       monthTarget = document.querySelector('input[class="calendar-form-month-radio"]:checked').value;
     }
     savedData.currentMonth = monthTarget;
-    savedData.setTimeDisp();
-    savedData.setDayLength(24);
-    savedData.genDateWordy();
-    savedData.genAbbrev();
+
     let returnData = {
       months: savedData.months,
       daysOfTheWeek: savedData.daysOfTheWeek,
@@ -164,21 +166,38 @@ class CalendarForm extends FormApplication {
     }
 
     for(var i = 0, max=monthsNum.length; i < max; i++){
-      monthsNum[i].checked = !this.data.months[i].isNumbered;
-      if(monthsNum[i].checked){
-        monthsAbbrev[i].disabled = false; 
-        monthsAbbrev[i].style.cursor ='auto'
-      }
       if(i == this.data.currentMonth){
         months[i].checked = true;
       }
     }
   }
 
-  renderForm(newData){
+  renderForm(){
     let templatePath = "modules/calendar-weather/templates/calendar-form.html";
-    this.data = newData = JSON.parse(newData);
-    renderTemplate(templatePath, this.data).then(html => {
+    let dt = game.Gametime.DTNow();
+    let months = Object.keys(game.Gametime.DTC.month_len);
+    let lenArr = Object.values(game.Gametime.DTC.month_len);
+    let monthObj = {};
+    let monthResult = [];
+    for(var i =0; i < months.length; i++){
+      monthObj = {
+        name: months[i],
+        length: lenArr[i][0],
+        leapYear: lenArr[i][1]
+      }
+      monthResult.push(monthObj);
+    }
+    this.data = {
+      year: dt.years,
+      day: dt.days + 1,
+      hours: dt.hours,
+      minutes: dt.minutes,
+      daysOfTheWeek: game.Gametime.DTC.weekDays,
+      numDayOfTheWeek: dt.dow(),
+      currentMonth: dt.months,
+      months: monthResult
+    }
+    renderTemplate(templatePath, templateData).then(html => {
       this.render(true)
     }).then(this.checkBoxes());
 
@@ -227,21 +246,11 @@ class Calendar extends Application {
     templateData.dt.genDateWordy();
   }
 
-  updateSettings(){
-    game.settings.update('calendar-weather.dateTime', {
-      name: "Date/Time Data",
-      scope: 'world',
-      config: false,
-      default: this.toObject(),
-      type: Object,
-    });
-  }
-
   getFormattedDate(){
-    let date = game.Gametime.DTNow().longDate().date.split(" ");
-    let month = date[1];
-    let day = date[2];
-    let year = date[3];
+    let dt = game.Gametime.DTNow();
+    let month = Object.keys(game.Gametime.DTC.month_len)[dt.months];
+    let day = dt.days + 1;
+    let year = dt.years;
     let dayAppendage = "";
     day = parseInt(day);
     if(day % 10 == 1 && day != 11){
@@ -256,18 +265,18 @@ class Calendar extends Application {
     return day + dayAppendage + " of " + month + ", " + parseInt(year);
   }
 
-  getWeekday(){
-    let date = game.Gametime.DTNow().longDate().date.split(" ")
-    return date[0];
-  }
-
   getAMPMTime(){
-    let longTime = game.Gametime.DTNow().shortDate().time;
-    longTime = longTime.split(":");
-    let hours = longTime[0];
-    let minutes = longTime[1];
-    let sec = longTime[2];
+    let dt = game.Gametime.DTNow();
+    let hours = dt.hours;
+    let minutes = dt.minutes;
+    let sec = dt.seconds;
     let AmOrPm = hours >= 12 ? 'PM' : 'AM';
+    if(minutes < 10){
+      minutes = "0" + minutes;
+    }
+    if(sec < 10){
+      sec = "0" + sec;
+    }
     hours = (hours % 12) || 12;
     return hours + ":" + minutes + ":" + sec + " " + AmOrPm;
   }
@@ -275,34 +284,15 @@ class Calendar extends Application {
   updateDisplay(){
     document.getElementById("calendar-date").innerHTML = this.getFormattedDate();
     document.getElementById("calendar-date-num").innerHTML = game.Gametime.DTNow().shortDate().date;
-    document.getElementById("calendar-weekday").innerHTML = this.getWeekday();
+    document.getElementById("calendar-weekday").innerHTML = game.Gametime.DTC.weekDays[game.Gametime.DTNow().dow()];
     document.getElementById("calendar-time").innerHTML = this.getAMPMTime();
-    let split = game.Gametime.DTNow().longDate().date.split(" ");
-    if(this.lastUpdate[0] != split[1] || this.lastUpdate[1] != split[2]){
+    game.Gametime._save(true);
+    let dt = game.Gametime.DTNow();
+    if(this.lastUpdate[0] != dt.days || this.lastUpdate[1] != dt.months){
       this.weather.generate();
     }
-    this.lastUpdate[0] = split[1];
-    this.lastUpdate[1] = split[2];
-  }
-
-  toObject(){
-    return {
-      months: templateData.dt.months,
-      daysOfTheWeek: templateData.dt.daysOfTheWeek,
-      year: templateData.dt.year,
-      day: templateData.dt.day,
-      numDayOfTheWeek: templateData.dt.numDayOfTheWeek,
-      currentMonth: templateData.dt.currentMonth,
-      currentWeekday : templateData.dt.currentWeekday,
-      dateWordy: templateData.dt.dateWordy,
-      era : templateData.dt.era,
-      minutes: templateData.dt.minutes,
-      hours: templateData.dt.hours,
-      dayLength: templateData.dt.dayLength,
-      timeDisp : templateData.dt.timeDisp,
-      dateNum : templateData.dt.dateNum,
-      weather: templateData.dt.weather
-    }
+    this.lastUpdate[0] = dt.days;
+    this.lastUpdate[1] = dt.months;
   }
 
   activateListeners(html){
@@ -318,6 +308,8 @@ class Calendar extends Application {
     const nightSkip = '#calendar-btn-night';
     const toggleClock = '#calendar-time';
     this.clockIsRunning = true;
+
+    let form = new CalendarForm();
     
     this.updateDisplay()
     //Next Morning
@@ -326,6 +318,7 @@ class Calendar extends Application {
       if(!this.isOpen && game.user.isGM){
         console.log("calendar-weather | To morning.");
         game.Gametime.advanceTime({days: 1})
+        // game.Gametime.setTime({hours: 7, minutes: 0, seconds: 0});
       }
     });
     //Quick Action
@@ -440,43 +433,8 @@ class Calendar extends Application {
     html.find(calendarSetup).click(ev => {
       ev.preventDefault();
       if(game.user.isGM){
+        form.renderForm();
         this.updateDisplay();
-        const  GregorianCalendar = {
-          // month lengths in days - first number is non-leap year, second is leapy year
-          "month_len": {
-              "January": [31,31],
-              "February": [28, 29],
-              "March": [31,31],
-              "April": [30,30],
-              "May": [31,31],
-              "June": [30,30],
-              "July": [31,31],
-              "August": [31,31],
-              "September": [30,30],
-              "October": [31,31],
-              "November": [30,30],
-              "December": [31,31],
-          },
-          // a function to return the number of leap years from 0 to the specified year. 
-          "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
-          // names of the days of the week. It is assumed weeklengths don't change
-          "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          // year when the clock starts and time is recorded as seconds from this 1/1/clock_start_year 00:00:00. If is set to 1970 as a unix joke. you can set it to 0.
-          "clock_start_year": 1970,
-          // day of the week of 0/0/0 00:00:00
-          "first_day": 6,
-          "notes": {},
-          "hours_per_day": 24,
-          "seconds_per_minute": 60,
-          "minutes_per_hour": 60,
-          // Is there a year 0 in the calendar? Gregorian goes from -1BC to 1CE with no 0 in between.
-          "has_year_0": false
-        }
-        let newDTC = new game.Gametime.DTC();
-        console.log(newDTC);
-        // console.log(newDTC.daysInYear();
-        newDTC._createFromData();
-
       }
 
       
@@ -484,7 +442,7 @@ class Calendar extends Application {
     html.find(calendarSetupOverlay).click(ev => {
       ev.preventDefault();
       if(game.user.isGM){
-        // form.renderForm(JSON.stringify(this.toObject()));
+        form.renderForm();
         this.updateDisplay();
       }
     });
@@ -661,42 +619,9 @@ $(document).ready(() => {
 
   templateData = {};
 
-  const  GregorianCalendar = {
-    // month lengths in days - first number is non-leap year, second is leapy year
-    "month_len": {
-        "January": [31,31],
-        "February": [28, 29],
-        "March": [31,31],
-        "April": [30,30],
-        "May": [31,31],
-        "June": [30,30],
-        "July": [31,31],
-        "August": [31,31],
-        "September": [30,30],
-        "October": [31,31],
-        "November": [30,30],
-        "December": [31,31],
-    },
-    // a function to return the number of leap years from 0 to the specified year. 
-    "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
-    // names of the days of the week. It is assumed weeklengths don't change
-    "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    // year when the clock starts and time is recorded as seconds from this 1/1/clock_start_year 00:00:00. If is set to 1970 as a unix joke. you can set it to 0.
-    "clock_start_year": 2000,
-    // day of the week of 0/0/0 00:00:00
-    "first_day": 6,
-    "notes": {},
-    "hours_per_day": 24,
-    "seconds_per_minute": 60,
-    "minutes_per_hour": 60,
-    // Is there a year 0 in the calendar? Gregorian goes from -1BC to 1CE with no 0 in between.
-    "has_year_0": false
-  }
-
   let c = new Calendar();
   // Init settings so they can be wrote to later
   Hooks.on('init', ()=> {
-    // game.Gametime.DTC()._createFromData(GregorianCalendar);
   });
 
   Hooks.on('calendarSettingsOpen', ()=> {
@@ -720,9 +645,12 @@ $(document).ready(() => {
     renderTemplate(templatePath, templateData).then(html => {
       c.render(true);
     });
+    // game.Gametime.DTC._createFromData(GregorianCalendar);
     game.Gametime.startRunning();
   });
   Hooks.on("pseudoclockSet", ()=>{
-    c.updateDisplay();
+    if(document.getElementById('calendar-weather-container')){
+      c.updateDisplay();
+    }
   })
 });

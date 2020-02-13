@@ -211,9 +211,6 @@
         <span class="calendar-form-month-isNum-label">
             Intercalary
         </span>
-        <span class="calendar-form-month-abbrev-label">
-            Abbreviation
-        </span>
         <span class="calendar-form-month-del">
             Delete
         </span>
@@ -224,8 +221,7 @@
             <div class="calendar-form-month-container">
                 <input class="calendar-form-month-input" value="{{month.name}}" name="input-month-{{@index}}" type="text" placeholder="ex. October" id="calendar-form-month-{{@index}}">
                 <input class="calendar-form-month-length-input" value="{{month.length}}" name="input-month-length-{{@index}}" type="number" id="calendar-form-month-length-{{@index}}">
-                <input class="calendar-form-month-abbrev" title="What is displayed instead of the month number if the month is intercalary."value="{{month.abbrev}}" id="calendar-form-month-abbrev-{{@index}}" maxlength="3" disabled>
-                <input class="calendar-form-month-isnum" title="Removes the month from the normal month numbering scheme" type="checkbox" name="is-numbered" value="{{@index}}" onclick="var input = document.getElementById('calendar-form-month-abbrev-{{@index}}'); if(this.checked){input.disabled = false; input.focus(); input.style.cursor ='auto'}else{input.disabled=true; input.style.cursor ='not-allowed'}">
+                <input class="calendar-form-month-isnum" title="Removes the month from the normal month numbering scheme" type="checkbox" name="is-numbered" value="{{@index}}" onclick="var input = document.getElementById('calendar-form-month-length-{{@index}}'); if(!this.checked){input.disabled = false; input.focus(); input.style.cursor ='auto'}else{input.disabled=true; input.style.cursor ='not-allowed'; input.value = 1}">
                 <input class="calendar-form-month-radio" type="radio" name="current-month" value="{{@index}}">
                 <button class="calendar-form-month-del" id="calendar-form-del-month-{{@index}}" name="del-month-{{@index}}" title="Delete a month">
                     <i class="fas fa-trash-alt"></i>

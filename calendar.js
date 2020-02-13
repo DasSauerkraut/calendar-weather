@@ -31,18 +31,16 @@ class CalendarForm extends FormApplication {
     //Get the currently selected day of the week, with handling for if the weekday was deleted.
     let weekdayTarget = 0;
     if(document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null){
-      weekdayTarget = savedData.daysOfTheWeek.length-1
+      weekdayTarget = newCalendar.weekdays.length-1
     } else {
       weekdayTarget = document.querySelector('input[class="calendar-form-weekday-radio"]:checked').value;
     }
-    //This might set the current weekday? Doesn't in practice, need to find solution
-    newCalendar.first_day = weekdayTarget; 
+    //This might set the current weekday? Doesn't in practice, need to find solution 
     
     //Gets array of month names and length from form.
     let newMonthsName = document.getElementsByClassName("calendar-form-month-input");
     let newMonthsLength = document.getElementsByClassName("calendar-form-month-length-input");
-    // let newMonthsIsNum = document.getElementsByClassName("calendar-form-month-isnum");
-    // let newMonthsAbbrev = document.getElementsByClassName("calendar-form-month-abbrev");
+    let newMonthsIsNum = document.getElementsByClassName("calendar-form-month-isnum");
     let lengthArr = []
     let lenVal = 0;
     for(var i = 0, max = newMonthsName.length; i < max; i++){
@@ -57,9 +55,14 @@ class CalendarForm extends FormApplication {
       lengthArr.push(lenVal);
       lengthArr.push(lenVal);
       //adds new month to calendar
-      newCalendar.month_len[newMonthsName[i].value] = lengthArr;
+      newCalendar.month_len[newMonthsName[i].value] = {
+        days: lengthArr,
+        intercalary: newMonthsIsNum[i].checked
+      };
       lengthArr = [];
     }
+
+    console.log(newCalendar.month_len)
 
     //finds current month, defaulting to last month if current month was deleted.
     let monthTarget = 0;
@@ -70,19 +73,19 @@ class CalendarForm extends FormApplication {
     }
 
     //attempt to create new calendar
-    game.Gametime.DTC._createFromData(newCalendar);
+    game.Gametime.DTC.createFromData(newCalendar);
 
     //create new date object with data from form.
-    let newDate = game.Gametime.DTf({
+    game.Gametime.setAbsolute({
       years: parseInt(document.getElementById("calendar-form-year-input").value),
       months: monthTarget,
-      days: parseInt(document.getElementById("calendar-form-cDay-input").value),
+      days: parseInt(document.getElementById("calendar-form-cDay-input").value - 1),
       hours: parseInt(document.getElementById("calendar-form-hour-input").value),
       minutes: parseInt(document.getElementById("calendar-form-minute-input").value),
     });
+    game.Gametime.DTNow().setCalDow(weekdayTarget);
     // game.Gametime.ElapsedTime = 0;
     //attempt to set current date to newDate
-    game.Gametime.setTime(newDate);
     return;
   }
 
@@ -148,18 +151,25 @@ class CalendarForm extends FormApplication {
     await this.formLoaded();
     let weekdays = document.getElementsByClassName("calendar-form-weekday-radio");
     let monthsNum = document.getElementsByClassName("calendar-form-month-isnum");
-    let monthsAbbrev = document.getElementsByClassName("calendar-form-month-abbrev");
+    let monthsLen = document.getElementsByClassName("calendar-form-month-length-input");
     let months = document.getElementsByClassName("calendar-form-month-radio");
     for(var i = 0, max=weekdays.length; i < max; i++){
       if(i == this.data.numDayOfTheWeek){
         weekdays[i].checked = true;
+        
         break;
       } else {
         weekdays[i].checked = false;
       }
     }
-
+    console.log(this.data.months)
     for(var i = 0, max=monthsNum.length; i < max; i++){
+      if(this.data.months[i].intercalary){
+        monthsNum[i].checked = true;
+        monthsLen[i].disabled = true;
+        monthsLen[i].style.cursor = 'not-allowed';
+      }
+      
       if(i == this.data.currentMonth){
         months[i].checked = true;
       }
@@ -179,12 +189,12 @@ class CalendarForm extends FormApplication {
       dayHold = Object.values(dayHold);
       monthObj = {
         name: months[i],
-        length: dayHold[0],
-        leapYear: dayHold[1]
+        length: dayHold[0][0],
+        leapYear: dayHold[0][1],
+        intercalary: lenArr[i].intercalary
       }
       monthResult.push(monthObj);
     }
-    console.log(monthResult);
     this.data = {
       year: dt.years,
       day: dt.days + 1,
@@ -297,7 +307,7 @@ class Calendar extends Application {
       if(!this.isOpen && game.user.isGM){
         console.log("calendar-weather | To morning.");
         game.Gametime.advanceTime({days: 1})
-        // game.Gametime.setTime({hours: 7});
+        game.Gametime.setTime({hours: 7});
         // console.log(game.Gametime.set({hours: 7}))
       }
     });
@@ -355,6 +365,7 @@ class Calendar extends Application {
       if(!this.isOpen && game.user.isGM){
         console.log("calendar-weather | Advancing to midnight.");
         game.Gametime.advanceTime({days: 1})
+        game.Gametime.setTime({hours: 0});
       }
     });
     //toggles real time clock on off, disabling granular controls
@@ -602,18 +613,24 @@ $(document).ready(() => {
   const  GregorianCalendar = {
     // month lengths in days - first number is non-leap year, second is leapy year
     "month_len": {
-        "January": [31,31],
-        "February": [28, 29],
-        "March": [31,31],
-        "April": [30,30],
-        "May": [31,31],
-        "June": [30,30],
-        "July": [31,31],
-        "August": [31,31],
-        "September": [30,30],
-        "October": [31,31],
-        "November": [30,30],
-        "December": [31,31],
+      "Hexenstag": {days: [1,1], intercalary: true},
+      "Nachexen": {days: [32,32]},
+      "Jahdrung": {days: [33,33]},
+      "Mitterfruhl": {days: [1,1], intercalary: true},
+      "Pflugzeit": {days: [33,33]},
+      "Sigmarzeit": {days: [33,33]},
+      "SommerZeit": {days: [33,33]},
+      "Sonnstill" : {days: [1,1], intercalary: true},
+      "Vorgeheim": {days: [33,33]},
+      "Geheimnistag": {days: [1,1], intercalary: true},
+      "Nachgeheim": {days: [32,32]},
+      "Erntezeit": {days: [33,33]},
+      "Mitterbst" : {days: [1,1], intercalary: true},
+      "Brauzeit": {days: [33,33]},
+      "Kalderzeit": {days: [33,33]},
+      "Ulriczeit": {days: [33,33]},
+      "Mondstille": {days: [1,1], intercalary: true},
+      "Vorhexen": {days: [33,33]},
     },
     // a function to return the number of leap years from 0 to the specified year. 
     "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
@@ -657,8 +674,7 @@ $(document).ready(() => {
     renderTemplate(templatePath, templateData).then(html => {
       c.render(true);
     });
-    game.Gametime.DTC._createFromData(GregorianCalendar);
-    console.log(game.Gametime)
+    game.Gametime.DTC.createFromData(GregorianCalendar);
     game.Gametime.startRunning();
   });
   Hooks.on("pseudoclockSet", ()=>{

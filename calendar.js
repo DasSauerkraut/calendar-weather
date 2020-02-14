@@ -282,7 +282,6 @@ class Calendar extends Application {
 
   loadSettings(){
     let data = game.settings.get('calendar-weather', 'dateTime');
-    this.clockIsRunning = game.settings.get('calendar-weather', 'clockRunning');
     templateData.dt.months = data.default.months;
     templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
     templateData.dt.year = data.default.year;

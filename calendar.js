@@ -547,9 +547,6 @@ class DateTime {
   currentWeekday = "";
   dateWordy ="";
   era = "";
-  minutes = 0;
-  hours = 0;
-  dayLength = 0;
   timeDisp = "";
   dateNum = "";
   weather = new WeatherTracker();
@@ -585,65 +582,54 @@ class DateTime {
   }
 
   setTimeDisp(){
-    let minDisp = ""
-    let sunDisp = ""
-    if(6 <= this.hours && this.hours <= 11){
-      sunDisp = "Morning";
-    } else if(this.hours == 12){
-      sunDisp = "Noon";
-    } else if (13 <= this.hours && this.hours <= 16){
-      sunDisp = "Afternoon";
-    } else if (17 <= this.hours && this.hours <= 21){
-      sunDisp = "Evening";
-    } else if (22 <= this.hours && this.hours <= 24){
-      sunDisp = "Night";
-    } else if (this.hours == 0){
-      sunDisp = "Midnight";
-    } else if (1 <= this.hours && this.hours <= 3){
-      sunDisp = "Night";
-    } else if (4 <= this.hours && this.hours <= 5){
-      sunDisp = "Early Morning";
+    let dt = game.Gametime.DTNow();
+    let hours = dt.hours;
+    let minutes = dt.minutes;
+    let sec = dt.seconds;
+    let AmOrPm = hours >= 12 ? 'PM' : 'AM';
+    if(minutes < 10){
+      minutes = "0" + minutes;
     }
-
-    if(this.minutes == 0){
-      minDisp = "00";
-    } else {
-      minDisp = this.minutes * 15;
+    if(sec < 10){
+      sec = "0" + sec;
     }
-    this.timeDisp = this.hours + ":" + minDisp + ", " + sunDisp;
+    hours = (hours % 12) || 12;
+    this.timeDisp = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
   }
 
   quickAction(){
-    if(this.minutes == 3){
-      this.advanceHour()
-      this.minutes = 0;
-    } else {
-      this.minutes += 1;
+    let dt = game.Gametime.DTNow();
+    let prevDay = dt.days;
+    let prevMonth = dt.months;
+    game.Gametime.advanceTime({minutes: 15})
+    dt = game.Gametime.DTNow();
+    if(prevDay != dt.days || prevMonth != dt.months){
+      this.advanceDay();
     }
     this.setTimeDisp();
   }
 
   advanceHour(){
-    if(this.hours == this.dayLength - 1){
+    let dt = game.Gametime.DTNow();
+    let prevDay = dt.days;
+    let prevMonth = dt.months;
+    game.Gametime.advanceTime({hours: 1})
+    dt = game.Gametime.DTNow();
+    if(prevDay != dt.days || prevMonth != dt.months){
       this.advanceDay();
-      this.hours = 0;
-    } else {
-      this.hours += 1;
     }
     this.setTimeDisp();
   }
 
   advanceNight(){
     this.advanceDay();
-    this.hours = 0;
-    this.minutes = 0;
+    game.Gametime.setTime({hours: 0});
     this.setTimeDisp();
   }
 
   advanceMorning(){
     this.advanceDay();
-    this.hours = 7;
-    this.minutes = 0;
+    game.Gametime.setTime({hours: 7});
     this.setTimeDisp();
   }
 
@@ -709,6 +695,44 @@ $(document).ready(() => {
     dt: new DateTime()
   }
 
+  const  GregorianCalendar = {
+    // month lengths in days - first number is non-leap year, second is leapy year
+    "month_len": {
+      "Hexenstag": {days: [1,1], intercalary: true},
+      "Nachexen": {days: [32,32]},
+      "Jahdrung": {days: [33,33]},
+      "Mitterfruhl": {days: [1,1], intercalary: true},
+      "Pflugzeit": {days: [33,33]},
+      "Sigmarzeit": {days: [33,33]},
+      "SommerZeit": {days: [33,33]},
+      "Sonnstill" : {days: [1,1], intercalary: true},
+      "Vorgeheim": {days: [33,33]},
+      "Geheimnistag": {days: [1,1], intercalary: true},
+      "Nachgeheim": {days: [32,32]},
+      "Erntezeit": {days: [33,33]},
+      "Mitterbst" : {days: [1,1], intercalary: true},
+      "Brauzeit": {days: [33,33]},
+      "Kalderzeit": {days: [33,33]},
+      "Ulriczeit": {days: [33,33]},
+      "Mondstille": {days: [1,1], intercalary: true},
+      "Vorhexen": {days: [33,33]},
+    },
+    // a function to return the number of leap years from 0 to the specified year. 
+    "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
+    // names of the days of the week. It is assumed weeklengths don't change
+    "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    // year when the clock starts and time is recorded as seconds from this 1/1/clock_start_year 00:00:00. If is set to 1970 as a unix joke. you can set it to 0.
+    "clock_start_year": 2020,
+    // day of the week of 0/0/0 00:00:00
+    "first_day": 6,
+    "notes": {},
+    "hours_per_day": 24,
+    "seconds_per_minute": 60,
+    "minutes_per_hour": 60,
+    // Is there a year 0 in the calendar? Gregorian goes from -1BC to 1CE with no 0 in between.
+    "has_year_0": false
+  }
+
   let c = new Calendar();
   // Init settings so they can be wrote to later
   Hooks.on('init', ()=> {
@@ -741,9 +765,17 @@ $(document).ready(() => {
     c.settingsOpen(false);
   });
 
+  Hooks.on("pseudoclockSet", ()=>{
+    if(document.getElementById('calendar-weather-container')){
+      c.updateDisplay();
+    }
+  })
+
   Hooks.on('ready', ()=> {
     renderTemplate(templatePath, templateData).then(html => {
       c.render(true);
     });
+    game.Gametime.DTC.createFromData(GregorianCalendar);
+    game.Gametime.startRunning();
   });  
 });

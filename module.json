@@ -2,7 +2,7 @@
   "name": "calendar-weather",
   "title": "Calendar/Weather",
   "description": "Adds a customizable calendar with events and weather.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "minimumCoreVersion": "0.4.5",
   "author": "Michael Sebelski [DasSauerkraut#3215], about-time by tposney#1462",
   "url": "https://github.com/DasSauerkraut/calendar-weather",

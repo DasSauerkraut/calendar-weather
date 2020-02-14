@@ -4,7 +4,7 @@ A customizable module that accurately tracks and displays dates and time.
 * Manifest: https://raw.githubusercontent.com/DasSauerkraut/calendar-weather/master/package/module.json
 * Direct Link: https://github.com/DasSauerkraut/calendar-weather/raw/master/package/calendar-weather-v1.0.3.zip
 
-This module **REQUIRES** [about-time](https://gitlab.com/tposney/about-time) installed and loaded to function correctly.
+This module **REQUIRES** [about-time](https://gitlab.com/tposney/about-time) v1.6 or greater installed and loaded to function correctly.
 ## Features:
 * Customizable calendar that handles arbitrarily long weeks, months, and years. 
 * Intercalary day handling.

@@ -229,7 +229,6 @@ class Calendar extends Application {
       templateData.dt.setYear(2020);
       templateData.dt.setEra("AD");
       templateData.dt.setWeekday("Monday")
-      templateData.dt.setTimeDisp();
       templateData.dt.setDayLength(24);
       templateData.dt.genDateWordy();
       templateData.dt.weather.generate();
@@ -249,10 +248,7 @@ class Calendar extends Application {
     if(obj.currentWeekday != ""){templateData.dt.currentWeekday = obj.currentWeekday;}
     if(obj.dateWordy != ""){templateData.dt.dateWordy = obj.dateWordy;}
     if(obj.era != ""){templateData.dt.era = obj.era;}
-    templateData.dt.minutes = obj.minutes;
-    templateData.dt.hours = obj.hours;
     if(obj.dayLength != 0){templateData.dt.dayLength = obj.dayLength;}
-    if(obj.timeDisp != ""){templateData.dt.timeDisp = obj.timeDisp;}
     if(obj.dateNum != ""){templateData.dt.dateNum = obj.dateNum;}
     templateData.dt.setTimeDisp();
     templateData.dt.genDateWordy();
@@ -272,6 +268,7 @@ class Calendar extends Application {
     document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
     document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
+    templateData.dt.setTimeDisp();
     document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
   }
 
@@ -698,23 +695,23 @@ $(document).ready(() => {
   const  GregorianCalendar = {
     // month lengths in days - first number is non-leap year, second is leapy year
     "month_len": {
-      "Hexenstag": {days: [1,1], intercalary: true},
+      "Hexenstag": {days: [1,1],},
       "Nachexen": {days: [32,32]},
       "Jahdrung": {days: [33,33]},
-      "Mitterfruhl": {days: [1,1], intercalary: true},
+      "Mitterfruhl": {days: [1,1],},
       "Pflugzeit": {days: [33,33]},
       "Sigmarzeit": {days: [33,33]},
       "SommerZeit": {days: [33,33]},
-      "Sonnstill" : {days: [1,1], intercalary: true},
+      "Sonnstill" : {days: [1,1], },
       "Vorgeheim": {days: [33,33]},
-      "Geheimnistag": {days: [1,1], intercalary: true},
+      "Geheimnistag": {days: [1,1], },
       "Nachgeheim": {days: [32,32]},
       "Erntezeit": {days: [33,33]},
-      "Mitterbst" : {days: [1,1], intercalary: true},
+      "Mitterbst" : {days: [1,1], },
       "Brauzeit": {days: [33,33]},
       "Kalderzeit": {days: [33,33]},
       "Ulriczeit": {days: [33,33]},
-      "Mondstille": {days: [1,1], intercalary: true},
+      "Mondstille": {days: [1,1], },
       "Vorhexen": {days: [33,33]},
     },
     // a function to return the number of leap years from 0 to the specified year. 
@@ -767,6 +764,7 @@ $(document).ready(() => {
 
   Hooks.on("pseudoclockSet", ()=>{
     if(document.getElementById('calendar-weather-container')){
+      console.log("Psuedoclock fired!")
       c.updateDisplay();
     }
   })

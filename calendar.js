@@ -217,7 +217,6 @@ class Calendar extends Application {
     templateData.dt.timeDisp = data.default.timeDisp;
     templateData.dt.dateNum = data.default.dateNum;
     templateData.dt.weather = data.default.weather;
-    console.log(templateData.dt.getWeatherObj())
   }
 
   populateData(){
@@ -686,8 +685,8 @@ class DateTime {
         this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
       }
     }
-    this.weather.generate();
-    console.log(this.weather.temp + " " + this.weather.precipitation);
+    // this.weather.generate();
+    // console.log(this.weather.temp + " " + this.weather.precipitation);
     this.genDateWordy()
   }
 

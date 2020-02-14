@@ -2,13 +2,13 @@
   "name": "calendar-weather",
   "title": "Calendar/Weather",
   "description": "Adds a customizable calendar with events and weather.",
-  "version": "0.1",
+  "version": "1.0",
   "minimumCoreVersion": "0.4.5",
-  "author": "Michael Sebelski [DasSauerkraut#3215]",
+  "author": "Michael Sebelski [DasSauerkraut#3215], about-time by tposney#1462",
   "url": "n/a",
   "manifest": "n/a",
   "download": "n/a",
-  "scripts": [ "./calendar.js" ],
+  "scripts": [ "calendar.js"],
   "styles": [ "./css/calendar.css" ],
   "packs": []
 }

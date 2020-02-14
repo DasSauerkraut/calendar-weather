@@ -53,7 +53,12 @@ class CalendarForm extends FormApplication {
     let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
     if(newWeekdays.length < 1){savedData.addWeekday("Weekday");}
     for(var i = 0, max=newWeekdays.length; i < max; i++){
-      savedData.addWeekday(newWeekdays[i].value);
+      if(newWeekdays[i].value){
+        savedData.addWeekday(newWeekdays[i].value);
+      } else {
+        savedData.addWeekday("Weekday");
+      }
+      
     }
 
     let weekdayTarget = 0;
@@ -100,7 +105,12 @@ class CalendarForm extends FormApplication {
     savedData.currentMonth = monthTarget;
 
     let day = parseInt(document.getElementById("calendar-form-cDay-input").value);
-    if(savedData.months[savedData.currentMonth].length < day){day = savedData.months[savedData.currentMonth].length - 1}
+    if(savedData.months[savedData.currentMonth].length < day){
+      day = savedData.months[savedData.currentMonth].length - 1
+    }
+    if(savedData.months[savedData.currentMonth].length == 1){
+      day = 1;
+    }
     
     savedData.day = day;
     

@@ -28,6 +28,12 @@
         border-radius: 20%;
         width: 4%;
     }
+    #calendar-form-second-input{
+        background-color: white;
+        border: 1px solid grey;
+        border-radius: 20%;
+        width: 4%;
+    }
 
     .calendar-form-weekday-container{
         display: grid;
@@ -166,7 +172,14 @@
         <label>Current Day: </label><input value="{{day}}" type="number" min="1" placeholder="14" id="calendar-form-cDay-input">
         <label class="calendar-form-label">Year: </label><input type="number" min="1" value="{{year}}" placeholder="2020" id="calendar-form-year-input">
         <label class="calendar-form-label">Era: </label><input value="{{era}}" type="text" placeholder="AD" id="calendar-form-era-input" maxlength="3">
-        <label class="calendar-form-label">Time: </label><input value="{{hours}}" type="text" placeholder="7" id="calendar-form-hour-input" max="24">:<input value="{{minutes}}" type="text" placeholder="15" id="calendar-form-minute-input" max="60">
+        <label class="calendar-form-label">Time: </label>
+        <input value="{{hours}}" type="text" placeholder="7" id="calendar-form-hour-input" max="24">:
+        <input value="{{minutes}}" type="text" placeholder="15" id="calendar-form-minute-input" max="60">:
+        <input value="{{seconds}}" type="text" placeholder="00" id="calendar-form-second-input" max="60">
+        <select id="calendar-form-ampm" selected="{{amPm}}">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+        </select>
     </div>
     <h2>Weekdays</h2>
     <div class="calendar-form-weekday-label-container">
@@ -192,7 +205,6 @@
             </div>
         </li>
         {{/each}}
-        <input id="numDayOfTheWeek" value={{numDayOfTheWeek}} hidden></input>
     </ol>
     <button id="calendar-form-add-weekday" name="add-weekday" title="Add a new day of the week">
         <i class="fas fa-plus"></i> Add Weekday
@@ -225,7 +237,22 @@
                 <input class="calendar-form-month-input" value="{{month.name}}" name="input-month-{{@index}}" type="text" placeholder="ex. October" id="calendar-form-month-{{@index}}">
                 <input class="calendar-form-month-length-input" value="{{month.length}}" name="input-month-length-{{@index}}" type="number" id="calendar-form-month-length-{{@index}}">
                 <input class="calendar-form-month-abbrev" title="What is displayed instead of the month number if the month is intercalary."value="{{month.abbrev}}" id="calendar-form-month-abbrev-{{@index}}" maxlength="3" disabled>
-                <input class="calendar-form-month-isnum" title="Removes the month from the normal month numbering scheme" type="checkbox" name="is-numbered" value="{{@index}}" onclick="var input = document.getElementById('calendar-form-month-abbrev-{{@index}}'); if(this.checked){input.disabled = false; input.focus(); input.style.cursor ='auto'}else{input.disabled=true; input.style.cursor ='not-allowed'}">
+                <input class="calendar-form-month-isnum" title="Removes the month from the normal month numbering scheme" type="checkbox" name="is-numbered" value="{{@index}}" onclick="
+                var input = document.getElementById('calendar-form-month-abbrev-{{@index}}');
+                var length = document.getElementById('calendar-form-month-length-{{@index}}');
+                if(this.checked){
+                    input.disabled = false; 
+                    input.focus(); 
+                    input.style.cursor ='auto'
+                    length.disabled = true;
+                    length.style.cursor = 'not-allowed';
+                    length.value = 1;
+                }else{
+                    input.disabled=true; 
+                    input.style.cursor ='not-allowed'
+                    length.disabled = false;
+                    length.style.cursor = 'auto';
+                }">
                 <input class="calendar-form-month-radio" type="radio" name="current-month" value="{{@index}}">
                 <button class="calendar-form-month-del" id="calendar-form-del-month-{{@index}}" name="del-month-{{@index}}" title="Delete a month">
                     <i class="fas fa-trash-alt"></i>

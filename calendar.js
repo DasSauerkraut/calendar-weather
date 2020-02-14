@@ -12,8 +12,9 @@ class CalendarForm extends FormApplication {
       currentMonth: newData.currentMonth,
       currentWeekday: newData.currentWeekday,
       era: newData.era,
-      minutes: newData.minutes,
-      hours: newData.hours,
+      hours: game.Gametime.DTNow().hours,
+      minutes: game.Gametime.DTNow().minutes,
+      seconds: game.Gametime.DTNow().seconds,
     };
   }
 
@@ -27,12 +28,30 @@ class CalendarForm extends FormApplication {
 
   saveData(){
     let savedData = new DateTime();
-    savedData.year = parseInt(document.getElementById("calendar-form-year-input").value);
+    let year = parseInt(document.getElementById("calendar-form-year-input").value);
+    if(year < 0){year = 1;}
+    savedData.year = year;
+
     savedData.era = document.getElementById("calendar-form-era-input").value;
-    savedData.day = parseInt(document.getElementById("calendar-form-cDay-input").value);
-    savedData.hours = parseInt(document.getElementById("calendar-form-hour-input").value);
     
+    let hours = parseInt(document.getElementById("calendar-form-hour-input").value)
+    if(hours > 24){hours = 24;}
+    if(document.getElementById("calendar-form-ampm").value == "PM" && hours < 12){
+      hours = hours + 12;
+    }
+    if(document.getElementById("calendar-form-ampm").value == "AM" && hours == 12){
+      hours == hours - 12;
+    }
+
+    let minutes = parseInt(document.getElementById("calendar-form-minute-input").value);
+    if(minutes > 59){minutes = 59;}
+    game.Gametime.setTime({
+      hours: hours,
+      minutes: minutes,
+    })
+
     let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
+    if(newWeekdays.length < 1){savedData.addWeekday("Weekday");}
     for(var i = 0, max=newWeekdays.length; i < max; i++){
       savedData.addWeekday(newWeekdays[i].value);
     }
@@ -51,11 +70,23 @@ class CalendarForm extends FormApplication {
     let newMonthsIsNum = document.getElementsByClassName("calendar-form-month-isnum");
     let newMonthsAbbrev = document.getElementsByClassName("calendar-form-month-abbrev");
     let tempMonth = new Month("Month 1", 30, true);
+    if(newMonthsName.length < 1){savedData.addMonth(tempMonth);}
     for(var i = 0, max = newMonthsName.length; i < max; i++){
-      tempMonth.name = newMonthsName[i].value;
+      if(newMonthsName[i].value == ""){
+        tempMonth.name = "New Month"
+      }else{
+        tempMonth.name = newMonthsName[i].value;
+      }
       tempMonth.length = newMonthsLength[i].value;
       tempMonth.isNumbered = !newMonthsIsNum[i].checked;
-      tempMonth.abbrev = newMonthsAbbrev[i].value;
+      if(newMonthsIsNum[i].checked){
+        if(newMonthsAbbrev[i].value){
+          tempMonth.abbrev = newMonthsAbbrev[i].value;
+        } else {
+          console.log("Generating Abbrev")
+          tempMonth.abbrev = tempMonth.name.substring(0,2).toUpperCase();
+        }
+      }
       savedData.addMonth(tempMonth);
       tempMonth = new Month("Month 1", 30, true);
     }
@@ -67,6 +98,12 @@ class CalendarForm extends FormApplication {
       monthTarget = document.querySelector('input[class="calendar-form-month-radio"]:checked').value;
     }
     savedData.currentMonth = monthTarget;
+
+    let day = parseInt(document.getElementById("calendar-form-cDay-input").value);
+    if(savedData.months[savedData.currentMonth].length < day){day = savedData.months[savedData.currentMonth].length - 1}
+    
+    savedData.day = day;
+    
     savedData.setTimeDisp();
     savedData.setDayLength(24);
     savedData.genDateWordy();
@@ -81,12 +118,11 @@ class CalendarForm extends FormApplication {
       currentWeekday : savedData.currentWeekday,
       dateWordy: savedData.dateWordy,
       era : savedData.era,
-      minutes: savedData.minutes,
-      hours: savedData.hours,
       dayLength: savedData.dayLength,
       timeDisp : savedData.timeDisp,
       dateNum : savedData.dateNum,
     }
+    console.log("calendar-weather | Building new calendar with the following object:")
     console.log(returnData);
     return JSON.stringify(returnData);
   }
@@ -173,11 +209,19 @@ class CalendarForm extends FormApplication {
         months[i].checked = true;
       }
     }
+    if(game.Gametime.DTNow().hours >= 12){
+      document.getElementById("calendar-form-ampm")[1].selected = "true";
+    } else {
+      document.getElementById("calendar-form-ampm")[0].selected = "true";
+    }
   }
 
   renderForm(newData){
     let templatePath = "modules/calendar-weather/templates/calendar-form.html";
-    this.data = newData = JSON.parse(newData);
+    this.data = JSON.parse(newData);
+    this.data["hours"] = (game.Gametime.DTNow().hours % 12) || 12;
+    this.data["minutes"] = game.Gametime.DTNow().minutes;
+    this.data["seconds"] = game.Gametime.DTNow().seconds;
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true)
     }).then(this.checkBoxes());
@@ -188,6 +232,7 @@ class CalendarForm extends FormApplication {
 
 class Calendar extends Application {
   isOpen = false;
+  clockIsRunning = true;
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -211,8 +256,6 @@ class Calendar extends Application {
     templateData.dt.currentWeekday = data.default.currentWeekday;
     templateData.dt.dateWordy = data.default.dateWordy;
     templateData.dt.era = data.default.era;
-    templateData.dt.minutes = data.default.minutes;
-    templateData.dt.hours = data.default.hours;
     templateData.dt.dayLength = data.default.dayLength;
     templateData.dt.timeDisp = data.default.timeDisp;
     templateData.dt.dateNum = data.default.dateNum;
@@ -236,6 +279,15 @@ class Calendar extends Application {
 
   settingsOpen(isOpen){
     this.isOpen = isOpen;
+    if(isOpen){
+      game.Gametime.stopRunning();
+      console.log("calendar-weather | Pausing real time clock.")
+    } else {
+      if(this.clockIsRunning){
+        game.Gametime.startRunning();
+        console.log("calendar-weather | Resuming real time clock.")
+      }
+    }
   }
 
   rebuild(obj){
@@ -262,6 +314,7 @@ class Calendar extends Application {
       default: this.toObject(),
       type: Object,
     });
+    game.Gametime._save(true);
   }
 
   updateDisplay(){
@@ -270,6 +323,7 @@ class Calendar extends Application {
     document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
     templateData.dt.setTimeDisp();
     document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
+    game.Gametime._save(true);
   }
 
   toObject(){
@@ -283,8 +337,6 @@ class Calendar extends Application {
       currentWeekday : templateData.dt.currentWeekday,
       dateWordy: templateData.dt.dateWordy,
       era : templateData.dt.era,
-      minutes: templateData.dt.minutes,
-      hours: templateData.dt.hours,
       dayLength: templateData.dt.dayLength,
       timeDisp : templateData.dt.timeDisp,
       dateNum : templateData.dt.dateNum,
@@ -299,14 +351,19 @@ class Calendar extends Application {
     const calendarSetupOverlay = '#calendar-date-num'
     const longAction = '#calendar-btn-long';
     const nightSkip = '#calendar-btn-night';
+    const sec = '#calendar-btn-sec';
+    const halfMin = '#calendar-btn-halfMin';
+    const min = '#calendar-btn-min';
+    const fiveMin = '#calendar-btn-fiveMin';
+    const toggleClock = '#calendar-time';
     this.updateDisplay()
     let form = new CalendarForm(JSON.stringify(this.toObject()));
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
+        console.log("calendar-weather | Advancing to 7am.");
         templateData.dt.advanceMorning();
-        this.updateDisplay();
         this.updateSettings();
       }
     });
@@ -314,17 +371,49 @@ class Calendar extends Application {
     html.find(quickAction).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
+        console.log("calendar-weather | Advancing 15 min.");
         templateData.dt.quickAction();
-        this.updateDisplay();
         this.updateSettings();
       }
     });
+        //1 sec advance
+        html.find(sec).click(ev => {
+          ev.preventDefault();
+          if(!this.isOpen && game.user.isGM && !this.clockIsRunning){
+            console.log("calendar-weather | Advancing 1 sec.");
+            game.Gametime.advanceClock(1)
+          }
+        });
+        //advance 30s
+        html.find(halfMin).click(ev => {
+          ev.preventDefault();
+          if(!this.isOpen && game.user.isGM && !this.clockIsRunning){
+            console.log("calendar-weather | Advancing 30 sec");
+            game.Gametime.advanceClock(30)
+          }
+        });
+        //advance 1 min
+        html.find(min).click(ev => {
+          ev.preventDefault();
+          if(!this.isOpen && game.user.isGM){
+            console.log("calendar-weather | Advancing 1 min.");
+            game.Gametime.advanceTime({minutes: 1})
+          }
+        });
+        //advance 5 min
+        html.find(fiveMin).click(ev => {
+          ev.preventDefault();
+          if(!this.isOpen && game.user.isGM){
+            console.log("calendar-weather | Advancing 5 min.");
+            game.Gametime.advanceTime({minutes: 5})
+          }
+        });
     //Long Action
     html.find(longAction).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
+        console.log("calendar-weather | Advancing 1 hour.");
         templateData.dt.advanceHour();
-        this.updateDisplay();
         this.updateSettings();
       }
     });
@@ -332,9 +421,61 @@ class Calendar extends Application {
     html.find(nightSkip).click(ev => {
       ev.preventDefault();
       if(!this.isOpen && game.user.isGM){
+        console.log("calendar-weather | Advancing to midnight.");
         templateData.dt.advanceNight();
-        this.updateDisplay();
         this.updateSettings();
+      }
+    });
+    //toggles real time clock on off, disabling granular controls
+    html.find(toggleClock).click(ev => {
+      ev.preventDefault();
+      if(!this.isOpen && game.user.isGM){
+        if(this.clockIsRunning){
+          console.log("calendar-weather | Stopping about-time pseudo clock.");
+          this.clockIsRunning = false;
+          game.Gametime.stopRunning();
+          document.getElementById('calendar-btn-sec').disabled = false;
+          document.getElementById('calendar-btn-halfMin').disabled = false;
+          document.getElementById('calendar-btn-sec').style.cursor = 'pointer';
+          document.getElementById('calendar-btn-halfMin').style.cursor = 'pointer';
+          document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
+          document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
+        } else {
+          console.log("calendar-weather | Starting about-time pseudo clock.");
+          this.clockIsRunning = true;
+          game.Gametime.startRunning();
+          document.getElementById('calendar-btn-sec').disabled = true;
+          document.getElementById('calendar-btn-halfMin').disabled = true;
+          document.getElementById('calendar-btn-sec').style.cursor = 'not-allowed';
+          document.getElementById('calendar-btn-halfMin').style.cursor = 'not-allowed';
+          document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
+          document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
+        }
+      }
+    });
+    //handles hover events because can't access css hover property
+    html.find(sec).mouseover(ev => {
+      ev.preventDefault();
+      if(!this.clockIsRunning){
+        document.getElementById('calendar-btn-sec').style.color = "#FFF"
+      }
+    });
+    html.find(sec).mouseleave(ev => {
+      ev.preventDefault();
+      if(!this.clockIsRunning){
+        document.getElementById('calendar-btn-sec').style.color = "#000"
+      }
+    });
+    html.find(halfMin).mouseover(ev => {
+      ev.preventDefault();
+      if(!this.clockIsRunning){
+        document.getElementById('calendar-btn-halfMin').style.color = "#FFF"
+      }
+    });
+    html.find(halfMin).mouseleave(ev => {
+      ev.preventDefault();
+      if(!this.clockIsRunning){
+        document.getElementById('calendar-btn-halfMin').style.color = "#000"
       }
     });
     //Launch Calendar Form
@@ -745,12 +886,12 @@ $(document).ready(() => {
   });
 
   Hooks.on('calendarSettingsOpen', ()=> {
-    console.log("Hook fired! Calendar Settings is open.")
+    console.log("calendar-settings | Opening Calendar form.")
     c.settingsOpen(true);
   });
 
   Hooks.on('calendarSettingsClose', (updatedData)=> {
-    console.log("Hook fired! Calendar Settings is closed.");
+    console.log("calendar-settings | Closing Calendar form.");
     c.rebuild(JSON.parse(updatedData));
     c.updateDisplay();
     c.updateSettings();
@@ -758,13 +899,13 @@ $(document).ready(() => {
   });
 
   Hooks.on('closeCalendarForm', ()=> {
-    console.log("Hook fired! Calendar Settings is closed.");
+    console.log("calendar-settings | Closing Calendar form");
     c.settingsOpen(false);
+
   });
 
   Hooks.on("pseudoclockSet", ()=>{
     if(document.getElementById('calendar-weather-container')){
-      console.log("Psuedoclock fired!")
       c.updateDisplay();
     }
   })

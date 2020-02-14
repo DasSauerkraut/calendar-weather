@@ -6,8 +6,8 @@
   "minimumCoreVersion": "0.4.5",
   "author": "Michael Sebelski [DasSauerkraut#3215], about-time by tposney#1462",
   "url": "n/a",
-  "manifest": "https://github.com/DasSauerkraut/calendar-weather/blob/master/module.json",
-  "download": "n/a",
+  "manifest": "https://github.com/DasSauerkraut/calendar-weather/blob/master/package/module.json",
+  "download": "https://github.com/DasSauerkraut/calendar-weather/blob/master/package/calendar-weather-v1.0.0.zip",
   "scripts": [ "calendar.js"],
   "styles": [ "./css/calendar.css" ],
   "packs": []

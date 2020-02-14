@@ -11,7 +11,7 @@ class CalendarForm extends FormApplication {
   saveData(){
     let newCalendar = {
       "month_len": {},
-      "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
+      "leap_year_rule": (year) => 0,
       "weekdays": [],
       "clock_start_year": 0,
       "first_day": 6,
@@ -85,9 +85,9 @@ class CalendarForm extends FormApplication {
 
     //create new date object with data from form.
     game.Gametime.setAbsolute({
-      years: parseInt(document.getElementById("calendar-form-year-input").value ) + 1,
+      years: parseInt(document.getElementById("calendar-form-year-input").value ),
       months: monthTarget,
-      days: parseInt(document.getElementById("calendar-form-cDay-input").value),
+      days: parseInt(document.getElementById("calendar-form-cDay-input").value) - 1,
       hours: parseInt(document.getElementById("calendar-form-hour-input").value),
       minutes: parseInt(document.getElementById("calendar-form-minute-input").value),
     });
@@ -117,7 +117,7 @@ class CalendarForm extends FormApplication {
     });
     html.find(addMonth).click(ev => {
       ev.preventDefault();
-      newMonth = {
+      let newMonth = {
         name: "",
         length: 30
       }

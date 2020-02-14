@@ -8,4 +8,5 @@ A customizable module that accurately tracks and displays dates and time.
 ### Upcoming Features:
 * Weather generation that takes custom seasons and climates into consideration, and generates extreme weather events like tornados.
 * Event tracking that handles reoccuring and one-time events.
+### Controls:
 ![control menu](https://i.imgur.com/yUysSNH.png)

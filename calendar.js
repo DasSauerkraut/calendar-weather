@@ -13,7 +13,7 @@ class CalendarForm extends FormApplication {
       "month_len": {},
       "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
       "weekdays": [],
-      "clock_start_year": 1970,
+      "clock_start_year": 0,
       "first_day": 6,
       "notes": {},
       "hours_per_day": 24,
@@ -72,18 +72,28 @@ class CalendarForm extends FormApplication {
       monthTarget = document.querySelector('input[class="calendar-form-month-radio"]:checked').value;
     }
 
+    // game.Gametime.setAbsolute({
+    //   years: 0,
+    //   months: 0,
+    //   days: 0,
+    //   hours: 0,
+    //   minutes: 0,
+    // });
+
     //attempt to create new calendar
     game.Gametime.DTC.createFromData(newCalendar);
 
     //create new date object with data from form.
     game.Gametime.setAbsolute({
-      years: parseInt(document.getElementById("calendar-form-year-input").value),
+      years: parseInt(document.getElementById("calendar-form-year-input").value ) + 1,
       months: monthTarget,
-      days: parseInt(document.getElementById("calendar-form-cDay-input").value - 1),
+      days: parseInt(document.getElementById("calendar-form-cDay-input").value),
       hours: parseInt(document.getElementById("calendar-form-hour-input").value),
       minutes: parseInt(document.getElementById("calendar-form-minute-input").value),
     });
     game.Gametime.DTNow().setCalDow(weekdayTarget);
+    console.log(weekdayTarget)
+    console.log(game.Gametime.DTNow().longDate());
     // game.Gametime.ElapsedTime = 0;
     //attempt to set current date to newDate
     return;

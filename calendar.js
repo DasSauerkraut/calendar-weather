@@ -35,7 +35,7 @@ class CalendarForm extends FormApplication {
     savedData.era = document.getElementById("calendar-form-era-input").value;
     
     let hours = parseInt(document.getElementById("calendar-form-hour-input").value)
-    if(hours > 24){hours = 24;}
+    if(hours > 24 || hours < 1){hours = 23;}
     if(document.getElementById("calendar-form-ampm").value == "PM" && hours < 12){
       hours = hours + 12;
     }
@@ -44,11 +44,20 @@ class CalendarForm extends FormApplication {
     }
 
     let minutes = parseInt(document.getElementById("calendar-form-minute-input").value);
-    if(minutes > 59){minutes = 59;}
+    if(minutes > 59 || minutes < 1){minutes = 59;}
+
+    let seconds = parseInt(document.getElementById("calendar-form-second-input").value)
+    if(seconds > 59 || seconds < 1){seconds = 59}
+
     game.Gametime.setTime({
       hours: hours,
       minutes: minutes,
-    })
+      seconds: seconds,
+    });
+
+    console.log(hours + " " + minutes + " " + seconds)
+    console.log(game.Gametime.DTNow().longDate());
+
 
     let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
     if(newWeekdays.length < 1){savedData.addWeekday("Weekday");}
@@ -152,29 +161,45 @@ class CalendarForm extends FormApplication {
     });
     html.find(addWeekday).click(ev => {
       ev.preventDefault();
+      this.data = JSON.parse(this.saveData());
       this.data.daysOfTheWeek.push("");
       this.render(true);
+      this.checkBoxes();
     });
     html.find(addMonth).click(ev => {
       ev.preventDefault();
+      this.data = JSON.parse(this.saveData());
       let newMonth = new Month("", 30, true);
       this.data.months.push(newMonth);
       this.render(true);
+      this.checkBoxes();
     });
     html.find(delWeekday).click(ev => {
       ev.preventDefault();
+      this.data = JSON.parse(this.saveData());
       const targetName = ev.currentTarget.name.split("-");
       const index = targetName[targetName.length - 1];
       this.data.daysOfTheWeek.splice(index, 1);
       this.render(true);
+      this.checkBoxes();
     });
     html.find(delMonth).click(ev => {
       ev.preventDefault();
+      this.data = JSON.parse(this.saveData());
       const targetName = ev.currentTarget.name.split("-");
       const index = targetName[targetName.length - 1];
       this.data.months.splice(index, 1);
       this.render(true);
+      this.checkBoxes();
     });
+    html.find("*").keydown( ev => {
+      if ( ev.which == 13 ) {
+        ev.preventDefault();
+        this.close();
+        Hooks.callAll("calendarSettingsClose", this.saveData());
+       }
+    });
+
   }
   
   getData(){
@@ -257,6 +282,7 @@ class Calendar extends Application {
 
   loadSettings(){
     let data = game.settings.get('calendar-weather', 'dateTime');
+    this.clockIsRunning = game.settings.get('calendar-weather', 'clockRunning');
     templateData.dt.months = data.default.months;
     templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
     templateData.dt.year = data.default.year;
@@ -324,6 +350,13 @@ class Calendar extends Application {
       default: this.toObject(),
       type: Object,
     });
+    // game.settings.register('calendar-weather', 'clockRunning', {
+    //   name: "clockRunning",
+    //   scope: 'world',
+    //   config: false,
+    //   default: this.clockIsRunning,
+    //   type: Boolean,
+    // });
     game.Gametime._save(true);
   }
 
@@ -785,9 +818,9 @@ class DateTime {
     let dayAppendage = "";
     if(this.day % 10 == 1 && this.day != 11){
       dayAppendage = "st";
-    } else if (this.day % 10 == 2) {
+    } else if (this.day % 10 == 2 && this.day != 12) {
       dayAppendage = "nd";
-    } else if (this.day % 10 == 3) {
+    } else if (this.day % 10 == 3 && this.day != 13) {
       dayAppendage = "rd";
     } else {
       dayAppendage = "th";
@@ -892,6 +925,13 @@ $(document).ready(() => {
       default: c.toObject(),
       type: Object,
     });
+    // game.settings.register('calendar-weather', 'clockRunning', {
+    //   name: "clockRunning",
+    //   scope: 'world',
+    //   config: false,
+    //   default: true,
+    //   type: Boolean,
+    // });
     c.loadSettings();
   });
 

@@ -1,5 +1,7 @@
 class CalendarEvents extends FormApplication {
-  data = {};
+  data = {
+    seasons: [{name: "boi",}],
+  };
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar-events.html";
@@ -13,17 +15,25 @@ class CalendarEvents extends FormApplication {
   }
 
   activateListeners(html){
-    const submit = '#calendar-form-submit';
+    const submit = '#calendar-events-submit';
+    const addSeason = '#calendar-events-add-season'
     html.find(submit).click(ev => {
       ev.preventDefault();
       this.close();
-      Hooks.callAll("calendarSettingsClose", this.saveData());
+      // Hooks.callAll("calendarSettingsClose", this.saveData());
+    });
+    html.find(addSeason).click(ev => {
+      ev.preventDefault();
+      // this.data = JSON.parse(this.saveData());
+      this.data.seasons.push({name: "Test"});
+      console.log(this.data)
+      this.render(true);
+      // this.checkBoxes();
     });
   }
 
   renderForm(newData){
-    this.data = JSON.parse(newData);
-    console.log(this.data)
+    this.data = Object.assign(this.data, JSON.parse(newData));
     let templatePath = "modules/calendar-weather/templates/calendar-events.html";
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true)
@@ -566,6 +576,7 @@ class Calendar extends Application {
     })
   }
 }
+
 class Month {
   name = "";
   length = 0;

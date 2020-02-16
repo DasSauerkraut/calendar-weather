@@ -1,47 +1,96 @@
 <style>
-  .calendar-season{
-    
+  .calendar-season-container{
+    display: grid;
+    justify-items: center;
   }
+  .calendar-season-name{
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .calendar-season-temp{
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .calendar-season-humidity{
+    grid-row: 1;
+    grid-column: 3;
+  }
+  .calendar-season-color{
+    grid-row: 1;
+    grid-column: 4;
+  }
+  .calendar-season-month{
+    grid-row: 1;
+    grid-column: 5;
+  }
+  .calendar-season-del{
+    grid-row: 1;
+    grid-column: 6;
+    width: 40px;
+  }
+
+  .calendar-season-label-name{
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .calendar-season-label-temp{
+    grid-row: 1;
+    grid-column: 2;
+    padding-left: 75px;
+  }
+
+  .calendar-season-label-color{
+    grid-row: 1;
+    grid-column: 3;
+  }
+  .calendar-season-label-date{
+    grid-row: 1;
+    grid-column: 4;
+  }
+  .calendar-season-label-del{
+    grid-row: 1;
+    grid-column: 5;
+    width: 40px;
+  }
+
 </style>
 <form autocomplete="off" onsubmit="event.preventDefault();" title="Calendar Events" class="calendar-events-container">
   <h1>Events</h1>
-  <h2>Seasons</h2>
+  <h2>Seasons(Under Construction)</h2>
   <div>
-    <p>Enter the start date and weather modifiers for each season.</p>
-    <div class="calendar-form-weekday-label-container">
-      <span class="calendar-form-weekday-input-label">
+    <p>Enter the start date and weather modifiers for each season. Currently non-functional</p>
+    <div class="calendar-season-container">
+      <span class="calendar-season-label-name">
           Name
       </span>
-      <span class="calendar-form-weekday-radio-label">
-          Temperature
+      <span class="calendar-season-label-temp">
+          Temperature Humidity
       </span>
-      <span class="calendar-form-weekday-del">
-          Humidity
-      </span>
-      <span class="calendar-form-weekday-del">
+      <span class="calendar-season-label-color">
         Color
       </span>
-      <span class="calendar-form-weekday-del">
+      <span class="calendar-season-label-date">
         Start Date
       </span>
-      <span class="calendar-form-weekday-del">
+      <span class="calendar-season-label-del">
         Delete
       </span>
     </div>
     <ol>
-      <li>
-        <input class="calendar-season" type="text" placeholder="ex. Autumn" id="calendar-season-{{@index}}">
-        <select class="calendar-season-temp" id="calendar-season-temp-{{@index}}">
-          <option value="+">+</option>
+      {{#each seasons as |season|}}
+      <li class="calendar-season-container">
+        <input class="calendar-season" value="{{season.name}}" type="text" placeholder="ex. Autumn" title="Enter the season's name"id="calendar-season-{{@index}}">
+        <select class="calendar-season-temp" title="Is the season hotter or colder than average?"id="calendar-season-temp-{{@index}}">
           <option value=" "> </option>
+          <option value="+">+</option>
           <option value="-">-</option>
         </select>
-        <select class="calendar-season-humidity" id="calendar-season-humidity-{{@index}}">
-          <option value="+">+</option>
+        <select class="calendar-season-humidity" title="Is the season drier or wetter than average?" id="calendar-season-humidity-{{@index}}">
           <option value=" "> </option>
+          <option value="+">+</option>
           <option value="-">-</option>
         </select>
-        <select class="calendar-season-color" id="calendar-season-color-{{@index}}">
+        <select class="calendar-season-color" title="What color do you want to display with the season?"id="calendar-season-color-{{@index}}">
           <option value="red" style="background-color: red;">Red</option>
           <option value="orange" style="background-color: orange;">Orange</option>
           <option value="yellow" style="background-color: yellow;">Yellow</option>
@@ -49,31 +98,35 @@
           <option value="blue" style="color:white; background-color: blue;">Blue</option>
           <option value="white" style="background-color: white;">White</option>
         </select>
-        <select onchange="
-          var element = document.getElementById('calendar-events-day'),
-            frag = document.createDocumentFragment();
-          while(element.firstChild){
-            element.removeChild(element.firstChild);
-          }
-          for(var i = 1, max=parseInt(this.options[this.selectedIndex].attributes['name'].value) + 1; i < max; i++){
-            var option = document.createElement('option');
-            option.value = i;
-            option.appendChild(document.createTextNode(i));
-            frag.appendChild(option);
-          }
-          element.appendChild(frag);
-        ">
-          {{#each months as |month|}}
-            <option value="{{month.abbrev}}" name="{{month.length}}">{{month.abbrev}}</option>
-          {{/each}}
-        </select>
-        <select id="calendar-events-day">
-          
-        </select>
+        <div class="calendar-season-month">
+          <select  title="What month does the season start?" id="calendar-season-month-{{@index}}" onchange="
+            var element = document.getElementById('calendar-events-day-{{@index}}'),
+              frag = document.createDocumentFragment();
+            while(element.firstChild){
+              element.removeChild(element.firstChild);
+            }
+            for(var i = 1, max=parseInt(this.options[this.selectedIndex].attributes['name'].value) + 1; i < max; i++){
+              var option = document.createElement('option');
+              option.value = i;
+              option.appendChild(document.createTextNode(i));
+              frag.appendChild(option);
+            }
+            element.appendChild(frag);
+          ">
+            {{#each ../months as |month|}}
+              <script>
+                console.log("DO SOMETHING")
+              </script>
+              <option value="{{month.abbrev}}" title="What day does the season start?" name="{{month.length}}">{{month.abbrev}}</option>
+            {{/each}}
+          </select>
+          <select id="calendar-season-day-{{@index}}"></select>
+        </div>
         <button class="calendar-season-del" id="calendar-season-del-{{@index}}" name="del-season-{{@index}}" title="Delete Season">
           <i class="fas fa-trash-alt"></i>
         </button>
       </li>
+      {{/each}}
     </ol>
     <button id="calendar-events-add-season" name="add-season" title="Add a new season">
       <i class="fas fa-plus"></i> Add Season

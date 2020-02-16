@@ -1,3 +1,36 @@
+class CalendarEvents extends FormApplication {
+  data = {};
+  static get defaultOptions() {
+    const options = super.defaultOptions;
+    options.template = "modules/calendar-weather/templates/calendar-events.html";
+    options.width = 600;
+    options.height = "auto";
+    return options;
+  }
+
+  getData(){
+    return this.data;
+  }
+
+  activateListeners(html){
+    const submit = '#calendar-form-submit';
+    html.find(submit).click(ev => {
+      ev.preventDefault();
+      this.close();
+      Hooks.callAll("calendarSettingsClose", this.saveData());
+    });
+  }
+
+  renderForm(newData){
+    this.data = JSON.parse(newData);
+    console.log(this.data)
+    let templatePath = "modules/calendar-weather/templates/calendar-events.html";
+    renderTemplate(templatePath, this.data).then(html => {
+      this.render(true)
+    });
+  }
+}
+
 class CalendarForm extends FormApplication {
   data = {};
   constructor(newData){
@@ -35,7 +68,7 @@ class CalendarForm extends FormApplication {
     savedData.era = document.getElementById("calendar-form-era-input").value;
     
     let hours = parseInt(document.getElementById("calendar-form-hour-input").value)
-    if(hours > 24 || hours < 1){hours = 23;}
+    if(hours > 24 || hours < 0){hours = 23;}
     if(document.getElementById("calendar-form-ampm").value == "PM" && hours < 12){
       hours = hours + 12;
     }
@@ -44,20 +77,16 @@ class CalendarForm extends FormApplication {
     }
 
     let minutes = parseInt(document.getElementById("calendar-form-minute-input").value);
-    if(minutes > 59 || minutes < 1){minutes = 59;}
+    if(minutes > 59 || minutes < 0){minutes = 59;}
 
     let seconds = parseInt(document.getElementById("calendar-form-second-input").value)
-    if(seconds > 59 || seconds < 1){seconds = 59}
+    if(seconds > 59 || seconds < 0){seconds = 59}
 
     game.Gametime.setTime({
       hours: hours,
       minutes: minutes,
       seconds: seconds,
     });
-
-    console.log(hours + " " + minutes + " " + seconds)
-    console.log(game.Gametime.DTNow().longDate());
-
 
     let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
     if(newWeekdays.length < 1){savedData.addWeekday("Weekday");}
@@ -349,13 +378,6 @@ class Calendar extends Application {
       default: this.toObject(),
       type: Object,
     });
-    // game.settings.register('calendar-weather', 'clockRunning', {
-    //   name: "clockRunning",
-    //   scope: 'world',
-    //   config: false,
-    //   default: this.clockIsRunning,
-    //   type: Boolean,
-    // });
     game.Gametime._save(true);
   }
 
@@ -398,8 +420,10 @@ class Calendar extends Application {
     const min = '#calendar-btn-min';
     const fiveMin = '#calendar-btn-fiveMin';
     const toggleClock = '#calendar-time';
+    const events = '#calendar-events';
     this.updateDisplay()
     let form = new CalendarForm(JSON.stringify(this.toObject()));
+    let eventsForm = new CalendarEvents();
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
@@ -534,7 +558,12 @@ class Calendar extends Application {
         form.renderForm(JSON.stringify(this.toObject()));
       }
     });
-    
+    html.find(events).click(ev => {
+      ev.preventDefault();
+      if(game.user.isGM){
+        eventsForm.renderForm(JSON.stringify(this.toObject()));
+      }
+    })
   }
 }
 class Month {

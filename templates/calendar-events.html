@@ -1,0 +1,102 @@
+<style>
+  .calendar-season{
+    
+  }
+</style>
+<form autocomplete="off" onsubmit="event.preventDefault();" title="Calendar Events" class="calendar-events-container">
+  <h1>Events</h1>
+  <h2>Seasons</h2>
+  <div>
+    <p>Enter the start date and weather modifiers for each season.</p>
+    <div class="calendar-form-weekday-label-container">
+      <span class="calendar-form-weekday-input-label">
+          Name
+      </span>
+      <span class="calendar-form-weekday-radio-label">
+          Temperature
+      </span>
+      <span class="calendar-form-weekday-del">
+          Humidity
+      </span>
+      <span class="calendar-form-weekday-del">
+        Color
+      </span>
+      <span class="calendar-form-weekday-del">
+        Start Date
+      </span>
+      <span class="calendar-form-weekday-del">
+        Delete
+      </span>
+    </div>
+    <ol>
+      <li>
+        <input class="calendar-season" type="text" placeholder="ex. Autumn" id="calendar-season-{{@index}}">
+        <select class="calendar-season-temp" id="calendar-season-temp-{{@index}}">
+          <option value="+">+</option>
+          <option value=" "> </option>
+          <option value="-">-</option>
+        </select>
+        <select class="calendar-season-humidity" id="calendar-season-humidity-{{@index}}">
+          <option value="+">+</option>
+          <option value=" "> </option>
+          <option value="-">-</option>
+        </select>
+        <select class="calendar-season-color" id="calendar-season-color-{{@index}}">
+          <option value="red" style="background-color: red;">Red</option>
+          <option value="orange" style="background-color: orange;">Orange</option>
+          <option value="yellow" style="background-color: yellow;">Yellow</option>
+          <option value="green" style="background-color: green;">Green</option>
+          <option value="blue" style="color:white; background-color: blue;">Blue</option>
+          <option value="white" style="background-color: white;">White</option>
+        </select>
+        <select onchange="
+          var element = document.getElementById('calendar-events-day'),
+            frag = document.createDocumentFragment();
+          while(element.firstChild){
+            element.removeChild(element.firstChild);
+          }
+          for(var i = 1, max=parseInt(this.options[this.selectedIndex].attributes['name'].value) + 1; i < max; i++){
+            var option = document.createElement('option');
+            option.value = i;
+            option.appendChild(document.createTextNode(i));
+            frag.appendChild(option);
+          }
+          element.appendChild(frag);
+        ">
+          {{#each months as |month|}}
+            <option value="{{month.abbrev}}" name="{{month.length}}">{{month.abbrev}}</option>
+          {{/each}}
+        </select>
+        <select id="calendar-events-day">
+          
+        </select>
+        <button class="calendar-season-del" id="calendar-season-del-{{@index}}" name="del-season-{{@index}}" title="Delete Season">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </li>
+    </ol>
+    <button id="calendar-events-add-season" name="add-season" title="Add a new season">
+      <i class="fas fa-plus"></i> Add Season
+    </button>
+  </div>
+  <h2>Reoccuring Events</h2>
+  <div>
+    <p>Enter the date and description of reoccuring events such as holidays.</p>
+    <button id="calendar-events-add-reEvent" name="add-reEvent" title="Add a new reoccuring event">
+      <i class="fas fa-plus"></i> Add Reoccuring Event
+    </button>
+  </div>
+  <h2>One Time Events</h2>
+  <div>
+    <p>
+      Enter the date and description of one time events, for example an assassination.
+      The event will be deleted after it is triggered.
+    </p>
+    <button id="calendar-events-add-event" name="add-event" title="Add a new one time event">
+      <i class="fas fa-plus"></i> Add One Time Event
+    </button>
+  </div>
+  <button id="calendar-events-submit" type="submit" name="submit" title="Save Event Settings">
+    <i class="far fa-save"></i> Save Events
+  </button>
+</form>

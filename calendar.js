@@ -1,7 +1,7 @@
 class CalendarEvents extends FormApplication {
   data = {
     seasons: [{name: "boi",}],
-    reEvent: [{name: "ladtide"}]
+    reEvents: [{name: "ladtide"}]
   };
   static get defaultOptions() {
     const options = super.defaultOptions;

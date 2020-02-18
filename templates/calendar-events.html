@@ -100,7 +100,8 @@
         </select>
         <div class="calendar-season-month">
           <select  title="What month does the season start?" id="calendar-season-month-{{@index}}" onchange="
-            var element = document.getElementById('calendar-events-day-{{@index}}'),
+            let id = {{@index}}
+            var element = document.getElementById('calendar-season-day-' + id),
               frag = document.createDocumentFragment();
             while(element.firstChild){
               element.removeChild(element.firstChild);
@@ -114,9 +115,6 @@
             element.appendChild(frag);
           ">
             {{#each ../months as |month|}}
-              <script>
-                console.log("DO SOMETHING")
-              </script>
               <option value="{{month.abbrev}}" title="What day does the season start?" name="{{month.length}}">{{month.abbrev}}</option>
             {{/each}}
           </select>
@@ -135,6 +133,35 @@
   <h2>Reoccuring Events</h2>
   <div>
     <p>Enter the date and description of reoccuring events such as holidays.</p>
+    <ol>
+      {{#each reEvents as |reEvent|}}
+      <li>
+        <input class="calendar-reEvent" value="{{reEvent.name}}" type="text" placeholder="ex. Christmas" title="Enter the events's name"id="calendar-reEvent-{{@index}}">
+        <div class="calendar-reEvent-month">
+          <select  title="What month does the event start?" id="calendar-reEvent-{{@index}}" onchange="
+            let id = {{@index}}
+            var element = document.getElementById('calendar-reEvent-day-' + id),
+              frag = document.createDocumentFragment();
+            while(element.firstChild){
+              element.removeChild(element.firstChild);
+            }
+            for(var i = 1, max=parseInt(this.options[this.selectedIndex].attributes['name'].value) + 1; i < max; i++){
+              var option = document.createElement('option');
+              option.value = i;
+              option.appendChild(document.createTextNode(i));
+              frag.appendChild(option);
+            }
+            element.appendChild(frag);
+          ">
+            {{#each ../months as |month|}}
+              <option value="{{month.abbrev}}" title="What day does the event start?" name="{{month.length}}">{{month.abbrev}}</option>
+            {{/each}}
+          </select>
+          <select id="calendar-reEvent-day-{{@index}}"></select>
+        </div>
+      </li>
+      {{/each}}
+    </ol>
     <button id="calendar-events-add-reEvent" name="add-reEvent" title="Add a new reoccuring event">
       <i class="fas fa-plus"></i> Add Reoccuring Event
     </button>

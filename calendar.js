@@ -1,6 +1,7 @@
 class CalendarEvents extends FormApplication {
   data = {
     seasons: [{name: "boi",}],
+    reEvent: [{name: "ladtide"}]
   };
   static get defaultOptions() {
     const options = super.defaultOptions;
@@ -16,7 +17,8 @@ class CalendarEvents extends FormApplication {
 
   activateListeners(html){
     const submit = '#calendar-events-submit';
-    const addSeason = '#calendar-events-add-season'
+    const addSeason = '#calendar-events-add-season';
+    const delSeason = "button[class='calendar-season-del']";
     html.find(submit).click(ev => {
       ev.preventDefault();
       this.close();
@@ -26,7 +28,15 @@ class CalendarEvents extends FormApplication {
       ev.preventDefault();
       // this.data = JSON.parse(this.saveData());
       this.data.seasons.push({name: "Test"});
-      console.log(this.data)
+      this.render(true);
+      // this.checkBoxes();
+    });
+    html.find(delSeason).click(ev => {
+      ev.preventDefault();
+      // this.data = JSON.parse(this.saveData());
+      const targetName = ev.currentTarget.name.split("-");
+      const index = targetName[targetName.length - 1];
+      this.data.seasons.splice(index, 1);
       this.render(true);
       // this.checkBoxes();
     });

@@ -42,6 +42,36 @@ class CalendarEvents extends FormApplication {
     return this.data;
   }
 
+  formLoaded(){
+    return new Promise(resolve => {
+      function check() {
+        if(document.getElementById('calendar-events')){
+          resolve();
+        } else {
+          setTimeout(check, 30);
+        }
+      }
+      check();
+    })
+  }
+
+  async checkBoxes() {
+    await this.formLoaded();
+    let days = document.getElementsByClassName("calendar-reEvent-day");
+    let months = document.getElementsByClassName("calendar-reEvent-month-value");
+    for(var i = 0, max=months.length; i < max; i++){
+      frag = document.createDocumentFragment();
+      let element = days[i];
+      for(var k = 1, max=parseInt(this.data.months[i].length + 1; k < max; k++){
+        var option = document.createElement('option');
+        option.value = KeyboardEvent;
+        option.appendChild(document.createTextNode(k));
+        frag.appendChild(option);
+      }
+      element.appendChild(frag);
+    }
+  }
+
   activateListeners(html){
     const submit = '#calendar-events-submit';
     const addSeason = '#calendar-events-add-season';
@@ -94,6 +124,7 @@ class CalendarEvents extends FormApplication {
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true)
     });
+    this.checkBoxes();
   }
 }
 

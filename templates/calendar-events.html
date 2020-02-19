@@ -29,6 +29,7 @@
     width: 40px;
   }
 
+  /* Season Column Labels */
   .calendar-season-label-name{
     grid-row: 1;
     grid-column: 1;
@@ -38,7 +39,6 @@
     grid-column: 2;
     padding-left: 75px;
   }
-
   .calendar-season-label-color{
     grid-row: 1;
     grid-column: 3;
@@ -50,6 +50,32 @@
   .calendar-season-label-del{
     grid-row: 1;
     grid-column: 5;
+    width: 40px;
+  }
+
+  .calendar-reEvent-item{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    outline-offset: 5px;
+    border-bottom: 1px solid rgb(116, 0, 0);
+  }
+
+  .calendar-reEvent-container{
+    display: grid;
+  }
+  .calendar-reEvent-name{
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .calendar-reEvent-month{
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .calendar-reEvent-month-value{}
+  .calendar-reEvent-del{
+    grid-row: 1;
+    grid-column: 3;
+    justify-self: end;
     width: 40px;
   }
 
@@ -135,10 +161,12 @@
     <p>Enter the date and description of reoccuring events such as holidays.</p>
     <ol>
       {{#each reEvents as |reEvent|}}
-      <li>
-        <input class="calendar-reEvent" value="{{reEvent.name}}" type="text" placeholder="ex. Christmas" title="Enter the events's name"id="calendar-reEvent-{{@index}}">
-        <div class="calendar-reEvent-month">
-          <select  title="What month does the event start?" id="calendar-reEvent-{{@index}}" onchange="
+      <li class="calendar-reEvent-item">
+        <div class="calendar-reEvent-container">
+          <input class="calendar-reEvent-name" value="{{reEvent.name}}" type="text" placeholder="ex. Christmas" title="Name of the event"id="calendar-reEvent-{{@index}}">
+          <div class="calendar-reEvent-month">
+            <span> Start Date: </span>
+            <select class="calendar-reEvent-month-value" title="Event start month" id="calendar-reEvent-{{@index}}" onchange="
             let id = {{@index}}
             var element = document.getElementById('calendar-reEvent-day-' + id),
               frag = document.createDocumentFragment();
@@ -156,9 +184,14 @@
             {{#each ../months as |month|}}
               <option value="{{month.abbrev}}" title="What day does the event start?" name="{{month.length}}">{{month.abbrev}}</option>
             {{/each}}
-          </select>
-          <select id="calendar-reEvent-day-{{@index}}"></select>
+            </select>
+            <select class="calendar-reEvent-day" title="Event start day" id="calendar-reEvent-day-{{@index}}"></select>
+          </div>
+          <button class="calendar-reEvent-del" id="calendar-reEvent-del-{{@index}}" name="del-reEvent-{{@index}}" title="Delete reoccuring event.">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </div>
+        <input title="Event text, supports @JournalEntry[]'s" class="calendar-reEvent-text" value="{{reEvent.text}}" id="calendar-reEvent-text-{{@index}}" type="text" placeholder="ex. @JournalEntry[EntryName] is an event">
       </li>
       {{/each}}
     </ol>

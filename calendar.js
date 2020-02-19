@@ -1,7 +1,7 @@
 class CalendarEvents extends FormApplication {
   data = {
-    seasons: [{name: "boi",}],
-    reEvents: [{name: "ladtide"}]
+    seasons: [],
+    reEvents: []
   };
   static get defaultOptions() {
     const options = super.defaultOptions;
@@ -9,6 +9,33 @@ class CalendarEvents extends FormApplication {
     options.width = 600;
     options.height = "auto";
     return options;
+  }
+
+  saveData(){
+    let savedData = {
+      seasons: [],
+      reEvents: []
+    };
+    // let year = parseInt(document.getElementById("calendar-form-year-input").value);
+
+    let reEventName = document.getElementsByClassName("calendar-reEvent-name");
+    let reEventMonth = document.getElementsByClassName("calendar-reEvent-month-value");
+    let reEventDay = document.getElementsByClassName("calendar-reEvent-day");
+    let reEventContent = document.getElementsByClassName("calendar-reEvent-text");
+    // if(newMonthsName.length < 1){savedData.addMonth(tempMonth);}
+    let event = {};
+    for(var i = 0, max = reEventName.length; i < max; i++){
+      event['name'] = reEventName[i].value;
+      event['date'] = {
+        month: reEventMonth[i].options[reEventMonth[i].selectedIndex].value,
+        day: reEventDay[i].options[reEventDay[i].selectedIndex].value,
+        combined: reEventMonth[i].options[reEventMonth[i].selectedIndex].value + '-' + reEventDay[i].options[reEventDay[i].selectedIndex].value,
+      };
+      event['text'] = reEventContent[i].value;
+      savedData.reEvents.push(event);
+      event = {};
+    }
+    this.data = Object.assign(this.data, savedData);
   }
 
   getData(){
@@ -19,24 +46,43 @@ class CalendarEvents extends FormApplication {
     const submit = '#calendar-events-submit';
     const addSeason = '#calendar-events-add-season';
     const delSeason = "button[class='calendar-season-del']";
+    const addReEvent = "#calendar-events-add-reEvent";
+    const delReEvent = "button[class='calendar-reEvent-del']";
     html.find(submit).click(ev => {
       ev.preventDefault();
+      this.saveData();
       this.close();
       // Hooks.callAll("calendarSettingsClose", this.saveData());
     });
     html.find(addSeason).click(ev => {
       ev.preventDefault();
-      // this.data = JSON.parse(this.saveData());
-      this.data.seasons.push({name: "Test"});
+      this.saveData();
+      this.data.seasons.push({name: ""});
+      this.render(true);
+      // this.checkBoxes();
+    });
+    html.find(addReEvent).click(ev => {
+      ev.preventDefault();
+      this.saveData();
+      this.data.reEvents.push({name: ""});
       this.render(true);
       // this.checkBoxes();
     });
     html.find(delSeason).click(ev => {
       ev.preventDefault();
-      // this.data = JSON.parse(this.saveData());
+      this.saveData();
       const targetName = ev.currentTarget.name.split("-");
       const index = targetName[targetName.length - 1];
       this.data.seasons.splice(index, 1);
+      this.render(true);
+      // this.checkBoxes();
+    });
+    html.find(delReEvent).click(ev => {
+      ev.preventDefault();
+      this.saveData();
+      const targetName = ev.currentTarget.name.split("-");
+      const index = targetName[targetName.length - 1];
+      this.data.reEvents.splice(index, 1);
       this.render(true);
       // this.checkBoxes();
     });

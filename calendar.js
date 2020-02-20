@@ -1,7 +1,8 @@
 class CalendarEvents extends FormApplication {
   data = {
     seasons: [],
-    reEvents: []
+    reEvents: [],
+    events: []
   };
   static get defaultOptions() {
     const options = super.defaultOptions;
@@ -14,9 +15,9 @@ class CalendarEvents extends FormApplication {
   saveData() {
     let savedData = {
       seasons: [],
-      reEvents: []
+      reEvents: [],
+      events: [],
     };
-    // let year = parseInt(document.getElementById("calendar-form-year-input").value);
 
     let reEventName = document.getElementsByClassName("calendar-reEvent-name");
     let reEventMonth = document.getElementsByClassName("calendar-reEvent-month-value");
@@ -24,18 +25,21 @@ class CalendarEvents extends FormApplication {
     let reEventContent = document.getElementsByClassName("calendar-reEvent-text");
     // if(newMonthsName.length < 1){savedData.addMonth(tempMonth);}
     let event = {};
+    let day = 0;
     for (var i = 0, max = reEventName.length; i < max; i++) {
       event['name'] = reEventName[i].value;
+      day = parseInt(reEventDay[i].selectedIndex) + 1
       event['date'] = {
         month: reEventMonth[i].options[reEventMonth[i].selectedIndex].value,
-        day: reEventDay[i].options[reEventDay[i].selectedIndex].value,
-        combined: reEventMonth[i].options[reEventMonth[i].selectedIndex].value + '-' + reEventDay[i].options[reEventDay[i].selectedIndex].value,
+        day: day,
+        combined: reEventMonth[i].options[reEventMonth[i].selectedIndex].value + '-' + day,
       };
       event['text'] = reEventContent[i].value;
       savedData.reEvents.push(event);
       event = {};
     }
     this.data = Object.assign(this.data, savedData);
+    return JSON.stringify(this.data);
   }
 
   getData() {
@@ -64,18 +68,17 @@ class CalendarEvents extends FormApplication {
     let months = document.getElementsByClassName("calendar-reEvent-month-value");
     let length = 0;
     let event = undefined
-    console.log("Checking boxes!")
-    console.log(months)
-    for (var i = 0, max = months.length; i < max; i++) {
+    const numElements = names.length
+    console.log("------------CHECKING BOXES")
+    for (var i = 0; i < numElements; i++) {
       if (names[i] && months[i]) {
         event = this.data.reEvents.find(fEvent => fEvent.name == names[i].value);
         console.log(event);
-        if (event.date) {
+        if (event) {
           for (var k = 0, max = months[i].getElementsByTagName('option').length; k < max; k++) {
             if (months[i].getElementsByTagName('option')[k].value == event.date.month) {
               months[i].getElementsByTagName('option')[k].selected = 'selected';
               length = parseInt(months[i].getElementsByTagName('option')[k].attributes['name'].value);
-              break;
             }
           }
           let frag = document.createDocumentFragment();
@@ -84,13 +87,12 @@ class CalendarEvents extends FormApplication {
             var option = document.createElement('option');
             option.value = KeyboardEvent;
             if (k == event.date.day) {
+              console.log("Selected " + k)
               option.selected = 'selected';
             }
             option.appendChild(document.createTextNode(k));
             frag.appendChild(option);
           }
-          // frag[event.date.day].selected = 'selected';
-          // console.log(frag);
           element.appendChild(frag);
         }
       }
@@ -105,7 +107,8 @@ class CalendarEvents extends FormApplication {
     const delReEvent = "button[class='calendar-reEvent-del']";
     html.find(submit).click(ev => {
       ev.preventDefault();
-      this.saveData();
+      Hooks.callAll("calendarEventsClose", this.saveData());
+      // this.saveData();
       this.close();
       // Hooks.callAll("calendarSettingsClose", this.saveData());
     });
@@ -463,6 +466,12 @@ class Calendar extends Application {
     templateData.dt.timeDisp = data.default.timeDisp;
     templateData.dt.dateNum = data.default.dateNum;
     templateData.dt.weather = data.default.weather;
+    templateData.dt.seasons = data.default.seasons;
+    templateData.dt.reEvents = data.default.reEvents;
+    templateData.dt.events = data.default.events;
+    console.log(templateData.dt.reEvents);
+    console.log(data.default.reEvents)
+    templateData.dt.checkEvents();
   }
 
   populateData() {
@@ -527,6 +536,13 @@ class Calendar extends Application {
     templateData.dt.genDateWordy();
   }
 
+  setEvents(data){
+    data = JSON.parse(data);
+    templateData.dt.seasons = data.seasons
+    templateData.dt.reEvents = data.reEvents
+    templateData.dt.events = data.events
+  }
+
   updateSettings() {
     game.settings.update('calendar-weather.dateTime', {
       name: "Date/Time Data",
@@ -548,6 +564,7 @@ class Calendar extends Application {
   }
 
   toObject() {
+    console.log(templateData.dt.reEvents);
     return {
       months: templateData.dt.months,
       daysOfTheWeek: templateData.dt.daysOfTheWeek,
@@ -561,7 +578,10 @@ class Calendar extends Application {
       dayLength: templateData.dt.dayLength,
       timeDisp: templateData.dt.timeDisp,
       dateNum: templateData.dt.dateNum,
-      weather: templateData.dt.weather
+      weather: templateData.dt.weather,
+      seasons: templateData.dt.seasons,
+      reEvents: templateData.dt.reEvents,
+      events: templateData.dt.events
     }
   }
 
@@ -925,6 +945,9 @@ class DateTime {
   timeDisp = "";
   dateNum = "";
   weather = new WeatherTracker();
+  seasons = [];
+  reEvents = [];
+  events = [];
 
   addMonth(month) {
     this.months.push(month)
@@ -943,6 +966,25 @@ class DateTime {
   }
   setWeekday(day) {
     this.currentWeekday = day
+  }
+
+  checkEvents(){
+    // this.seasons
+    let combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day
+    let reEvent = this.reEvents.find(fEvent => fEvent.date.combined == combinedDate)
+    console.log(combinedDate);
+    console.log(reEvent);
+    if(reEvent){
+      console.log(reEvent)
+      let chatOut = "<b>" + reEvent.name + "</b> - " + this.dateNum + "<hr>" + reEvent.text;
+      ChatMessage.create({
+        speaker: {
+            alias: "Reoccuring Event:",
+        },
+        content: chatOut,
+    });
+    }
+    // this.events.find()
   }
 
   getWeatherObj() {
@@ -1068,7 +1110,8 @@ class DateTime {
     }
     // this.weather.generate();
     // console.log(this.weather.temp + " " + this.weather.precipitation);
-    this.genDateWordy()
+    this.genDateWordy();
+    this.checkEvents();
   }
 
   advanceMonth() {
@@ -1183,6 +1226,12 @@ $(document).ready(() => {
     //   type: Boolean,
     // });
     c.loadSettings();
+  });
+
+  Hooks.on('calendarEventsClose', (newEvents) => {
+    console.log("calendar-settings | Saving events.")
+    c.settingsOpen(false);
+    c.setEvents(newEvents);
   });
 
   Hooks.on('calendarSettingsOpen', () => {

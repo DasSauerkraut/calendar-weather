@@ -42,10 +42,10 @@ class CalendarEvents extends FormApplication {
     return this.data;
   }
 
-  formLoaded(){
+  formLoaded(element){
     return new Promise(resolve => {
       function check() {
-        if(document.getElementById('calendar-events')){
+        if(document.getElementById(element)){
           resolve();
         } else {
           setTimeout(check, 30);
@@ -56,19 +56,44 @@ class CalendarEvents extends FormApplication {
   }
 
   async checkBoxes() {
-    await this.formLoaded();
+    console.log(this.data.reEvents.length);
+    await this.formLoaded('calendar-events');
+    await this.formLoaded('calendar-reEvent-'+ (this.data.reEvents.length - 1));
+    let names = document.getElementsByClassName("calendar-reEvent-name");
     let days = document.getElementsByClassName("calendar-reEvent-day");
     let months = document.getElementsByClassName("calendar-reEvent-month-value");
+    let length = 0;
+    let event = undefined
+    console.log("Checking boxes!")
+    console.log(months)
     for(var i = 0, max=months.length; i < max; i++){
-      frag = document.createDocumentFragment();
-      let element = days[i];
-      for(var k = 1, max=parseInt(this.data.months[i].length + 1; k < max; k++){
-        var option = document.createElement('option');
-        option.value = KeyboardEvent;
-        option.appendChild(document.createTextNode(k));
-        frag.appendChild(option);
+      if(names[i] && months[i]){
+        event = this.data.reEvents.find(fEvent => fEvent.name == names[i].value);
+        console.log(event);
+        if(event.date){
+          for(var k = 0, max=months[i].getElementsByTagName('option').length; k<max; k++){
+            if(months[i].getElementsByTagName('option')[k].value == event.date.month){
+              months[i].getElementsByTagName('option')[k].selected = 'selected';
+              length = parseInt(months[i].getElementsByTagName('option')[k].attributes['name'].value);
+              break;
+            }
+          }
+          let frag = document.createDocumentFragment();
+          let element = days[i];
+          for(var k = 1, max=length + 1; k < max; k++){
+            var option = document.createElement('option');
+            option.value = KeyboardEvent;
+            if(k == event.date.day){
+              option.selected = 'selected';
+            }
+            option.appendChild(document.createTextNode(k));
+            frag.appendChild(option);
+          }
+          // frag[event.date.day].selected = 'selected';
+          // console.log(frag);
+          element.appendChild(frag);
+        }
       }
-      element.appendChild(frag);
     }
   }
 
@@ -89,14 +114,14 @@ class CalendarEvents extends FormApplication {
       this.saveData();
       this.data.seasons.push({name: ""});
       this.render(true);
-      // this.checkBoxes();
+      this.checkBoxes();
     });
     html.find(addReEvent).click(ev => {
       ev.preventDefault();
       this.saveData();
       this.data.reEvents.push({name: ""});
       this.render(true);
-      // this.checkBoxes();
+      this.checkBoxes();
     });
     html.find(delSeason).click(ev => {
       ev.preventDefault();
@@ -105,7 +130,7 @@ class CalendarEvents extends FormApplication {
       const index = targetName[targetName.length - 1];
       this.data.seasons.splice(index, 1);
       this.render(true);
-      // this.checkBoxes();
+      this.checkBoxes();
     });
     html.find(delReEvent).click(ev => {
       ev.preventDefault();
@@ -114,7 +139,7 @@ class CalendarEvents extends FormApplication {
       const index = targetName[targetName.length - 1];
       this.data.reEvents.splice(index, 1);
       this.render(true);
-      // this.checkBoxes();
+      this.checkBoxes();
     });
   }
 
@@ -123,8 +148,7 @@ class CalendarEvents extends FormApplication {
     let templatePath = "modules/calendar-weather/templates/calendar-events.html";
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true)
-    });
-    this.checkBoxes();
+    }).then(this.checkBoxes());
   }
 }
 

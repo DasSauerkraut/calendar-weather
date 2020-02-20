@@ -215,11 +215,13 @@ class CalendarForm extends FormApplication {
       seconds = 59
     }
 
-    game.Gametime.setTime({
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds,
-    });
+    if (this.data.hours != hours || this.data.minutes != minutes || this.data.seconds != seconds) {
+      game.Gametime.setTime({
+        hours: hours,
+        minutes: minutes,
+        seconds: seconds,
+      });
+    }
 
     let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
     if (newWeekdays.length < 1) {

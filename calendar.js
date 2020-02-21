@@ -68,35 +68,39 @@ class CalendarEvents extends FormApplication {
     let months = document.getElementsByClassName("calendar-reEvent-month-value");
     let length = 0;
     let event = undefined
-    const numElements = names.length
+    const numElements = this.data.reEvents.length
     console.log("------------CHECKING BOXES")
     for (var i = 0; i < numElements; i++) {
+      console.log('Element ' + (i + 1));
       if (names[i] && months[i]) {
         event = this.data.reEvents.find(fEvent => fEvent.name == names[i].value);
-        console.log(event);
         if (event) {
           for (var k = 0, max = months[i].getElementsByTagName('option').length; k < max; k++) {
             if (months[i].getElementsByTagName('option')[k].value == event.date.month) {
-              months[i].getElementsByTagName('option')[k].selected = 'selected';
+              months[i].getElementsByTagName('option')[k].selected = true;
               length = parseInt(months[i].getElementsByTagName('option')[k].attributes['name'].value);
             }
           }
           let frag = document.createDocumentFragment();
           let element = days[i];
+          while(element.firstChild){
+            element.removeChild(element.firstChild);
+          }
           for (var k = 1, max = length + 1; k < max; k++) {
             var option = document.createElement('option');
-            option.value = KeyboardEvent;
+            option.value = k;
             if (k == event.date.day) {
-              console.log("Selected " + k)
-              option.selected = 'selected';
+              option.selected = true;
             }
             option.appendChild(document.createTextNode(k));
             frag.appendChild(option);
           }
           element.appendChild(frag);
+          console.log(element);
         }
       }
     }
+    console.log(months);
   }
 
   activateListeners(html) {
@@ -125,7 +129,12 @@ class CalendarEvents extends FormApplication {
       ev.preventDefault();
       this.saveData();
       this.data.reEvents.push({
-        name: ""
+        name: "",
+        date: {
+          month: "1",
+          day: 1,
+          combined: "1-" + 1
+        }
       });
       this.render(true);
       this.checkBoxes();
@@ -971,7 +980,10 @@ class DateTime {
   checkEvents(){
     // this.seasons
     let combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day
-    let reEvent = this.reEvents.find(fEvent => fEvent.date.combined == combinedDate)
+    let reEvent = undefined;
+    if(this.reEvents){
+      reEvent = this.reEvents.find(fEvent => fEvent.date.combined == combinedDate)
+    }
     console.log(combinedDate);
     console.log(reEvent);
     if(reEvent){

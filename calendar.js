@@ -628,7 +628,6 @@ class Calendar extends Application {
     templateData.dt.seasons = data.default.seasons;
     templateData.dt.reEvents = data.default.reEvents;
     templateData.dt.events = data.default.events;
-    templateData.dt.checkEvents();
   }
 
   checkEventBoxes() {
@@ -700,10 +699,10 @@ class Calendar extends Application {
 
   setEvents(data) {
     data = JSON.parse(data);
-    console.log(data)
     templateData.dt.seasons = data.seasons
     templateData.dt.reEvents = data.reEvents
     templateData.dt.events = data.events
+    templateData.dt.checkEvents();
   }
 
   updateSettings() {
@@ -761,6 +760,7 @@ class Calendar extends Application {
     const toggleClock = '#calendar-time';
     const events = '#calendar-events';
     this.updateDisplay()
+    templateData.dt.checkEvents();
     let form = new CalendarForm(JSON.stringify(this.toObject()));
     //Next Morning
     html.find(nextDay).click(ev => {
@@ -1131,20 +1131,65 @@ class DateTime {
 
   checkEvents() {
     // this.seasons
+
+    //Find reoccuring events
     let combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day
-    let reEvent = undefined;
-    if (this.reEvents) {
-      reEvent = this.reEvents.find(fEvent => fEvent.date.combined == combinedDate)
+    console.log(combinedDate)
+    let filtReEvents = this.reEvents.filter(function (event) {
+      return event.date.combined == combinedDate;
+    });
+    console.log(this.reEvents)
+    if (filtReEvents) {
+      filtReEvents.forEach((event) => {
+        console.log(event);
+          let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
+          ChatMessage.create({
+            speaker: {
+              alias: "Reoccuring Event:",
+            },
+            content: chatOut,
+          });
+      })
     }
 
-    if (reEvent) {
-      let chatOut = "<b>" + reEvent.name + "</b> - " + this.dateNum + "<hr>" + reEvent.text;
-      ChatMessage.create({
-        speaker: {
-          alias: "Reoccuring Event:",
-        },
-        content: chatOut,
-      });
+    combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day + "-" + this.year
+    let filtEvents = this.events.filter(function (event) {
+      return event.date.combined == combinedDate;
+    });
+
+    // if (this.events) {
+    //   event = this.events.find(fEvent => fEvent.date.combined == combinedDate)
+    // }
+
+    if (filtEvents) {
+      filtEvents.forEach((event) => {
+        console.log(event);
+        if(event.allDay){
+          let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
+          ChatMessage.create({
+            speaker: {
+              alias: "Event:",
+            },
+            content: chatOut,
+          });
+        } else {
+          // let eventMessage = () => {
+          //   let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
+          //   ChatMessage.create({
+          //     speaker: {
+          //       alias: "Event:",
+          //     },
+          //     content: chatOut,
+          //   });
+          // }
+          // console.log(event.date)
+          // game.Gametime.doAt({
+          //   hours: event.date.hours,
+          //   minutes: event.date.minutes,
+          //   seconds: event.date.seconds
+          // }, eventMessage)
+        }
+      })
     }
     // this.events.find()
   }

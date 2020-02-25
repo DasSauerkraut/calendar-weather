@@ -80,7 +80,7 @@
   }
 
 </style>
-<form id="calendar-events" autocomplete="off" onsubmit="event.preventDefault();" title="Calendar Events" class="calendar-events-container">
+<form id="calendar-events" autocomplete="off" onsubmit="event.preventDefault();" class="calendar-events-container">
   <h1>Events</h1>
   <h2>Seasons(Under Construction)</h2>
   <div>
@@ -205,6 +205,67 @@
       Enter the date and description of one time events, for example an assassination.
       The event will be deleted after it is triggered.
     </p>
+    <ol>
+      {{#each events as |event|}}
+      <li class="calendar-event-item">
+        <div class="calendar-event-container">
+          <input class="calendar-event-name" value="{{event.name}}" type="text" placeholder="ex. Christmas" title="Name of the event"id="calendar-event-{{@index}}">
+          <div class="calendar-event-month">
+            <span> Date: </span>
+            <select class="calendar-event-month-value" title="Event start month" id="calendar-event-{{@index}}" onchange="
+            let id = {{@index}}
+            var element = document.getElementById('calendar-event-day-' + id),
+              frag = document.createDocumentFragment();
+            while(element.firstChild){
+              element.removeChild(element.firstChild);
+            }
+            for(var i = 1, max=parseInt(this.options[this.selectedIndex].attributes['name'].value) + 1; i < max; i++){
+              var option = document.createElement('option');
+              option.value = i;
+              option.appendChild(document.createTextNode(i));
+              frag.appendChild(option);
+            }
+            element.appendChild(frag);
+          ">
+            {{#each ../months as |month|}}
+              <option value="{{month.abbrev}}" title="What day does the event start?" name="{{month.length}}">{{month.abbrev}}</option>
+            {{/each}}
+            </select>
+            <select class="calendar-event-day" title="Event start day" id="calendar-event-day-{{@index}}"></select>
+            <input title="Event start year" class="calendar-event-year" value="{{event.date.year}}" placeholder="ex. 1234" type="number">
+            <input type="checkbox" id="calendar-event-allDay-{{@index}}" onclick="
+            var input = document.getElementById('calendar-form-month-abbrev-{{@index}}');
+            var length = document.getElementById('calendar-form-month-length-{{@index}}');
+            if(this.checked){
+                input.disabled = false; 
+                input.focus(); 
+                input.style.cursor ='auto'
+                length.disabled = true;
+                length.style.cursor = 'not-allowed';
+                length.value = 1;
+            }else{
+                input.disabled=true; 
+                input.style.cursor ='not-allowed'
+                length.disabled = false;
+                length.style.cursor = 'auto';
+            }">>
+            <span>Time: </span>
+            <input value="{{event.date.hours}}" type="text" placeholder="7" id="calendar-event-hour-{{@index}}" max="24">:
+            <input value="{{event.date.minutes}}" type="text" placeholder="15" id="calendar-event-minute-{{@index}}" max="60">:
+            <input value="{{event.date.seconds}}" type="text" placeholder="00" id="calendar-event-second-{{@index}}" max="60">
+            <select id="calendar-event-ampm-{{@index}}">
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+          <button class="calendar-event-del" id="calendar-event-del-{{@index}}" name="del-event-{{@index}}" title="Delete reoccuring event.">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+        <input title="Event text, supports @JournalEntry[]'s" class="calendar-event-text" value="{{event.text}}" id="calendar-event-text-{{@index}}" type="text" placeholder="ex. @JournalEntry[EntryName] is an event">
+      </li>
+      {{/each}}
+    </ol>
     <button id="calendar-events-add-event" name="add-event" title="Add a new one time event">
       <i class="fas fa-plus"></i> Add One Time Event
     </button>

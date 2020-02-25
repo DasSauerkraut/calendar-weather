@@ -170,6 +170,11 @@ class CalendarEvents extends FormApplication {
 
   renderForm(newData) {
     this.data = Object.assign(this.data, JSON.parse(newData));
+    this.data.events.push({
+      name: "test",
+      date: {year: 1257},
+    });
+    console.log(this.data.events)
     let templatePath = "modules/calendar-weather/templates/calendar-events.html";
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true)
@@ -1156,34 +1161,28 @@ $(document).ready(() => {
 
   const GregorianCalendar = {
     "month_len": {
-      "Hexenstag": { days: [1, 1], intercalary: true },
-      "Nachexen": { days: [32, 32] },
-      "Jahdrung": { days: [33, 33] },
-      "Mitterfruhl": { days: [1, 1], intercalary: true },
-      "Pflugzeit": { days: [33, 33] },
-      "Sigmarzeit": { days: [33, 33] },
-      "SommerZeit": { days: [33, 33] },
-      "Sonnstill": { days: [1, 1], intercalary: true },
-      "Vorgeheim": { days: [33, 33] },
-      "Geheimnistag": { days: [1, 1], intercalary: true },
-      "Nachgeheim": { days: [32, 32] },
-      "Erntezeit": { days: [33, 33] },
-      "Mitterbst": { days: [1, 1], intercalary: true },
-      "Brauzeit": { days: [33, 33] },
-      "Kalderzeit": { days: [33, 33] },
-      "Ulriczeit": { days: [33, 33] },
-      "Mondstille": { days: [1, 1], intercalary: true },
-      "Vorhexen": { days: [33, 33] },
+      "January": { days: [31, 31] },
+      "February": { days: [28, 29] },
+      "March": { days: [31, 31] },
+      "April": { days: [30, 30] },
+      "May": { days: [31, 31] },
+      "June": { days: [30, 30] },
+      "July": { days: [31, 31] },
+      "August": { days: [31, 31] },
+      "September": { days: [30, 30] },
+      "October": { days: [31, 31] },
+      "November": { days: [30, 30] },
+      "December": { days: [31, 31] },
   },
-  "leap_year_rule": (year) => 0,
-  "weekdays": ["Wellentag", "Aubentag", "Marktag", "Backertag", "Bezahltag", "Konistag", "Angestag", "Festag"],
-  "clock_start_year": 0,
+  "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
+  "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  "clock_start_year": 1970,
   "first_day": 0,
   "notes": {},
   "hours_per_day": 24,
   "seconds_per_minute": 60,
   "minutes_per_hour": 60,
-  "has_year_0": true,
+  "has_year_0": false
 };
 
   let c = new Calendar();
@@ -1249,7 +1248,6 @@ $(document).ready(() => {
     // CONFIG.debug.hooks = true
 
     game.Gametime.DTC.createFromData(GregorianCalendar);
-    
     game.Gametime.startRunning();
   });
 });

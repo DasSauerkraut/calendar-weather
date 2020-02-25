@@ -23,7 +23,6 @@ class CalendarEvents extends FormApplication {
     let reEventMonth = document.getElementsByClassName("calendar-reEvent-month-value");
     let reEventDay = document.getElementsByClassName("calendar-reEvent-day");
     let reEventContent = document.getElementsByClassName("calendar-reEvent-text");
-    // if(newMonthsName.length < 1){savedData.addMonth(tempMonth);}
     let event = {};
     let day = 0;
     for (var i = 0, max = reEventName.length; i < max; i++) {
@@ -61,46 +60,55 @@ class CalendarEvents extends FormApplication {
 
   async checkBoxes() {
     console.log(this.data.reEvents.length);
-    await this.formLoaded('calendar-events');
+    //wait until form is loaded
     await this.formLoaded('calendar-reEvent-' + (this.data.reEvents.length - 1));
+    //get form data
     let names = document.getElementsByClassName("calendar-reEvent-name");
     let days = document.getElementsByClassName("calendar-reEvent-day");
     let months = document.getElementsByClassName("calendar-reEvent-month-value");
+    //init vars
     let length = 0;
     let event = undefined
     const numElements = this.data.reEvents.length
-    console.log("------------CHECKING BOXES")
+
+    //loop through all events setting dropdowns to correct value
     for (var i = 0; i < numElements; i++) {
-      console.log('Element ' + (i + 1));
+      //makes sure element exists at i
       if (names[i] && months[i]) {
+        //gets event that matches element from data
         event = this.data.reEvents.find(fEvent => fEvent.name == names[i].value);
         if (event) {
+          //loop through each option for the month dropdown, finding the one that matches the event's date and selects it
           for (var k = 0, max = months[i].getElementsByTagName('option').length; k < max; k++) {
             if (months[i].getElementsByTagName('option')[k].value == event.date.month) {
               months[i].getElementsByTagName('option')[k].selected = true;
+              //also grabs the months length, while it's there.
               length = parseInt(months[i].getElementsByTagName('option')[k].attributes['name'].value);
             }
           }
+          //create a whole bunch of options corresponding to each day in the selected month.
           let frag = document.createDocumentFragment();
           let element = days[i];
+          //clears day selection to prevent day duplication
           while(element.firstChild){
             element.removeChild(element.firstChild);
           }
+          //create a dropdown option for the length of the selected month
           for (var k = 1, max = length + 1; k < max; k++) {
             var option = document.createElement('option');
             option.value = k;
+            //if the index is the same as the event's day, select it.
             if (k == event.date.day) {
               option.selected = true;
             }
             option.appendChild(document.createTextNode(k));
             frag.appendChild(option);
           }
+          //add generated days to the day dropdown.
           element.appendChild(frag);
-          console.log(element);
         }
       }
     }
-    console.log(months);
   }
 
   activateListeners(html) {
@@ -123,7 +131,7 @@ class CalendarEvents extends FormApplication {
         name: ""
       });
       this.render(true);
-      this.checkBoxes();
+      // this.checkBoxes();
     });
     html.find(addReEvent).click(ev => {
       ev.preventDefault();
@@ -137,7 +145,7 @@ class CalendarEvents extends FormApplication {
         }
       });
       this.render(true);
-      this.checkBoxes();
+      // this.checkBoxes();
     });
     html.find(delSeason).click(ev => {
       ev.preventDefault();
@@ -146,7 +154,7 @@ class CalendarEvents extends FormApplication {
       const index = targetName[targetName.length - 1];
       this.data.seasons.splice(index, 1);
       this.render(true);
-      this.checkBoxes();
+      // this.checkBoxes();
     });
     html.find(delReEvent).click(ev => {
       ev.preventDefault();
@@ -155,7 +163,8 @@ class CalendarEvents extends FormApplication {
       const index = targetName[targetName.length - 1];
       this.data.reEvents.splice(index, 1);
       this.render(true);
-      this.checkBoxes();
+      // this.checkBoxes();
+
     });
   }
 
@@ -164,7 +173,7 @@ class CalendarEvents extends FormApplication {
     let templatePath = "modules/calendar-weather/templates/calendar-events.html";
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true)
-    }).then(this.checkBoxes());
+    });
   }
 }
 
@@ -448,6 +457,7 @@ class CalendarForm extends FormApplication {
 class Calendar extends Application {
   isOpen = false;
   clockIsRunning = true;
+  eventsForm = new CalendarEvents();
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -478,9 +488,12 @@ class Calendar extends Application {
     templateData.dt.seasons = data.default.seasons;
     templateData.dt.reEvents = data.default.reEvents;
     templateData.dt.events = data.default.events;
-    console.log(templateData.dt.reEvents);
-    console.log(data.default.reEvents)
     templateData.dt.checkEvents();
+  }
+
+  checkEventBoxes(){
+    this.eventsForm.checkBoxes();
+    return;
   }
 
   populateData() {
@@ -573,7 +586,6 @@ class Calendar extends Application {
   }
 
   toObject() {
-    console.log(templateData.dt.reEvents);
     return {
       months: templateData.dt.months,
       daysOfTheWeek: templateData.dt.daysOfTheWeek,
@@ -609,7 +621,6 @@ class Calendar extends Application {
     const events = '#calendar-events';
     this.updateDisplay()
     let form = new CalendarForm(JSON.stringify(this.toObject()));
-    let eventsForm = new CalendarEvents();
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
@@ -751,7 +762,7 @@ class Calendar extends Application {
     html.find(events).click(ev => {
       ev.preventDefault();
       if (game.user.isGM) {
-        eventsForm.renderForm(JSON.stringify(this.toObject()));
+        this.eventsForm.renderForm(JSON.stringify(this.toObject()));
       }
     })
   }
@@ -984,10 +995,8 @@ class DateTime {
     if(this.reEvents){
       reEvent = this.reEvents.find(fEvent => fEvent.date.combined == combinedDate)
     }
-    console.log(combinedDate);
-    console.log(reEvent);
+
     if(reEvent){
-      console.log(reEvent)
       let chatOut = "<b>" + reEvent.name + "</b> - " + this.dateNum + "<hr>" + reEvent.text;
       ChatMessage.create({
         speaker: {
@@ -1146,78 +1155,36 @@ $(document).ready(() => {
   }
 
   const GregorianCalendar = {
-    // month lengths in days - first number is non-leap year, second is leapy year
     "month_len": {
-      "Hexenstag": {
-        days: [1, 1],
-      },
-      "Nachexen": {
-        days: [32, 32]
-      },
-      "Jahdrung": {
-        days: [33, 33]
-      },
-      "Mitterfruhl": {
-        days: [1, 1],
-      },
-      "Pflugzeit": {
-        days: [33, 33]
-      },
-      "Sigmarzeit": {
-        days: [33, 33]
-      },
-      "SommerZeit": {
-        days: [33, 33]
-      },
-      "Sonnstill": {
-        days: [1, 1],
-      },
-      "Vorgeheim": {
-        days: [33, 33]
-      },
-      "Geheimnistag": {
-        days: [1, 1],
-      },
-      "Nachgeheim": {
-        days: [32, 32]
-      },
-      "Erntezeit": {
-        days: [33, 33]
-      },
-      "Mitterbst": {
-        days: [1, 1],
-      },
-      "Brauzeit": {
-        days: [33, 33]
-      },
-      "Kalderzeit": {
-        days: [33, 33]
-      },
-      "Ulriczeit": {
-        days: [33, 33]
-      },
-      "Mondstille": {
-        days: [1, 1],
-      },
-      "Vorhexen": {
-        days: [33, 33]
-      },
-    },
-    // a function to return the number of leap years from 0 to the specified year. 
-    "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
-    // names of the days of the week. It is assumed weeklengths don't change
-    "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    // year when the clock starts and time is recorded as seconds from this 1/1/clock_start_year 00:00:00. If is set to 1970 as a unix joke. you can set it to 0.
-    "clock_start_year": 2020,
-    // day of the week of 0/0/0 00:00:00
-    "first_day": 6,
-    "notes": {},
-    "hours_per_day": 24,
-    "seconds_per_minute": 60,
-    "minutes_per_hour": 60,
-    // Is there a year 0 in the calendar? Gregorian goes from -1BC to 1CE with no 0 in between.
-    "has_year_0": false
-  }
+      "Hexenstag": { days: [1, 1], intercalary: true },
+      "Nachexen": { days: [32, 32] },
+      "Jahdrung": { days: [33, 33] },
+      "Mitterfruhl": { days: [1, 1], intercalary: true },
+      "Pflugzeit": { days: [33, 33] },
+      "Sigmarzeit": { days: [33, 33] },
+      "SommerZeit": { days: [33, 33] },
+      "Sonnstill": { days: [1, 1], intercalary: true },
+      "Vorgeheim": { days: [33, 33] },
+      "Geheimnistag": { days: [1, 1], intercalary: true },
+      "Nachgeheim": { days: [32, 32] },
+      "Erntezeit": { days: [33, 33] },
+      "Mitterbst": { days: [1, 1], intercalary: true },
+      "Brauzeit": { days: [33, 33] },
+      "Kalderzeit": { days: [33, 33] },
+      "Ulriczeit": { days: [33, 33] },
+      "Mondstille": { days: [1, 1], intercalary: true },
+      "Vorhexen": { days: [33, 33] },
+  },
+  "leap_year_rule": (year) => 0,
+  "weekdays": ["Wellentag", "Aubentag", "Marktag", "Backertag", "Bezahltag", "Konistag", "Angestag", "Festag"],
+  "clock_start_year": 0,
+  "first_day": 0,
+  "notes": {},
+  "hours_per_day": 24,
+  "seconds_per_minute": 60,
+  "minutes_per_hour": 60,
+  "has_year_0": true,
+};
 
   let c = new Calendar();
   // Init settings so they can be wrote to later
@@ -1239,6 +1206,10 @@ $(document).ready(() => {
     // });
     c.loadSettings();
   });
+
+  Hooks.on('renderCalendarEvents', ()=> {
+    c.checkEventBoxes();
+  })
 
   Hooks.on('calendarEventsClose', (newEvents) => {
     console.log("calendar-settings | Saving events.")
@@ -1275,7 +1246,10 @@ $(document).ready(() => {
     renderTemplate(templatePath, templateData).then(html => {
       c.render(true);
     });
+    // CONFIG.debug.hooks = true
+
     game.Gametime.DTC.createFromData(GregorianCalendar);
+    
     game.Gametime.startRunning();
   });
 });

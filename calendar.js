@@ -67,7 +67,7 @@ class CalendarEvents extends FormApplication {
         hours = hours + 12;
       }
       if (ampm[i].value == "AM" && hours == 12) {
-        hours == hours - 12;
+        hours = hours - 12;
       }
       minutes = parseInt(eventMin[i].value);
       if (minutes > 59 || minutes < 0) {
@@ -93,8 +93,6 @@ class CalendarEvents extends FormApplication {
       savedData.events.push(event);
       event = {};
     }
-    console.log("calendar-weather | Saving event info with the following new data:")
-    console.log(savedData);
     this.data = Object.assign(this.data, savedData);
     return JSON.stringify(this.data);
   }
@@ -117,7 +115,6 @@ class CalendarEvents extends FormApplication {
   }
 
   async checkBoxes() {
-    console.log(this.data.reEvents.length);
     //wait until form is loaded
     await this.formLoaded('calendar-reEvent-' + (this.data.reEvents.length - 1));
     //get form data
@@ -127,7 +124,7 @@ class CalendarEvents extends FormApplication {
     //init vars
     let length = 0;
     let event = undefined
-    const numElements = this.data.reEvents.length
+    let numElements = this.data.reEvents.length
 
     //loop through all events setting dropdowns to correct value
     for (var i = 0; i < numElements; i++) {
@@ -164,6 +161,67 @@ class CalendarEvents extends FormApplication {
           }
           //add generated days to the day dropdown.
           element.appendChild(frag);
+        }
+      }
+    }
+
+    names = document.getElementsByClassName("calendar-event-name");
+    days = document.getElementsByClassName("calendar-event-day");
+    months = document.getElementsByClassName("calendar-event-month-value");
+    let allDay = document.getElementsByClassName("calendar-event-allDay");
+    let ampm = document.getElementsByClassName("calendar-event-ampm");
+    let hours = document.getElementsByClassName("calendar-event-time-hours");
+    //init vars
+    length = 0;
+    event = undefined
+    numElements = this.data.events.length
+
+    //loop through all events setting dropdowns to correct value
+    for (var i = 0; i < numElements; i++) {
+      //makes sure element exists at i
+      if (names[i] && months[i]) {
+        //gets event that matches element from data
+        event = this.data.events.find(fEvent => fEvent.name == names[i].value);
+        if (event) {
+          //loop through each option for the month dropdown, finding the one that matches the event's date and selects it
+          for (var k = 0, max = months[i].getElementsByTagName('option').length; k < max; k++) {
+            if (months[i].getElementsByTagName('option')[k].value == event.date.month) {
+              months[i].getElementsByTagName('option')[k].selected = true;
+              //also grabs the months length, while it's there.
+              length = parseInt(months[i].getElementsByTagName('option')[k].attributes['name'].value);
+            }
+          }
+          //create a whole bunch of options corresponding to each day in the selected month.
+          let frag = document.createDocumentFragment();
+          let element = days[i];
+          //clears day selection to prevent day duplication
+          while (element.firstChild) {
+            element.removeChild(element.firstChild);
+          }
+          //create a dropdown option for the length of the selected month
+          for (var k = 1, max = length + 1; k < max; k++) {
+            var option = document.createElement('option');
+            option.value = k;
+            //if the index is the same as the event's day, select it.
+            if (k == event.date.day) {
+              option.selected = true;
+            }
+            option.appendChild(document.createTextNode(k));
+            frag.appendChild(option);
+          }
+          //add generated days to the day dropdown.
+          element.appendChild(frag);
+
+          //check if the event is all day
+          allDay[i].checked = event.allDay;
+
+          if (event.date.hours >= 12) {
+            ampm[i].getElementsByTagName('option')[1].selected = "true";
+          } else {
+            ampm[i].getElementsByTagName('option')[0].selected = "true";
+          }
+          hours[i].value = ((event.date.hours + 11) % 12 + 1);
+
         }
       }
     }
@@ -224,7 +282,6 @@ class CalendarEvents extends FormApplication {
         },
         allDay: false,
       });
-      console.log(this.data.events)
       this.render(true);
     });
     html.find(delSeason).click(ev => {
@@ -255,8 +312,6 @@ class CalendarEvents extends FormApplication {
 
   renderForm(newData) {
     this.data = Object.assign(this.data, JSON.parse(newData));
-
-    console.log(this.data.events)
     let templatePath = "modules/calendar-weather/templates/calendar-events.html";
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true)
@@ -310,7 +365,7 @@ class CalendarForm extends FormApplication {
       hours = hours + 12;
     }
     if (document.getElementById("calendar-form-ampm").value == "AM" && hours == 12) {
-      hours == hours - 12;
+      hours = hours - 12;
     }
 
     let minutes = parseInt(document.getElementById("calendar-form-minute-input").value);

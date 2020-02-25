@@ -37,6 +37,64 @@ class CalendarEvents extends FormApplication {
       savedData.reEvents.push(event);
       event = {};
     }
+
+    let eventName = document.getElementsByClassName("calendar-event-name");
+    let eventContent = document.getElementsByClassName("calendar-event-content");
+    let eventMonth = document.getElementsByClassName("calendar-event-month-value");
+    let eventDay = document.getElementsByClassName("calendar-event-day");
+    let eventYear = document.getElementsByClassName("calendar-event-year");
+    let eventHours = document.getElementsByClassName("calendar-event-time-hours");
+    let eventMin = document.getElementsByClassName("calendar-event-time-min");
+    let eventSec = document.getElementsByClassName("calendar-event-time-sec");
+    let ampm = document.getElementsByClassName("calendar-event-ampm");
+    let allDay = document.getElementsByClassName("calendar-event-allDay");
+    event = {};
+    day = 0;
+
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+
+    for (var i = 0, max = eventName.length; i < max; i++) {
+      event['name'] = eventName[i].value;
+      day = parseInt(eventDay[i].selectedIndex) + 1
+
+      hours = parseInt(eventHours[i].value)
+      if (hours > 24 || hours < 0) {
+        hours = 23;
+      }
+      if (ampm[i].value == "PM" && hours < 12) {
+        hours = hours + 12;
+      }
+      if (ampm[i].value == "AM" && hours == 12) {
+        hours == hours - 12;
+      }
+      minutes = parseInt(eventMin[i].value);
+      if (minutes > 59 || minutes < 0) {
+        minutes = 59;
+      }
+      seconds = parseInt(eventSec[i].value)
+      if (seconds > 59 || seconds < 0) {
+        seconds = 59
+      }
+
+      event['date'] = {
+        month: eventMonth[i].options[eventMonth[i].selectedIndex].value,
+        day: day,
+        year: eventYear[i].value,
+        hours: hours,
+        minutes: minutes,
+        seconds: seconds,
+        combined: eventMonth[i].options[eventMonth[i].selectedIndex].value + '-' + day + '-' + eventYear[i].value,
+      };
+      event['text'] = eventContent[i].value;
+      event['allDay'] = allDay[i].checked;
+
+      savedData.events.push(event);
+      event = {};
+    }
+    console.log("calendar-weather | Saving event info with the following new data:")
+    console.log(savedData);
     this.data = Object.assign(this.data, savedData);
     return JSON.stringify(this.data);
   }
@@ -90,7 +148,7 @@ class CalendarEvents extends FormApplication {
           let frag = document.createDocumentFragment();
           let element = days[i];
           //clears day selection to prevent day duplication
-          while(element.firstChild){
+          while (element.firstChild) {
             element.removeChild(element.firstChild);
           }
           //create a dropdown option for the length of the selected month
@@ -117,6 +175,9 @@ class CalendarEvents extends FormApplication {
     const delSeason = "button[class='calendar-season-del']";
     const addReEvent = "#calendar-events-add-reEvent";
     const delReEvent = "button[class='calendar-reEvent-del']";
+    const addEvent = "#calendar-events-add-event";
+    const delEvent = "button[class='calendar-event-del']";
+
     html.find(submit).click(ev => {
       ev.preventDefault();
       Hooks.callAll("calendarEventsClose", this.saveData());
@@ -147,6 +208,25 @@ class CalendarEvents extends FormApplication {
       this.render(true);
       // this.checkBoxes();
     });
+    html.find(addEvent).click(ev => {
+      ev.preventDefault();
+      this.saveData();
+      this.data.events.push({
+        name: "",
+        date: {
+          month: "1",
+          day: 1,
+          year: 1111,
+          hours: 1,
+          minutes: 0,
+          seconds: 0,
+          combined: "1-1-1111"
+        },
+        allDay: false,
+      });
+      console.log(this.data.events)
+      this.render(true);
+    });
     html.find(delSeason).click(ev => {
       ev.preventDefault();
       this.saveData();
@@ -154,7 +234,6 @@ class CalendarEvents extends FormApplication {
       const index = targetName[targetName.length - 1];
       this.data.seasons.splice(index, 1);
       this.render(true);
-      // this.checkBoxes();
     });
     html.find(delReEvent).click(ev => {
       ev.preventDefault();
@@ -163,17 +242,20 @@ class CalendarEvents extends FormApplication {
       const index = targetName[targetName.length - 1];
       this.data.reEvents.splice(index, 1);
       this.render(true);
-      // this.checkBoxes();
-
+    });
+    html.find(delEvent).click(ev => {
+      ev.preventDefault();
+      this.saveData();
+      const targetName = ev.currentTarget.name.split("-");
+      const index = targetName[targetName.length - 1];
+      this.data.events.splice(index, 1);
+      this.render(true);
     });
   }
 
   renderForm(newData) {
     this.data = Object.assign(this.data, JSON.parse(newData));
-    this.data.events.push({
-      name: "test",
-      date: {year: 1257},
-    });
+
     console.log(this.data.events)
     let templatePath = "modules/calendar-weather/templates/calendar-events.html";
     renderTemplate(templatePath, this.data).then(html => {
@@ -291,7 +373,7 @@ class CalendarForm extends FormApplication {
         if (newMonthsAbbrev[i].value) {
           tempMonth.abbrev = newMonthsAbbrev[i].value;
         } else {
-          console.log("Generating Abbrev")
+          console.log("calendar-weather| Generating month abbrev")
           tempMonth.abbrev = tempMonth.name.substring(0, 2).toUpperCase();
         }
       }
@@ -339,8 +421,6 @@ class CalendarForm extends FormApplication {
     console.log(returnData);
     return JSON.stringify(returnData);
   }
-
-
 
   activateListeners(html) {
     const submit = '#calendar-form-submit';
@@ -496,7 +576,7 @@ class Calendar extends Application {
     templateData.dt.checkEvents();
   }
 
-  checkEventBoxes(){
+  checkEventBoxes() {
     this.eventsForm.checkBoxes();
     return;
   }
@@ -563,8 +643,9 @@ class Calendar extends Application {
     templateData.dt.genDateWordy();
   }
 
-  setEvents(data){
+  setEvents(data) {
     data = JSON.parse(data);
+    console.log(data)
     templateData.dt.seasons = data.seasons
     templateData.dt.reEvents = data.reEvents
     templateData.dt.events = data.events
@@ -607,7 +688,7 @@ class Calendar extends Application {
       weather: templateData.dt.weather,
       seasons: templateData.dt.seasons,
       reEvents: templateData.dt.reEvents,
-      events: templateData.dt.events
+      events: templateData.dt.events,
     }
   }
 
@@ -993,22 +1074,22 @@ class DateTime {
     this.currentWeekday = day
   }
 
-  checkEvents(){
+  checkEvents() {
     // this.seasons
     let combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day
     let reEvent = undefined;
-    if(this.reEvents){
+    if (this.reEvents) {
       reEvent = this.reEvents.find(fEvent => fEvent.date.combined == combinedDate)
     }
 
-    if(reEvent){
+    if (reEvent) {
       let chatOut = "<b>" + reEvent.name + "</b> - " + this.dateNum + "<hr>" + reEvent.text;
       ChatMessage.create({
         speaker: {
-            alias: "Reoccuring Event:",
+          alias: "Reoccuring Event:",
         },
         content: chatOut,
-    });
+      });
     }
     // this.events.find()
   }
@@ -1161,29 +1242,53 @@ $(document).ready(() => {
 
   const GregorianCalendar = {
     "month_len": {
-      "January": { days: [31, 31] },
-      "February": { days: [28, 29] },
-      "March": { days: [31, 31] },
-      "April": { days: [30, 30] },
-      "May": { days: [31, 31] },
-      "June": { days: [30, 30] },
-      "July": { days: [31, 31] },
-      "August": { days: [31, 31] },
-      "September": { days: [30, 30] },
-      "October": { days: [31, 31] },
-      "November": { days: [30, 30] },
-      "December": { days: [31, 31] },
-  },
-  "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
-  "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-  "clock_start_year": 1970,
-  "first_day": 0,
-  "notes": {},
-  "hours_per_day": 24,
-  "seconds_per_minute": 60,
-  "minutes_per_hour": 60,
-  "has_year_0": false
-};
+      "January": {
+        days: [31, 31]
+      },
+      "February": {
+        days: [28, 29]
+      },
+      "March": {
+        days: [31, 31]
+      },
+      "April": {
+        days: [30, 30]
+      },
+      "May": {
+        days: [31, 31]
+      },
+      "June": {
+        days: [30, 30]
+      },
+      "July": {
+        days: [31, 31]
+      },
+      "August": {
+        days: [31, 31]
+      },
+      "September": {
+        days: [30, 30]
+      },
+      "October": {
+        days: [31, 31]
+      },
+      "November": {
+        days: [30, 30]
+      },
+      "December": {
+        days: [31, 31]
+      },
+    },
+    "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
+    "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "clock_start_year": 1970,
+    "first_day": 0,
+    "notes": {},
+    "hours_per_day": 24,
+    "seconds_per_minute": 60,
+    "minutes_per_hour": 60,
+    "has_year_0": false
+  };
 
   let c = new Calendar();
   // Init settings so they can be wrote to later
@@ -1206,7 +1311,7 @@ $(document).ready(() => {
     c.loadSettings();
   });
 
-  Hooks.on('renderCalendarEvents', ()=> {
+  Hooks.on('renderCalendarEvents', () => {
     c.checkEventBoxes();
   })
 
@@ -1214,6 +1319,7 @@ $(document).ready(() => {
     console.log("calendar-settings | Saving events.")
     c.settingsOpen(false);
     c.setEvents(newEvents);
+    c.updateSettings();
   });
 
   Hooks.on('calendarSettingsOpen', () => {

@@ -1,84 +1,147 @@
 <style>
-  .calendar-season-container{
+  .calendar-season-container {
     display: grid;
     justify-items: center;
   }
-  .calendar-season-name{
+
+  .calendar-season-name {
     grid-row: 1;
     grid-column: 1;
   }
-  .calendar-season-temp{
+
+  .calendar-season-temp {
     grid-row: 1;
     grid-column: 2;
   }
-  .calendar-season-humidity{
+
+  .calendar-season-humidity {
     grid-row: 1;
     grid-column: 3;
   }
-  .calendar-season-color{
+
+  .calendar-season-color {
     grid-row: 1;
     grid-column: 4;
   }
-  .calendar-season-month{
+
+  .calendar-season-month {
     grid-row: 1;
     grid-column: 5;
   }
-  .calendar-season-del{
+
+  .calendar-season-del {
     grid-row: 1;
     grid-column: 6;
     width: 40px;
   }
 
   /* Season Column Labels */
-  .calendar-season-label-name{
+  .calendar-season-label-name {
     grid-row: 1;
     grid-column: 1;
   }
-  .calendar-season-label-temp{
+
+  .calendar-season-label-temp {
     grid-row: 1;
     grid-column: 2;
     padding-left: 75px;
   }
-  .calendar-season-label-color{
+
+  .calendar-season-label-color {
     grid-row: 1;
     grid-column: 3;
   }
-  .calendar-season-label-date{
+
+  .calendar-season-label-date {
     grid-row: 1;
     grid-column: 4;
   }
-  .calendar-season-label-del{
+
+  .calendar-season-label-del {
     grid-row: 1;
     grid-column: 5;
     width: 40px;
   }
 
-  .calendar-reEvent-item{
+  .calendar-reEvent-item {
     padding-top: 5px;
     padding-bottom: 5px;
     outline-offset: 5px;
     border-bottom: 1px solid rgb(116, 0, 0);
   }
 
-  .calendar-reEvent-container{
+  .calendar-reEvent-container {
     display: grid;
   }
-  .calendar-reEvent-name{
+
+  .calendar-reEvent-name {
     grid-row: 1;
     grid-column: 1;
   }
-  .calendar-reEvent-month{
+
+  .calendar-reEvent-month {
     grid-row: 1;
     grid-column: 2;
   }
-  .calendar-reEvent-month-value{}
-  .calendar-reEvent-del{
+
+  .calendar-reEvent-del {
     grid-row: 1;
     grid-column: 3;
     justify-self: end;
     width: 40px;
   }
 
+  .calendar-event-item {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    outline-offset: 5px;
+    border-bottom: 1px solid rgb(116, 0, 0);
+  }
+
+  .calendar-event-container {
+    display: grid;
+  }
+
+  .calendar-event-name {
+    grid-row: 1;
+    grid-column: 1;
+    width: 33%;
+  }
+
+  .calendar-event-month {
+    grid-row: 1;
+    grid-column: 2;
+    display: inline-flex;
+    height: 25px;
+  }
+
+  .calendar-event-year {
+    width: 50px;
+  }
+
+  .calendar-event-text {
+    margin-top: 3px;
+  }
+
+  .calendar-event-allDay {
+    grid-row: 1;
+    grid-column: 3;
+  }
+
+  .calendar-event-time {
+    grid-row: 1;
+    grid-column: 4;
+    width: 160px;
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
+  .calendar-event-del {
+    grid-row: 1;
+    grid-column: 5;
+    justify-self: end;
+    width: 40px;
+  }
 </style>
 <form id="calendar-events" autocomplete="off" onsubmit="event.preventDefault();" class="calendar-events-container">
   <h1>Events</h1>
@@ -87,10 +150,10 @@
     <p>Enter the start date and weather modifiers for each season. Currently non-functional</p>
     <div class="calendar-season-container">
       <span class="calendar-season-label-name">
-          Name
+        Name
       </span>
       <span class="calendar-season-label-temp">
-          Temperature Humidity
+        Temperature Humidity
       </span>
       <span class="calendar-season-label-color">
         Color
@@ -105,18 +168,22 @@
     <ol>
       {{#each seasons as |season|}}
       <li class="calendar-season-container">
-        <input class="calendar-season" value="{{season.name}}" type="text" placeholder="ex. Autumn" title="Enter the season's name"id="calendar-season-{{@index}}">
-        <select class="calendar-season-temp" title="Is the season hotter or colder than average?"id="calendar-season-temp-{{@index}}">
+        <input class="calendar-season" value="{{season.name}}" type="text" placeholder="ex. Autumn"
+          title="Enter the season's name" id="calendar-season-{{@index}}">
+        <select class="calendar-season-temp" title="Is the season hotter or colder than average?"
+          id="calendar-season-temp-{{@index}}">
           <option value=" "> </option>
           <option value="+">+</option>
           <option value="-">-</option>
         </select>
-        <select class="calendar-season-humidity" title="Is the season drier or wetter than average?" id="calendar-season-humidity-{{@index}}">
+        <select class="calendar-season-humidity" title="Is the season drier or wetter than average?"
+          id="calendar-season-humidity-{{@index}}">
           <option value=" "> </option>
           <option value="+">+</option>
           <option value="-">-</option>
         </select>
-        <select class="calendar-season-color" title="What color do you want to display with the season?"id="calendar-season-color-{{@index}}">
+        <select class="calendar-season-color" title="What color do you want to display with the season?"
+          id="calendar-season-color-{{@index}}">
           <option value="red" style="background-color: red;">Red</option>
           <option value="orange" style="background-color: orange;">Orange</option>
           <option value="yellow" style="background-color: yellow;">Yellow</option>
@@ -125,7 +192,7 @@
           <option value="white" style="background-color: white;">White</option>
         </select>
         <div class="calendar-season-month">
-          <select  title="What month does the season start?" id="calendar-season-month-{{@index}}" onchange="
+          <select title="What month does the season start?" id="calendar-season-month-{{@index}}" onchange="
             let id = {{@index}}
             var element = document.getElementById('calendar-season-day-' + id),
               frag = document.createDocumentFragment();
@@ -141,12 +208,14 @@
             element.appendChild(frag);
           ">
             {{#each ../months as |month|}}
-              <option value="{{month.abbrev}}" title="What day does the season start?" name="{{month.length}}">{{month.abbrev}}</option>
+            <option value="{{month.abbrev}}" title="What day does the season start?" name="{{month.length}}">
+              {{month.abbrev}}</option>
             {{/each}}
           </select>
           <select id="calendar-season-day-{{@index}}"></select>
         </div>
-        <button class="calendar-season-del" id="calendar-season-del-{{@index}}" name="del-season-{{@index}}" title="Delete Season">
+        <button class="calendar-season-del" id="calendar-season-del-{{@index}}" name="del-season-{{@index}}"
+          title="Delete Season">
           <i class="fas fa-trash-alt"></i>
         </button>
       </li>
@@ -163,10 +232,12 @@
       {{#each reEvents as |reEvent|}}
       <li class="calendar-reEvent-item">
         <div class="calendar-reEvent-container">
-          <input class="calendar-reEvent-name" value="{{reEvent.name}}" type="text" placeholder="ex. Christmas" title="Name of the event"id="calendar-reEvent-{{@index}}">
+          <input class="calendar-reEvent-name" value="{{reEvent.name}}" type="text" placeholder="ex. Christmas"
+            title="Name of the event" id="calendar-reEvent-{{@index}}">
           <div class="calendar-reEvent-month">
-            <span> Start Date: </span>
-            <select class="calendar-reEvent-month-value" title="Event start month" id="calendar-reEvent-{{@index}}" onchange="
+            <span> Date: </span>
+            <select class="calendar-reEvent-month-value" title="Event start month" id="calendar-reEvent-{{@index}}"
+              onchange="
             let id = {{@index}}
             var element = document.getElementById('calendar-reEvent-day-' + id),
               frag = document.createDocumentFragment();
@@ -181,17 +252,20 @@
             }
             element.appendChild(frag);
           ">
-            {{#each ../months as |month|}}
-              <option value="{{month.abbrev}}" title="What day does the event start?" name="{{month.length}}">{{month.abbrev}}</option>
-            {{/each}}
+              {{#each ../months as |month|}}
+              <option value="{{month.abbrev}}" title="What day does the event start?" name="{{month.length}}">
+                {{month.abbrev}}</option>
+              {{/each}}
             </select>
             <select class="calendar-reEvent-day" title="Event start day" id="calendar-reEvent-day-{{@index}}"></select>
           </div>
-          <button class="calendar-reEvent-del" id="calendar-reEvent-del-{{@index}}" name="del-reEvent-{{@index}}" title="Delete reoccuring event.">
+          <button class="calendar-reEvent-del" id="calendar-reEvent-del-{{@index}}" name="del-reEvent-{{@index}}"
+            title="Delete reoccuring event.">
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
-        <input title="Event text, supports @JournalEntry[]'s" class="calendar-reEvent-text" value="{{reEvent.text}}" id="calendar-reEvent-text-{{@index}}" type="text" placeholder="ex. @JournalEntry[EntryName] is an event">
+        <input title="Event text, supports @JournalEntry[]'s" class="calendar-reEvent-text" value="{{reEvent.text}}"
+          id="calendar-reEvent-text-{{@index}}" type="text" placeholder="ex. @JournalEntry[EntryName] is an event">
       </li>
       {{/each}}
     </ol>
@@ -209,10 +283,12 @@
       {{#each events as |event|}}
       <li class="calendar-event-item">
         <div class="calendar-event-container">
-          <input class="calendar-event-name" value="{{event.name}}" type="text" placeholder="ex. Christmas" title="Name of the event"id="calendar-event-{{@index}}">
+          <input class="calendar-event-name" value="{{event.name}}" type="text" placeholder="ex. Christmas"
+            title="Name of the event" id="calendar-event-{{@index}}">
           <div class="calendar-event-month">
-            <span> Date: </span>
-            <select class="calendar-event-month-value" title="Event start month" id="calendar-event-{{@index}}" onchange="
+            <span class="calendar-event-text"> Date: </span>
+            <select class="calendar-event-month-value" title="Event start month" id="calendar-event-{{@index}}"
+              onchange="
             let id = {{@index}}
             var element = document.getElementById('calendar-event-day-' + id),
               frag = document.createDocumentFragment();
@@ -227,42 +303,62 @@
             }
             element.appendChild(frag);
           ">
-            {{#each ../months as |month|}}
-              <option value="{{month.abbrev}}" title="What day does the event start?" name="{{month.length}}">{{month.abbrev}}</option>
-            {{/each}}
+              {{#each ../months as |month|}}
+              <option value="{{month.abbrev}}" title="What day does the event start?" name="{{month.length}}">
+                {{month.abbrev}}</option>
+              {{/each}}
             </select>
             <select class="calendar-event-day" title="Event start day" id="calendar-event-day-{{@index}}"></select>
-            <input title="Event start year" class="calendar-event-year" value="{{event.date.year}}" placeholder="ex. 1234" type="number">
-            <input type="checkbox" id="calendar-event-allDay-{{@index}}" onclick="
-            var input = document.getElementById('calendar-form-month-abbrev-{{@index}}');
-            var length = document.getElementById('calendar-form-month-length-{{@index}}');
+            <input title="Event start year" class="calendar-event-year" value="{{event.date.year}}"
+              placeholder="ex. 1234" type="number">
+          </div>
+          <input class="calendar-event-allDay" title="All day event" type="checkbox"
+            id="calendar-event-allDay-{{@index}}" onclick="
+            var hours = document.getElementById('calendar-event-hour-{{@index}}');
+            var min = document.getElementById('calendar-event-minute-{{@index}}');
+            var sec = document.getElementById('calendar-event-second-{{@index}}');
+            var ampm = document.getElementById('calendar-event-ampm-{{@index}}');
             if(this.checked){
-                input.disabled = false; 
-                input.focus(); 
-                input.style.cursor ='auto'
-                length.disabled = true;
-                length.style.cursor = 'not-allowed';
-                length.value = 1;
+                hours.disabled = true; 
+                min.disabled = true; 
+                sec.disabled = true;
+                ampm.disabled = true; 
+                
+                hours.style.cursor = 'not-allowed';
+                min.style.cursor = 'not-allowed';
+                sec.style.cursor = 'not-allowed';
+                ampm.style.cursor = 'not-allowed';
             }else{
-                input.disabled=true; 
-                input.style.cursor ='not-allowed'
-                length.disabled = false;
-                length.style.cursor = 'auto';
-            }">>
-            <span>Time: </span>
-            <input value="{{event.date.hours}}" type="text" placeholder="7" id="calendar-event-hour-{{@index}}" max="24">:
-            <input value="{{event.date.minutes}}" type="text" placeholder="15" id="calendar-event-minute-{{@index}}" max="60">:
-            <input value="{{event.date.seconds}}" type="text" placeholder="00" id="calendar-event-second-{{@index}}" max="60">
-            <select id="calendar-event-ampm-{{@index}}">
+                hours.disabled = false; 
+                min.disabled = false; 
+                sec.disabled = false; 
+                ampm.disabled = false; 
+                
+                hours.style.cursor = 'auto';
+                min.style.cursor = 'auto';
+                sec.style.cursor = 'auto';
+                ampm.style.cursor = 'auto';
+            }">
+          <div class="calendar-event-time">
+            <span class="calendar-event-text">Time: </span>
+            <input class="calendar-event-time-hours" value="{{event.date.hours}}" type="text" placeholder="7"
+              id="calendar-event-hour-{{@index}}" max="24">:
+            <input class="calendar-event-time-min" value="{{event.date.minutes}}" type="text" placeholder="15"
+              id="calendar-event-minute-{{@index}}" max="60">:
+            <input class="calendar-event-time-sec" value="{{event.date.seconds}}" type="text" placeholder="00"
+              id="calendar-event-second-{{@index}}" max="60">
+            <select id="calendar-event-ampm-{{@index}}" class="calendar-event-ampm">
               <option value="AM">AM</option>
               <option value="PM">PM</option>
             </select>
           </div>
-          <button class="calendar-event-del" id="calendar-event-del-{{@index}}" name="del-event-{{@index}}" title="Delete reoccuring event.">
+          <button class="calendar-event-del" id="calendar-event-del-{{@index}}" name="del-event-{{@index}}"
+            title="Delete reoccuring event.">
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
-        <input title="Event text, supports @JournalEntry[]'s" class="calendar-event-text" value="{{event.text}}" id="calendar-event-text-{{@index}}" type="text" placeholder="ex. @JournalEntry[EntryName] is an event">
+        <input title="Event text, supports @JournalEntry[]'s" class="calendar-event-content" value="{{event.text}}"
+          id="calendar-event-text-{{@index}}" type="text" placeholder="ex. @JournalEntry[EntryName] is an event">
       </li>
       {{/each}}
     </ol>

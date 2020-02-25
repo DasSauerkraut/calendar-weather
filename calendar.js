@@ -26,7 +26,9 @@ class CalendarEvents extends FormApplication {
     let event = {};
     let day = 0;
     for (var i = 0, max = reEventName.length; i < max; i++) {
-      event['name'] = reEventName[i].value;
+      if(reEventName[i].value == ""){event['name'] = "Event " + i} else{
+        event['name'] = reEventName[i].value;
+      }
       day = parseInt(reEventDay[i].selectedIndex) + 1
       event['date'] = {
         month: reEventMonth[i].options[reEventMonth[i].selectedIndex].value,
@@ -56,7 +58,9 @@ class CalendarEvents extends FormApplication {
     let seconds = 0;
 
     for (var i = 0, max = eventName.length; i < max; i++) {
-      event['name'] = eventName[i].value;
+      if(eventName[i].value == ""){event['name'] = "Event " + i} else{
+        event['name'] = eventName[i].value;
+      }
       day = parseInt(eventDay[i].selectedIndex) + 1
 
       hours = parseInt(eventHours[i].value)
@@ -597,6 +601,7 @@ class CalendarForm extends FormApplication {
 class Calendar extends Application {
   isOpen = false;
   clockIsRunning = true;
+  showToPlayers = true;
   eventsForm = new CalendarEvents();
   static get defaultOptions() {
     const options = super.defaultOptions;
@@ -610,8 +615,11 @@ class Calendar extends Application {
     return templateData;
   }
 
+  getPlayerDisp(){return this.showToPlayers}
+
   loadSettings() {
     let data = game.settings.get('calendar-weather', 'dateTime');
+    this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
     templateData.dt.months = data.default.months;
     templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
     templateData.dt.year = data.default.year;
@@ -1133,20 +1141,19 @@ class DateTime {
     // this.seasons
 
     //Find reoccuring events
+    let messageLvl = ChatMessage.getWhisperIDs("GM")
     let combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day
-    console.log(combinedDate)
     let filtReEvents = this.reEvents.filter(function (event) {
       return event.date.combined == combinedDate;
     });
-    console.log(this.reEvents)
     if (filtReEvents) {
       filtReEvents.forEach((event) => {
-        console.log(event);
           let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
           ChatMessage.create({
             speaker: {
               alias: "Reoccuring Event:",
             },
+            whisper: messageLvl,
             content: chatOut,
           });
       })
@@ -1157,31 +1164,30 @@ class DateTime {
       return event.date.combined == combinedDate;
     });
 
-    // if (this.events) {
-    //   event = this.events.find(fEvent => fEvent.date.combined == combinedDate)
-    // }
 
     if (filtEvents) {
       filtEvents.forEach((event) => {
-        console.log(event);
         if(event.allDay){
           let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
           ChatMessage.create({
             speaker: {
               alias: "Event:",
             },
+            whisper: messageLvl,
             content: chatOut,
           });
         } else {
-          // let eventMessage = () => {
-          //   let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
-          //   ChatMessage.create({
-          //     speaker: {
-          //       alias: "Event:",
-          //     },
-          //     content: chatOut,
-          //   });
-          // }
+          let eventMessage = () => {
+            let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
+            ChatMessage.create({
+              speaker: {
+                alias: "Event:",
+              },
+              whisper: messageLvl,
+              content: chatOut,
+            });
+          }
+          eventMessage();
           // console.log(event.date)
           // game.Gametime.doAt({
           //   hours: event.date.hours,
@@ -1190,6 +1196,9 @@ class DateTime {
           // }, eventMessage)
         }
       })
+      this.events = this.events.filter(function (event) {
+        return event.date.combined != combinedDate;
+      });
     }
     // this.events.find()
   }
@@ -1401,13 +1410,14 @@ $(document).ready(() => {
       default: c.toObject(),
       type: Object,
     });
-    // game.settings.register('calendar-weather', 'clockRunning', {
-    //   name: "clockRunning",
-    //   scope: 'world',
-    //   config: false,
-    //   default: true,
-    //   type: Boolean,
-    // });
+    game.settings.register('calendar-weather', 'calendarDisplay', {
+      name: "Calendar Display for Non-GM",
+      hint: "If false, clients without GM-level permissions will not see the calendar displayed",
+      scope: 'world',
+      config: true,
+      default: true,
+      type: Boolean,
+    });
     c.loadSettings();
   });
 
@@ -1448,9 +1458,17 @@ $(document).ready(() => {
   })
 
   Hooks.on('ready', () => {
-    renderTemplate(templatePath, templateData).then(html => {
-      c.render(true);
-    });
+    if(!c.getPlayerDisp()){
+      if(game.user.isGM){
+        renderTemplate(templatePath, templateData).then(html => {
+          c.render(true);
+        });
+      }
+    } else {
+      renderTemplate(templatePath, templateData).then(html => {
+        c.render(true);
+      });
+    }
     // CONFIG.debug.hooks = true
 
     game.Gametime.DTC.createFromData(GregorianCalendar);

@@ -1234,9 +1234,11 @@ class DateTime {
           game.Gametime.doAt(time, eventMessage)
         }
       })
-      this.events = this.events.filter(function (event) {
-        return event.date.combined != combinedDate;
-      });
+      if(this.events){
+        this.events = this.events.filter(function (event) {
+          return event.date.combined != combinedDate;
+        });
+      }
     }
     // this.events.find()
   }

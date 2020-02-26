@@ -1157,9 +1157,12 @@ class DateTime {
     //Find reoccuring events
     let messageLvl = ChatMessage.getWhisperIDs("GM")
     let combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day
-    let filtReEvents = this.reEvents.filter(function (event) {
-      return event.date.combined == combinedDate;
-    });
+    let filtReEvents = [];
+    if(this.reEvents){
+      filtReEvents = this.reEvents.filter(function (event) {
+        return event.date.combined == combinedDate;
+      });
+    }
     if (filtReEvents) {
       filtReEvents.forEach((event) => {
         let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
@@ -1174,9 +1177,12 @@ class DateTime {
     }
 
     combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day + "-" + this.year
-    let filtEvents = this.events.filter(function (event) {
-      return event.date.combined == combinedDate;
-    });
+    let filtEvents = [];
+    if(this.events){
+      filtEvents = this.events.filter(function (event) {
+        return event.date.combined == combinedDate;
+      });
+    }
 
 
     if (filtEvents) {

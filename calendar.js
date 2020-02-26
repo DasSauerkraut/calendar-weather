@@ -26,7 +26,9 @@ class CalendarEvents extends FormApplication {
     let event = {};
     let day = 0;
     for (var i = 0, max = reEventName.length; i < max; i++) {
-      if(reEventName[i].value == ""){event['name'] = "Event " + i} else{
+      if (reEventName[i].value == "") {
+        event['name'] = "Event " + i
+      } else {
         event['name'] = reEventName[i].value;
       }
       day = parseInt(reEventDay[i].selectedIndex) + 1
@@ -58,7 +60,9 @@ class CalendarEvents extends FormApplication {
     let seconds = 0;
 
     for (var i = 0, max = eventName.length; i < max; i++) {
-      if(eventName[i].value == ""){event['name'] = "Event " + i} else{
+      if (eventName[i].value == "") {
+        event['name'] = "Event " + i
+      } else {
         event['name'] = eventName[i].value;
       }
       day = parseInt(eventDay[i].selectedIndex) + 1
@@ -273,16 +277,17 @@ class CalendarEvents extends FormApplication {
     html.find(addEvent).click(ev => {
       ev.preventDefault();
       this.saveData();
+      let dt = game.Gametime.DTNow();
       this.data.events.push({
         name: "",
         date: {
-          month: "1",
-          day: 1,
-          year: 1111,
-          hours: 1,
-          minutes: 0,
-          seconds: 0,
-          combined: "1-1-1111"
+          month: this.data.months[this.data.currentMonth].abbrev,
+          day: this.data.day,
+          year: this.data.year,
+          hours: dt.hours,
+          minutes: dt.minutes,
+          seconds: dt.seconds,
+          combined: this.data.months[this.data.currentMonth].abbrev + "-" + this.data.day + "-" + this.data.year
         },
         allDay: false,
       });
@@ -600,7 +605,6 @@ class CalendarForm extends FormApplication {
 
 class Calendar extends Application {
   isOpen = false;
-  clockIsRunning = true;
   showToPlayers = true;
   eventsForm = new CalendarEvents();
   static get defaultOptions() {
@@ -615,7 +619,9 @@ class Calendar extends Application {
     return templateData;
   }
 
-  getPlayerDisp(){return this.showToPlayers}
+  getPlayerDisp() {
+    return this.showToPlayers
+  }
 
   loadSettings() {
     let data = game.settings.get('calendar-weather', 'dateTime');
@@ -636,6 +642,7 @@ class Calendar extends Application {
     templateData.dt.seasons = data.default.seasons;
     templateData.dt.reEvents = data.default.reEvents;
     templateData.dt.events = data.default.events;
+    templateData.dt.isRunning = data.default.isRunning;
   }
 
   checkEventBoxes() {
@@ -664,7 +671,7 @@ class Calendar extends Application {
       game.Gametime.stopRunning();
       console.log("calendar-weather | Pausing real time clock.")
     } else {
-      if (this.clockIsRunning) {
+      if (templateData.dt.isRunning) {
         game.Gametime.startRunning();
         console.log("calendar-weather | Resuming real time clock.")
       }
@@ -724,6 +731,10 @@ class Calendar extends Application {
     game.Gametime._save(true);
   }
 
+  isRunning(){
+    return templateData.dt.isRunning;
+  }
+
   updateDisplay() {
     document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
@@ -751,6 +762,7 @@ class Calendar extends Application {
       seasons: templateData.dt.seasons,
       reEvents: templateData.dt.reEvents,
       events: templateData.dt.events,
+      isRunning: templateData.dt.isRunning,
     }
   }
 
@@ -791,7 +803,7 @@ class Calendar extends Application {
     //1 sec advance
     html.find(sec).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM && !this.clockIsRunning) {
+      if (!this.isOpen && game.user.isGM && !templateData.dt.isRunning) {
         console.log("calendar-weather | Advancing 1 sec.");
         game.Gametime.advanceClock(1)
       }
@@ -799,7 +811,7 @@ class Calendar extends Application {
     //advance 30s
     html.find(halfMin).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM && !this.clockIsRunning) {
+      if (!this.isOpen && game.user.isGM && !templateData.dt.isRunning) {
         console.log("calendar-weather | Advancing 30 sec");
         game.Gametime.advanceClock(30)
       }
@@ -846,9 +858,9 @@ class Calendar extends Application {
     html.find(toggleClock).click(ev => {
       ev.preventDefault();
       if (!this.isOpen && game.user.isGM) {
-        if (this.clockIsRunning) {
+        if (templateData.dt.isRunning) {
           console.log("calendar-weather | Stopping about-time pseudo clock.");
-          this.clockIsRunning = false;
+          templateData.dt.isRunning = false;
           game.Gametime.stopRunning();
           document.getElementById('calendar-btn-sec').disabled = false;
           document.getElementById('calendar-btn-halfMin').disabled = false;
@@ -858,7 +870,7 @@ class Calendar extends Application {
           document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
         } else {
           console.log("calendar-weather | Starting about-time pseudo clock.");
-          this.clockIsRunning = true;
+          templateData.dt.isRunning = true;
           game.Gametime.startRunning();
           document.getElementById('calendar-btn-sec').disabled = true;
           document.getElementById('calendar-btn-halfMin').disabled = true;
@@ -867,6 +879,7 @@ class Calendar extends Application {
           document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
           document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
         }
+        this.updateSettings();
       }
     });
     //handles hover events because can't access css hover property
@@ -1117,6 +1130,7 @@ class DateTime {
   seasons = [];
   reEvents = [];
   events = [];
+  isRunning = true;
 
   addMonth(month) {
     this.months.push(month)
@@ -1148,14 +1162,14 @@ class DateTime {
     });
     if (filtReEvents) {
       filtReEvents.forEach((event) => {
-          let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
-          ChatMessage.create({
-            speaker: {
-              alias: "Reoccuring Event:",
-            },
-            whisper: messageLvl,
-            content: chatOut,
-          });
+        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
+        ChatMessage.create({
+          speaker: {
+            alias: "Reoccuring Event:",
+          },
+          whisper: messageLvl,
+          content: chatOut,
+        });
       })
     }
 
@@ -1167,7 +1181,7 @@ class DateTime {
 
     if (filtEvents) {
       filtEvents.forEach((event) => {
-        if(event.allDay){
+        if (event.allDay) {
           let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
           ChatMessage.create({
             speaker: {
@@ -1177,8 +1191,23 @@ class DateTime {
             content: chatOut,
           });
         } else {
+
           let eventMessage = () => {
-            let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
+            let hours = event.date.hours;
+            let minutes = event.date.minutes;
+            let sec = event.date.seconds;
+            let AmOrPm = hours >= 12 ? 'PM' : 'AM';
+            if (minutes < 10) {
+              minutes = "0" + minutes;
+            }
+            if (sec < 10) {
+              sec = "0" + sec;
+            }
+            hours = (hours % 12) || 12;
+            let timeOut = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
+            let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + ", " +
+              timeOut + "<hr>" + event.text;
+
             ChatMessage.create({
               speaker: {
                 alias: "Event:",
@@ -1187,13 +1216,16 @@ class DateTime {
               content: chatOut,
             });
           }
-          eventMessage();
-          // console.log(event.date)
-          // game.Gametime.doAt({
-          //   hours: event.date.hours,
-          //   minutes: event.date.minutes,
-          //   seconds: event.date.seconds
-          // }, eventMessage)
+          let dt = game.Gametime.DTNow()
+          let time = game.Gametime.DMf({
+            years: dt.years,
+            days: dt.days,
+            months: dt.months,
+            hours: event.date.hours,
+            minutes: event.date.minutes,
+            seconds: event.date.seconds
+          })
+          game.Gametime.doAt(time, eventMessage)
         }
       })
       this.events = this.events.filter(function (event) {
@@ -1423,6 +1455,7 @@ $(document).ready(() => {
 
   Hooks.on('renderCalendarEvents', () => {
     c.checkEventBoxes();
+    c.settingsOpen(true);
   })
 
   Hooks.on('calendarEventsClose', (newEvents) => {
@@ -1455,11 +1488,36 @@ $(document).ready(() => {
     if (document.getElementById('calendar-weather-container')) {
       c.updateDisplay();
     }
+    if(c.isRunning()){
+      game.Gametime.startRunning();
+    } else {
+      game.Gametime.stopRunning();
+    }
+  })
+
+  Hooks.on("renderCalendar", ()=>{
+    if (c.isRunning()) {
+      game.Gametime.startRunning();
+      document.getElementById('calendar-btn-sec').disabled = true;
+      document.getElementById('calendar-btn-halfMin').disabled = true;
+      document.getElementById('calendar-btn-sec').style.cursor = 'not-allowed';
+      document.getElementById('calendar-btn-halfMin').style.cursor = 'not-allowed';
+      document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
+      document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
+    } else {
+      game.Gametime.stopRunning();
+      document.getElementById('calendar-btn-sec').disabled = false;
+      document.getElementById('calendar-btn-halfMin').disabled = false;
+      document.getElementById('calendar-btn-sec').style.cursor = 'pointer';
+      document.getElementById('calendar-btn-halfMin').style.cursor = 'pointer';
+      document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
+      document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
+    }
   })
 
   Hooks.on('ready', () => {
-    if(!c.getPlayerDisp()){
-      if(game.user.isGM){
+    if (!c.getPlayerDisp()) {
+      if (game.user.isGM) {
         renderTemplate(templatePath, templateData).then(html => {
           c.render(true);
         });
@@ -1469,9 +1527,6 @@ $(document).ready(() => {
         c.render(true);
       });
     }
-    // CONFIG.debug.hooks = true
-
     game.Gametime.DTC.createFromData(GregorianCalendar);
-    game.Gametime.startRunning();
   });
 });

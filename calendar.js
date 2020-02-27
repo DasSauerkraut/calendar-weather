@@ -662,7 +662,6 @@ class Calendar extends Application {
     templateData.dt.setWeekday("Monday")
     templateData.dt.setDayLength(24);
     templateData.dt.genDateWordy();
-    templateData.dt.weather.generate();
   }
 
   settingsOpen(isOpen) {
@@ -1101,7 +1100,6 @@ class WeatherTracker {
   }
 
   generate() {
-    this.setClimate("volcanic")
     let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
     if (this.rand(1, 5) >= 5) {
       this.temp = this.rand(20, 60) + this.seasonTemp + this.climateTemp;
@@ -1131,6 +1129,9 @@ class DateTime {
   reEvents = [];
   events = [];
   isRunning = true;
+
+
+  testMonth = new Month();
 
   addMonth(month) {
     this.months.push(month)
@@ -1364,8 +1365,10 @@ class DateTime {
         this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
       }
     }
-    // this.weather.generate();
-    // console.log(this.weather.temp + " " + this.weather.precipitation);
+    this.testMonth.setAbbrev('asd');
+    console.log(this.testMonth);
+    this.weather.generate();
+    console.log(this.weather.temp + " " + this.weather.precipitation);
     this.genDateWordy();
     this.checkEvents();
   }

@@ -632,7 +632,6 @@ class WeatherForm extends Application {
 
   activateListeners(html) {
     const toggleTemp = '#calendar-weather-temp';
-
     html.find(toggleTemp).click(ev => {
       ev.preventDefault();
       if (game.user.isGM) {
@@ -800,6 +799,7 @@ class Calendar extends Application {
       temp.innerHTML = templateData.dt.getWeatherObj().temp;
       console.log(document.getElementById("calendar-weather-precip"))
       document.getElementById("calendar-weather-precip").innerHTML = templateData.dt.getWeatherObj().precipitation
+      
     }
     game.Gametime._save(true);
   }

@@ -19,12 +19,43 @@ class CalendarEvents extends FormApplication {
       events: [],
     };
 
+    let seasonName = document.getElementsByClassName("calendar-season-name");
+    let seasonMonth = document.getElementsByClassName("calendar-season-month-value");
+    let seasonDay = document.getElementsByClassName("calendar-season-day");
+    let seasonTemp = document.getElementsByClassName("calendar-season-temp");
+    let seasonHumid = document.getElementsByClassName("calendar-season-humidity");
+    let seasonColor = document.getElementsByClassName("calendar-season-color");
+    let event = {};
+    let day = 0;
+    for (var i = 0, max = seasonName.length; i < max; i++) {
+      if (seasonName[i].value == "") {
+        event['name'] = "Season " + i
+      } else {
+        event['name'] =seasonName[i].value;
+      }
+
+      day = parseInt(seasonDay[i].selectedIndex) + 1
+      event['date'] = {
+        month: seasonMonth[i].options[seasonMonth[i].selectedIndex].value,
+        day: day,
+        combined: seasonMonth[i].options[seasonMonth[i].selectedIndex].value + '-' + day,
+      };
+      //temp
+      event['temp'] = seasonTemp[i].options[seasonTemp[i].selectedIndex].value;
+      //humid
+      event['humidity'] = seasonHumid[i].options[seasonHumid[i].selectedIndex].value;
+      //color
+      event['color'] = seasonColor[i].options[seasonColor[i].selectedIndex].value;
+      savedData.seasons.push(event);
+      event = {};
+    }
+
     let reEventName = document.getElementsByClassName("calendar-reEvent-name");
     let reEventMonth = document.getElementsByClassName("calendar-reEvent-month-value");
     let reEventDay = document.getElementsByClassName("calendar-reEvent-day");
     let reEventContent = document.getElementsByClassName("calendar-reEvent-text");
-    let event = {};
-    let day = 0;
+    event = {};
+    day = 0;
     for (var i = 0, max = reEventName.length; i < max; i++) {
       if (reEventName[i].value == "") {
         event['name'] = "Event " + i
@@ -124,15 +155,81 @@ class CalendarEvents extends FormApplication {
 
   async checkBoxes() {
     //wait until form is loaded
-    await this.formLoaded('calendar-reEvent-' + (this.data.reEvents.length - 1));
+    // await this.formLoaded('calendar-reEvent-' + (this.data.reEvents.length - 1));
     //get form data
-    let names = document.getElementsByClassName("calendar-reEvent-name");
-    let days = document.getElementsByClassName("calendar-reEvent-day");
-    let months = document.getElementsByClassName("calendar-reEvent-month-value");
+
+    let names = document.getElementsByClassName("calendar-season-name");
+    let days = document.getElementsByClassName("calendar-season-day");
+    let months = document.getElementsByClassName("calendar-season-month-value");
+    let temp = document.getElementsByClassName("calendar-season-temp");
+    let humidity = document.getElementsByClassName("calendar-season-humidity");
+    let color = document.getElementsByClassName("calendar-season-color");
     //init vars
     let length = 0;
     let event = undefined
-    let numElements = this.data.reEvents.length
+    let numElements = this.data.seasons.length
+
+    //loop through all events setting dropdowns to correct value
+    for (var i = 0; i < numElements; i++) {
+      //makes sure element exists at i
+      if (names[i] && months[i]) {
+        //gets event that matches element from data
+        event = this.data.seasons.find(fEvent => fEvent.name == names[i].value);
+        if (event) {
+          for (var k = 0, max = temp[i].getElementsByTagName('option').length; k < max; k++) {
+            if (temp[i].getElementsByTagName('option')[k].value == event.temp) {
+              temp[i].getElementsByTagName('option')[k].selected = true;
+            }
+          }
+          for (var k = 0, max = humidity[i].getElementsByTagName('option').length; k < max; k++) {
+            if (humidity[i].getElementsByTagName('option')[k].value == event.humidity) {
+              humidity[i].getElementsByTagName('option')[k].selected = true;
+            }
+          }
+          for (var k = 0, max = color[i].getElementsByTagName('option').length; k < max; k++) {
+            if (color[i].getElementsByTagName('option')[k].value == event.color) {
+              color[i].getElementsByTagName('option')[k].selected = true;
+            }
+          }
+
+          for (var k = 0, max = months[i].getElementsByTagName('option').length; k < max; k++) {
+            if (months[i].getElementsByTagName('option')[k].value == event.date.month) {
+              months[i].getElementsByTagName('option')[k].selected = true;
+              //also grabs the months length, while it's there.
+              length = parseInt(months[i].getElementsByTagName('option')[k].attributes['name'].value);
+            }
+          }
+          //create a whole bunch of options corresponding to each day in the selected month.
+          let frag = document.createDocumentFragment();
+          let element = days[i];
+          //clears day selection to prevent day duplication
+          while (element.firstChild) {
+            element.removeChild(element.firstChild);
+          }
+          //create a dropdown option for the length of the selected month
+          for (var k = 1, max = length + 1; k < max; k++) {
+            var option = document.createElement('option');
+            option.value = k;
+            //if the index is the same as the event's day, select it.
+            if (k == event.date.day) {
+              option.selected = true;
+            }
+            option.appendChild(document.createTextNode(k));
+            frag.appendChild(option);
+          }
+          //add generated days to the day dropdown.
+          element.appendChild(frag);
+        }
+      }
+    }
+
+    names = document.getElementsByClassName("calendar-reEvent-name");
+    days = document.getElementsByClassName("calendar-reEvent-day");
+    months = document.getElementsByClassName("calendar-reEvent-month-value");
+    //init vars
+    length = 0;
+    event = undefined
+    numElements = this.data.reEvents.length
 
     //loop through all events setting dropdowns to correct value
     for (var i = 0; i < numElements; i++) {
@@ -255,10 +352,10 @@ class CalendarEvents extends FormApplication {
       ev.preventDefault();
       this.saveData();
       this.data.seasons.push({
-        name: ""
+        month: "1",
+        day: 1,
       });
       this.render(true);
-      // this.checkBoxes();
     });
     html.find(addReEvent).click(ev => {
       ev.preventDefault();
@@ -272,7 +369,6 @@ class CalendarEvents extends FormApplication {
         }
       });
       this.render(true);
-      // this.checkBoxes();
     });
     html.find(addEvent).click(ev => {
       ev.preventDefault();
@@ -482,7 +578,6 @@ class CalendarForm extends FormApplication {
       dateNum: savedData.dateNum,
     }
     console.log("calendar-weather | Building new calendar with the following object:")
-    console.log(returnData);
     return JSON.stringify(returnData);
   }
 
@@ -621,22 +716,32 @@ class WeatherForm extends Application {
     let units = " °F";
     if(this.data.isC){
       units = " °C"
-      document.getElementById("calendar-weather-temp").innerHTML = 
-      ((this.data.temp - 32) * 5/9).toFixed(2);
+      document.getElementById("calendar-weather-temp").innerHTML = this.data.cTemp;
     } else {
-      document.getElementById("calendar-weather-temp").innerHTML = this.data.temp
+      document.getElementById("calendar-weather-temp").innerHTML = this.data.temp;
     }
     document.getElementById("calendar-weather-units").innerHTML = units;
+    Hooks.callAll('calendarWeatherUpdateUnits', this.data.isC)
+  }
 
+  updateData(newData){
+    this.data = newData;
   }
 
   activateListeners(html) {
     const toggleTemp = '#calendar-weather-temp';
+    const regen = '#calendar-weather-precip'
     html.find(toggleTemp).click(ev => {
       ev.preventDefault();
       if (game.user.isGM) {
         this.data.isC = !this.data.isC;
         this.updateDisplay()
+      }
+    });
+    html.find(regen).click(ev => {
+      ev.preventDefault();
+      if (game.user.isGM) {
+        Hooks.callAll('calendarWeatherRegenerate');
       }
     });
   }
@@ -660,6 +765,7 @@ class Calendar extends Application {
   isOpen = false;
   showToPlayers = true;
   eventsForm = new CalendarEvents();
+  weatherForm = new WeatherForm();
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -679,6 +785,7 @@ class Calendar extends Application {
   loadSettings() {
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
+    console.log(data.default.weather)
     templateData.dt.months = data.default.months;
     templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
     templateData.dt.year = data.default.year;
@@ -769,7 +876,8 @@ class Calendar extends Application {
     templateData.dt.seasons = data.seasons
     templateData.dt.reEvents = data.reEvents
     templateData.dt.events = data.events
-    templateData.dt.checkEvents();
+    templateData.dt.findSeasonEvents();
+    // templateData.dt.checkEvents();
   }
 
   updateSettings() {
@@ -795,10 +903,15 @@ class Calendar extends Application {
     document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
     let temp = document.getElementById("calendar-weather-temp")
     if(temp){
-      temp.innerHTML = templateData.dt.getWeatherObj().temp;
+      if(templateData.dt.weather.isC){
+        temp.innerHTML = templateData.dt.getWeatherObj().cTemp;
+      } else {
+        temp.innerHTML = templateData.dt.getWeatherObj().temp;
+      }
       document.getElementById("calendar-weather-precip").innerHTML = templateData.dt.getWeatherObj().precipitation
       let offset = document.getElementById("calendar").offsetWidth + 225
       document.getElementById("calendar-weather-container").style.left = offset + 'px'
+      this.weatherForm.updateData(templateData.dt.getWeatherObj())
     }
     game.Gametime._save(true);
   }
@@ -841,8 +954,7 @@ class Calendar extends Application {
     const weather = '#calendar-weather';
     this.updateDisplay()
     templateData.dt.checkEvents();
-    let form = new CalendarForm(JSON.stringify(this.toObject()));
-    let weatherForm = new WeatherForm();
+    let form = new CalendarForm(JSON.stringify(this.toObject())); 
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
@@ -991,7 +1103,7 @@ class Calendar extends Application {
     html.find(weather).click(ev => {
       ev.preventDefault();
       if (game.user.isGM) {
-        weatherForm.toggleForm(templateData.dt.getWeatherObj());
+        this.weatherForm.toggleForm(templateData.dt.getWeatherObj());
       }
     })
   }
@@ -1021,22 +1133,28 @@ class WeatherTracker {
   humidity = 0;
   temp = 0;
   lastTemp = 70;
+  season = "";
   seasonTemp = 0;
   seasonHumidity = 0;
+  climate = "temperate";
   climateTemp = 0;
   climateHumidity = 0;
   precipitation = "";
   isVolcanic = false;
   outputToChat = true;
   isC = false;
+  cTemp = 21.11
 
   load(newData){
     this.outputToChat = game.settings.get('calendar-weather', 'weatherDisplay');
     this.humidity = newData.humidity;
     this.temp = newData.temp;
+    this.cTemp = newData.cTemp;
     this.lastTemp = newData.lastTemp;
+    this.season = newData.season;
     this.seasonTemp = newData.seasonTemp;
     this.seasonHumidity = newData.seasonHumidity;
+    this.climate = newData.climate;
     this.climateTemp = newData.climateTemp;
     this.climateHumidity = newData.climateHumidity;
     this.precipitation = newData.precipitation;
@@ -1049,6 +1167,7 @@ class WeatherTracker {
   }
 
   extremeWeather() {
+    console.log("-------------------------EXTREME WEATHER")
     let roll = this.rand(1, 5);
     let event = "";
     if (this.isVolcanic) {
@@ -1076,7 +1195,7 @@ class WeatherTracker {
         }
         break;
     }
-    return event;
+    return "<b>Extreme Weather!</b> <hr>" + event;
   }
 
   setClimate(climate) {
@@ -1085,31 +1204,45 @@ class WeatherTracker {
       case "temperate":
         this.climateHumidity = 0;
         this.climateTemp = 0;
+        this.climate = "temperate";
+        this.generate(true)
         break;
       case "tempMountain":
         this.climateHumidity = 0;
         this.climateTemp = -10;
+        this.climate = "tempMountain";
+        this.generate(true)
         break;
       case "desert":
         this.climateHumidity = -1;
         this.climateTemp = 20;
+        this.climate = "desert";
+        this.generate(true)
         break;
       case "tundra":
         this.climateHumidity = 0;
         this.climateTemp = -20;
+        this.climate = "tundra";
+        this.generate(true)
         break;
       case "tropical":
         this.climateHumidity = 1;
         this.climateTemp = 10;
+        this.climate = "tropical";
+        this.generate(true)
         break;
       case "taiga":
         this.climateHumidity = -1;
         this.climateTemp = -20;
+        this.climate = "taiga";
+        this.generate(true)
         break;
       case "volcanic":
         this.climateHumidity = 0;
         this.climateTemp = 40;
+        this.climate = "volcanic";
         this.isVolcanic = true;
+        this.generate(true)
         break;
     }
   }
@@ -1184,13 +1317,11 @@ class WeatherTracker {
   }
 
   output(){
-    this.isVolcanic = false;
-    let tempOut = this.temp;
+    let tempOut = "";
     if(this.isC){
-      tempOut = (tempOut - 32) * 5/9;
-      tempOut = tempOut.toFixed(2) + " °C";
+      tempOut = this.cTemp + " °C";
     } else {
-      tempOut = tempOut + " °F"
+      tempOut = this.temp + " °F"
     }
     let messageLvl = ChatMessage.getWhisperIDs("GM")
     let chatOut = "<b>" + tempOut + "</b> - " + this.precipitation;
@@ -1203,18 +1334,70 @@ class WeatherTracker {
     });
   }
 
-  generate() {
+  generate(force = false) {
     let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
-    if (this.rand(1, 5) >= 5) {
-      this.temp = this.rand(20, 60) + this.seasonTemp + this.climateTemp;
+    if (force) {
+      let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
+      this.temp = temp + this.seasonTemp + this.climateTemp;
+      // console.log("Forced Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
       this.lastTemp = this.temp;
-    } else {
-      this.temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
+    } else if(this.rand(1, 5) >= 5){
+      let temp = this.rand(20, 60)
+      // console.log("Fresh Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
+      this.temp = temp + this.seasonTemp + this.climateTemp;
+      this.lastTemp = this.temp;
+    }else {
+      let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
+      this.temp = temp;
+      // console.log("Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
       this.lastTemp = this.temp;
     }
+    this.cTemp = ((this.temp - 32) * 5/9).toFixed(2);
     this.precipitation = this.genPrecip(roll);
     if(this.outputToChat){
       this.output();
+    }
+  }
+
+  setSeason(season){
+    this.season = season.name;
+    if(season.temp == "-") {
+      this.seasonTemp = -10
+    } else if (season.temp = "+") {
+      this.seasonTemp = 10
+    } else {
+      this.seasonTemp = 0
+    }
+    if(season.humidity == "-") {
+      this.seasonHumidity = -10
+    } else if (season.humidity = "+") {
+      this.seasonHumidity = 10
+    } else {
+      this.seasonHumidity = 0
+    }
+    let icon = document.getElementById('calendar-weather');
+    switch(season.color){
+      case 'red':
+        icon.style.color = "#B12E2E"
+        break;
+      case 'orange':
+        icon.style.color = "#B1692E"
+        break;
+      case 'yellow':
+        icon.style.color = "#B99946"
+        break;
+      case 'green':
+        icon.style.color = "#258E25"
+        break;
+      case 'blue':
+        icon.style.color = "#5b80a5"
+        break;
+      case 'white':
+        icon.style.color = "#CCC"
+        break;
+      default:
+        icon.style.color = "#000"
+        break
     }
   }
 }
@@ -1256,12 +1439,82 @@ class DateTime {
     this.currentWeekday = day
   }
 
+  load(newData){
+    this.months = newData.months;
+    this.daysOfTheWeek = newData.daysOfTheWeek;
+    this.year = newData.year;
+    this.day = newData.day;
+    this.numDayOfTheWeek = newData.numDayOfTheWeek;
+    this.currentMonth = newData.currentMonth;
+    this.currentWeekday = newData.currentWeekday;
+    this.dateWordy = newData.dateWordy;
+    this.era = newData.era;
+    this.timeDisp = newData.timeDisp;
+    this.dateNum = newData.dateNum;
+    this.weather.load(newData.weather);
+    this.seasons = newData.seasons;
+    this.reEvents = newData.reEvents;
+    this.events = newData.events;
+    this.isRunning = newData.isRunning;
+  }
+
+  findSeasonEvents(){
+    let tempMonth = new DateTime();
+    let flag = false;
+    let index = 0;
+    tempMonth.load(JSON.parse(JSON.stringify(this)))
+
+    if(this.seasons.length == 1){
+      this.weather.setSeason(this.seasons[0])
+    } else {
+      while(!flag){
+        let combinedDate = (tempMonth.months[tempMonth.currentMonth].abbrev) + "-" + tempMonth.day
+        for(var i = 0; i<this.seasons.length; i++){
+          if(this.seasons[i].date.combined == combinedDate){
+            flag = true;
+            index = i;
+          }
+        }
+        if(!flag){
+          tempMonth.advanceDay(true);
+        }
+      }
+      if(index - 1 < 0){
+        this.weather.setSeason(this.seasons[this.seasons.length - 1])
+      } else {
+        this.weather.setSeason(this.seasons[index - 1])
+      }
+    }
+    this.checkEvents();
+  }
+
   checkEvents() {
     // this.seasons
-
-    //Find reoccuring events
     let messageLvl = ChatMessage.getWhisperIDs("GM")
     let combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day
+    if(this.seasons){
+      let index = -1;
+      for(var i = 0; i<this.seasons.length; i++){
+        if(this.seasons[i].date.combined == combinedDate){
+          index = i;
+          break;
+        }
+      }
+      if(index != -1){
+        let event = this.seasons[index];
+        this.weather.setSeason(event)
+        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum;
+        ChatMessage.create({
+          speaker: {
+            alias: "Season Change:",
+          },
+          whisper: messageLvl,
+          content: chatOut,
+        });
+      }
+    }
+
+    //Find reoccuring events
     let filtReEvents = [];
     if(this.reEvents){
       filtReEvents = this.reEvents.filter(function (event) {
@@ -1351,10 +1604,13 @@ class DateTime {
   getWeatherObj() {
     return {
       temp: this.weather.temp,
+      cTemp: this.weather.cTemp,
       humidity: this.weather.humidity,
       lastTemp: this.weather.lastTemp,
+      season: this.weather.season,
       seasonTemp: this.weather.seasonTemp,
       seasonHumidity: this.weather.seasonHumidity,
+      climate: this.weather.climate,
       climateTemp: this.weather.climateTemp,
       climateHumidity: this.weather.climateHumidity,
       precipitation: this.weather.precipitation
@@ -1448,7 +1704,7 @@ class DateTime {
     this.dateNum = this.day + "/" + this.months[this.currentMonth].abbrev + "/" + this.year + " " + this.era;
   }
 
-  advanceDay() {
+  advanceDay(suppress = false) {
     if (this.day == this.months[this.currentMonth].length) {
       this.day = 1;
       this.advanceMonth();
@@ -1469,10 +1725,11 @@ class DateTime {
         this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
       }
     }
-
-    this.weather.generate();
-    this.genDateWordy();
-    this.checkEvents();
+    if(!suppress){
+      this.weather.generate();
+      this.genDateWordy();
+      this.checkEvents();
+    }
   }
 
   advanceMonth() {
@@ -1618,7 +1875,26 @@ $(document).ready(() => {
   Hooks.on("renderWeatherForm", ()=>{
     let offset = document.getElementById("calendar").offsetWidth + 225
     document.getElementById("calendar-weather-container").style.left = offset + 'px'  
+    document.getElementById('calendar-weather-climate').value = templateData.dt.weather.climate;
   })
+
+  Hooks.on("calendarWeatherUpdateUnits", (newUnits)=>{
+    templateData.dt.weather.isC = newUnits;
+    c.updateSettings()
+  })
+
+  Hooks.on("calendarWeatherRegenerate", ()=>{
+    templateData.dt.weather.generate();
+    c.updateDisplay();
+    c.updateSettings();
+  })
+  
+  Hooks.on('calendarWeatherClimateSet', (newClimate) => {
+    console.log("calendar-weather | Setting climate: " + newClimate)
+    templateData.dt.weather.setClimate(newClimate);
+    c.updateDisplay();
+    c.updateSettings();
+  });
 
   Hooks.on("renderCalendar", ()=>{
     if (c.isRunning()) {

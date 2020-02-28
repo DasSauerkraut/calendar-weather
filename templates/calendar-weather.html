@@ -21,6 +21,10 @@
 		border-bottom: 1px solid #111;
     color: #CCC;
 	}
+  #calendar-weather-temp:hover{
+    color: white;
+    text-shadow: 0 0 8px red;
+  }
   #calendar-weather-temp{
     cursor: pointer;
     grid-row: 1;
@@ -45,12 +49,19 @@
     padding-left: 5px;
     padding-right: 5px;
     width: 100%;
+    cursor: pointer;
+  }
+  #calendar-weather-precip:hover{
+    color: white;
+    text-shadow: 0 0 8px red;
   }
 </style>
 <div id="calendar-weather-container">
 		<h3 id="calendar-weather-hdr">
       <span id="calendar-weather-temp" title="Switch between °F and °C">{{temp}}</span><span id="calendar-weather-units">{{#if isC}} °C {{else}} °F{{/if}}</span>
-      <select id="calendar-weather-climate" title="Select a climate">
+      <select id="calendar-weather-climate" title="Select a climate" onChange="
+        Hooks.callAll('calendarWeatherClimateSet', this.value);
+      ">
         <option value="temperate">Temperate</option>
         <option value="tempMountain">Temperate Mountain</option>
         <option value="desert">Desert</option>
@@ -60,5 +71,5 @@
         <option value="volcanic">Volcanic</option>
       </select>
     </h3>
-    <p id="calendar-weather-precip">{{precipitation}}</p>
+    <p id="calendar-weather-precip" title="Regenerate Weather">{{precipitation}}</p>
 </div>

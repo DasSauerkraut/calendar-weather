@@ -603,6 +603,16 @@ class CalendarForm extends FormApplication {
   }
 }
 
+class WeatherForm extends Application {
+  static get defaultOptions() {
+    const options = super.defaultOptions;
+    options.template = "modules/calendar-weather/templates/calendar-weather.html";
+    options.popOut = false;
+    options.resizable = false;
+    return options;
+  }
+}
+
 class Calendar extends Application {
   isOpen = false;
   showToPlayers = true;
@@ -638,7 +648,7 @@ class Calendar extends Application {
     templateData.dt.dayLength = data.default.dayLength;
     templateData.dt.timeDisp = data.default.timeDisp;
     templateData.dt.dateNum = data.default.dateNum;
-    templateData.dt.weather = data.default.weather;
+    templateData.dt.weather.load(data.default.weather);
     templateData.dt.seasons = data.default.seasons;
     templateData.dt.reEvents = data.default.reEvents;
     templateData.dt.events = data.default.events;
@@ -959,6 +969,22 @@ class WeatherTracker {
   climateHumidity = 0;
   precipitation = "";
   isVolcanic = false;
+  outputToChat = true;
+  isC = false;
+
+  load(newData){
+    this.outputToChat = game.settings.get('calendar-weather', 'weatherDisplay');
+    this.humidity = newData.humidity;
+    this.temp = newData.temp;
+    this.lastTemp = newData.lastTemp;
+    this.seasonTemp = newData.seasonTemp;
+    this.seasonHumidity = newData.seasonHumidity;
+    this.climateTemp = newData.climateTemp;
+    this.climateHumidity = newData.climateHumidity;
+    this.precipitation = newData.precipitation;
+    this.isVolcanic = newData.isVolcanic;
+    this.isC = newData.isC;
+  }
 
   rand(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -1099,6 +1125,27 @@ class WeatherTracker {
     }
   }
 
+  output(){
+    this.isVolcanic = false;
+    let tempOut = this.temp;
+    if(this.isC){
+      tempOut = (tempOut - 32) * 5/9;
+      tempOut = tempOut.toFixed(2) + " °C";
+    } else {
+      tempOut = tempOut + " °F"
+    }
+    console.log(this.temp)
+    let messageLvl = ChatMessage.getWhisperIDs("GM")
+    let chatOut = "<b>" + tempOut + "</b> - " + this.precipitation;
+    ChatMessage.create({
+      speaker: {
+        alias: "Today's Weather:",
+      },
+      whisper: messageLvl,
+      content: chatOut,
+    });
+  }
+
   generate() {
     let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
     if (this.rand(1, 5) >= 5) {
@@ -1109,6 +1156,9 @@ class WeatherTracker {
       this.lastTemp = this.temp;
     }
     this.precipitation = this.genPrecip(roll);
+    if(this.outputToChat){
+      this.output();
+    }
   }
 }
 
@@ -1129,9 +1179,6 @@ class DateTime {
   reEvents = [];
   events = [];
   isRunning = true;
-
-
-  testMonth = new Month();
 
   addMonth(month) {
     this.months.push(month)
@@ -1365,10 +1412,8 @@ class DateTime {
         this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
       }
     }
-    this.testMonth.setAbbrev('asd');
-    console.log(this.testMonth);
+
     this.weather.generate();
-    console.log(this.weather.temp + " " + this.weather.precipitation);
     this.genDateWordy();
     this.checkEvents();
   }
@@ -1456,6 +1501,14 @@ $(document).ready(() => {
     game.settings.register('calendar-weather', 'calendarDisplay', {
       name: "Calendar Display for Non-GM",
       hint: "If false, clients without GM-level permissions will not see the calendar displayed",
+      scope: 'world',
+      config: true,
+      default: true,
+      type: Boolean,
+    });
+    game.settings.register('calendar-weather', 'weatherDisplay', {
+      name: "Output weather to chat?",
+      hint: "If true, the weather will be output to chat, displayed only to GM level users.",
       scope: 'world',
       config: true,
       default: true,

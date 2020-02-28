@@ -1,0 +1,40 @@
+<style>
+	#calendar-weather-container{
+		position: fixed;
+		bottom: 75px;
+		left: 223px;
+		display: grid;
+	}
+	#calendar{
+	min-width: 150px;
+	grid-row: 1;
+	grid-column: 1;
+	width: fit-content;
+	height: fit-content;
+	margin: 0;
+	padding: 0;
+	border: 1px solid #000;
+	border-radius: 3%;
+	background: rgba(0, 0, 0, 0.5);
+	}
+	#calendar-hdr{
+		display: grid;
+		font-size: 16px;
+		margin: 3px;
+		padding: 4px;
+		text-align: center;
+		height: 25px;
+		width: fit-content;
+		min-width: 200px;
+		border-bottom: 1px solid #111;
+	}
+</style>
+<div id="calendar-weather-container">
+	<div id="calendar-weather">
+		<h3 id="calendar-hdr">
+			<span id="calendar-date" title="Edit Calendar">Date</span><span title="Edit Calendar" id="calendar-date-num">DateNum</span>
+		</h3>
+		<div class="calendar-container">
+		</div>
+	</div>
+</div>

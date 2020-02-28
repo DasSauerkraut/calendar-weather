@@ -281,13 +281,13 @@ class CalendarEvents extends FormApplication {
       this.data.events.push({
         name: "",
         date: {
-          month: this.data.months[this.data.currentMonth].abbrev,
+          month: this.data.months[dt.months].abbrev,
           day: this.data.day,
           year: this.data.year,
           hours: dt.hours,
           minutes: dt.minutes,
           seconds: dt.seconds,
-          combined: this.data.months[this.data.currentMonth].abbrev + "-" + this.data.day + "-" + this.data.year
+          combined: this.data.months[dt.months].abbrev + "-" + this.data.day + "-" + this.data.year
         },
         allDay: false,
       });
@@ -333,18 +333,19 @@ class CalendarForm extends FormApplication {
   constructor(newData) {
     super();
     newData = JSON.parse(newData);
+    let now = game.Gametime.DTNow();
     this.data = {
       months: newData.months,
       daysOfTheWeek: newData.daysOfTheWeek,
-      year: newData.year,
-      day: newData.day,
-      numDayOfTheWeek: newData.numDayOfTheWeek,
-      currentMonth: newData.currentMonth,
-      currentWeekday: newData.currentWeekday,
+      year: now.years,
+      day: now.days+1,
+      numDayOfTheWeek: now.dow(),
+      currentMonth: now.months+1,
+      currentWeekday: game.Gametime.DTC.weekDays[now.dow()],
       era: newData.era,
-      hours: game.Gametime.DTNow().hours,
-      minutes: game.Gametime.DTNow().minutes,
-      seconds: game.Gametime.DTNow().seconds,
+      hours: now.hours,
+      minutes: now.minutes,
+      seconds: now.seconds,
     };
   }
 
@@ -358,11 +359,11 @@ class CalendarForm extends FormApplication {
 
   saveData() {
     let savedData = new DateTime();
+ 
     let year = parseInt(document.getElementById("calendar-form-year-input").value);
     if (year < 0) {
       year = 1;
     }
-    savedData.year = year;
 
     savedData.era = document.getElementById("calendar-form-era-input").value;
 
@@ -370,6 +371,7 @@ class CalendarForm extends FormApplication {
     if (hours > 24 || hours < 0) {
       hours = 23;
     }
+
     if (document.getElementById("calendar-form-ampm").value == "PM" && hours < 12) {
       hours = hours + 12;
     }
@@ -386,46 +388,19 @@ class CalendarForm extends FormApplication {
     if (seconds > 59 || seconds < 0) {
       seconds = 59
     }
-
-    if (this.data.hours != hours || this.data.minutes != minutes || this.data.seconds != seconds) {
-      game.Gametime.setTime({
-        hours: hours,
-        minutes: minutes,
-        seconds: seconds,
-      });
-    }
-
-    let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
-    if (newWeekdays.length < 1) {
-      savedData.addWeekday("Weekday");
-    }
-    for (var i = 0, max = newWeekdays.length; i < max; i++) {
-      if (newWeekdays[i].value) {
-        savedData.addWeekday(newWeekdays[i].value);
-      } else {
-        savedData.addWeekday("Weekday");
-      }
-
-    }
-
-    let weekdayTarget = 0;
-    if (document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null) {
-      weekdayTarget = savedData.daysOfTheWeek.length - 1
-    } else {
-      weekdayTarget = document.querySelector('input[class="calendar-form-weekday-radio"]:checked').value;
-    }
-    savedData.currentWeekday = savedData.daysOfTheWeek[weekdayTarget];
-    savedData.numDayOfTheWeek = weekdayTarget;
-
+   
     let newMonthsName = document.getElementsByClassName("calendar-form-month-input");
     let newMonthsLength = document.getElementsByClassName("calendar-form-month-length-input");
     let newMonthsIsNum = document.getElementsByClassName("calendar-form-month-isnum");
     let newMonthsAbbrev = document.getElementsByClassName("calendar-form-month-abbrev");
-    let tempMonth = new Month("Month 1", 30, true);
+
+    let newMonths = [];
     if (newMonthsName.length < 1) {
-      savedData.addMonth(tempMonth);
+      savedData.addMonth(new Month("Month 1", 30, true));
     }
-    for (var i = 0, max = newMonthsName.length; i < max; i++) {
+
+    for (var i = 0; i < newMonthsName.length; i++) {
+      let tempMonth = new Month("Month 1", 30, true);
       if (newMonthsName[i].value == "") {
         tempMonth.name = "New Month"
       } else {
@@ -441,9 +416,22 @@ class CalendarForm extends FormApplication {
           tempMonth.abbrev = tempMonth.name.substring(0, 2).toUpperCase();
         }
       }
-      savedData.addMonth(tempMonth);
-      tempMonth = new Month("Month 1", 30, true);
+      newMonths.push(tempMonth);
     }
+    savedData.months = newMonths;
+
+    let weekDays = [];
+    let newWeekdays = document.getElementsByClassName("calendar-form-weekday-input");
+    for (var i = 0; i < newWeekdays.length; i++) {
+      if (!newWeekdays[i].value) newWeekdays[i].value = "Weekday";
+      weekDays.push(newWeekdays[i].value)
+    }
+    if (weekDays.length < 1) weekDays = ["Weekday"];
+    savedData.daysOfTheWeek = weekDays;
+   
+    savedData.setDayLength(24);
+
+    DateTime.updateDTC();
 
     let monthTarget = 0;
     if (document.querySelector('input[class="calendar-form-month-radio"]:checked') == null) {
@@ -451,38 +439,42 @@ class CalendarForm extends FormApplication {
     } else {
       monthTarget = document.querySelector('input[class="calendar-form-month-radio"]:checked').value;
     }
-    savedData.currentMonth = monthTarget;
 
     let day = parseInt(document.getElementById("calendar-form-cDay-input").value);
-    if (savedData.months[savedData.currentMonth].length < day) {
-      day = savedData.months[savedData.currentMonth].length - 1
+    if (savedData.months[monthTarget].length < day) {
+      day = savedData.months[monthTarget].length;
     }
-    if (savedData.months[savedData.currentMonth].length == 1) {
-      day = 1;
+    day -= 1;
+    Gametime.setAbsolute({years: year, months: monthTarget, days: day, hours: hours, minutes: minutes, seconds: seconds})
+    
+    let weekdayTarget = 0;
+    if (document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null) {
+      weekdayTarget = savedData.daysOfTheWeek.length - 1
+    } else {
+      weekdayTarget = document.querySelector('input[class="calendar-form-weekday-radio"]:checked').value;
     }
-
-    savedData.day = day;
+    savedData.numDayOfTheWeek = weekdayTarget;
 
     savedData.setTimeDisp();
-    savedData.setDayLength(24);
     savedData.genDateWordy();
     savedData.genAbbrev();
+    let now = game.Gametime.DTNow();
     let returnData = {
       months: savedData.months,
       daysOfTheWeek: savedData.daysOfTheWeek,
-      year: savedData.year,
-      day: savedData.day,
-      numDayOfTheWeek: savedData.numDayOfTheWeek,
-      currentMonth: savedData.currentMonth,
-      currentWeekday: savedData.currentWeekday,
+      year: now.years,
+      day: now.days,
+      numDayOfTheWeek: now.dow(),
+      currentMonth: now.months,
+      currentWeekday: game.Gametime.DTC.weekDays[now.dow()],
       dateWordy: savedData.dateWordy,
       era: savedData.era,
-      dayLength: savedData.dayLength,
+      dayLength: game.Gametime.DTC.hpd,
       timeDisp: savedData.timeDisp,
       dateNum: savedData.dateNum,
+      events: DateTime._events
     }
-    console.log("calendar-weather | Building new calendar with the following object:")
-    console.log(returnData);
+    console.log("calendar-weather | Building new calendar with the following object:", returnData)
     return JSON.stringify(returnData);
   }
 
@@ -492,6 +484,7 @@ class CalendarForm extends FormApplication {
     const addMonth = '#calendar-form-add-month';
     const delWeekday = "button[class='calendar-form-weekday-del']";
     const delMonth = "button[class='calendar-form-month-del']"
+    const loadDefault = "#calendar-form-load-default";
     html.find(submit).click(ev => {
       ev.preventDefault();
       this.close();
@@ -530,6 +523,35 @@ class CalendarForm extends FormApplication {
       this.render(true);
       this.checkBoxes();
     });
+    html.find(loadDefault).click(ev => {
+      ev.preventDefault();
+      let defaultCalendar = Object.keys(game.Gametime.calendars)[game.settings.get("about-time", "calendar")];
+      new Dialog({
+        title: "Choose Calendar",
+        content: `<p>${defaultCalendar}</p>`,
+        buttons: {
+          yes: {
+            icon: '<i class="fas fa-check"></i>',
+            label: "Load",
+            callback: async () => {
+              DateTime.updateFromDTC(defaultCalendar);
+              DateTime.updateDTC();
+              this.data.months = DateTime._months;
+              this.data.daysOfTheWeek = DateTime._daysOfTheWeek;
+              await this.render(true);
+              try {
+                await this.checkBoxes();
+              } catch(err) {}
+            }
+          },
+          no: {
+            icon: '<i class="fas fa-times"></i>',
+            label: "Don't Load"
+          }
+        }
+      }).render(true);
+    });
+
     html.find("*").keydown(ev => {
       if (ev.which == 13) {
         ev.preventDefault();
@@ -541,6 +563,15 @@ class CalendarForm extends FormApplication {
   }
 
   getData() {
+    let now = game.Gametime.DTNow();
+    this.data.year =  now.years;
+    this.data.day = now.days+1;
+    this.data.numDayOfTheWeek = now.dow();
+    this.data.currentMonth = now.months;
+    this.data.currentWeekday = game.Gametime.DTC.weekDays[now.dow()];
+    this.data.hours = now.hours;
+    this.data.minutes = now.minutes;
+    this.data.seconds = now.seconds;
     return this.data;
   }
 
@@ -564,24 +595,19 @@ class CalendarForm extends FormApplication {
     let monthsAbbrev = document.getElementsByClassName("calendar-form-month-abbrev");
     let months = document.getElementsByClassName("calendar-form-month-radio");
     for (var i = 0, max = weekdays.length; i < max; i++) {
-      if (i == this.data.numDayOfTheWeek) {
-        weekdays[i].checked = true;
-        break;
-      } else {
-        weekdays[i].checked = false;
-      }
+      weekdays[i].checked = i === this.data.numDayOfTheWeek;
     }
 
-    for (var i = 0, max = monthsNum.length; i < max; i++) {
+    for (var i = 0, max = this.data.months.length; i < max; i++) {
       monthsNum[i].checked = !this.data.months[i].isNumbered;
       if (monthsNum[i].checked) {
         monthsAbbrev[i].disabled = false;
         monthsAbbrev[i].style.cursor = 'auto'
-      }
-      if (i == this.data.currentMonth) {
-        months[i].checked = true;
+        monthsAbbrev[i].value = this.data.months[i].abbrev;
       }
     }
+    months[this.data.currentMonth].checked = true;
+
     if (game.Gametime.DTNow().hours >= 12) {
       document.getElementById("calendar-form-ampm")[1].selected = "true";
     } else {
@@ -592,9 +618,10 @@ class CalendarForm extends FormApplication {
   renderForm(newData) {
     let templatePath = "modules/calendar-weather/templates/calendar-form.html";
     this.data = JSON.parse(newData);
-    this.data["hours"] = (game.Gametime.DTNow().hours % 12) || 12;
-    this.data["minutes"] = game.Gametime.DTNow().minutes;
-    this.data["seconds"] = game.Gametime.DTNow().seconds;
+    let now = game.Gametime.DTNow();
+    this.data["hours"] = (now.hours % 12) || 12;
+    this.data["minutes"] = now.minutes;
+    this.data["seconds"] = now.seconds;
     renderTemplate(templatePath, this.data).then(html => {
       this.render(true)
     }).then(this.checkBoxes());
@@ -607,6 +634,8 @@ class Calendar extends Application {
   isOpen = false;
   showToPlayers = true;
   eventsForm = new CalendarEvents();
+
+
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -626,23 +655,28 @@ class Calendar extends Application {
   loadSettings() {
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
-    templateData.dt.months = data.default.months;
-    templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
-    templateData.dt.year = data.default.year;
-    templateData.dt.day = data.default.day;
-    templateData.dt.numDayOfTheWeek = data.default.numDayOfTheWeek;
-    templateData.dt.currentMonth = data.default.currentMonth;
-    templateData.dt.currentWeekday = data.default.currentWeekday;
-    templateData.dt.dateWordy = data.default.dateWordy;
-    templateData.dt.era = data.default.era;
-    templateData.dt.dayLength = data.default.dayLength;
-    templateData.dt.timeDisp = data.default.timeDisp;
-    templateData.dt.dateNum = data.default.dateNum;
-    templateData.dt.weather = data.default.weather;
-    templateData.dt.seasons = data.default.seasons;
-    templateData.dt.reEvents = data.default.reEvents;
-    templateData.dt.events = data.default.events;
-    templateData.dt.isRunning = data.default.isRunning;
+    // Also check intercalary days
+
+    if (!data) {
+      this.populateData();
+      Gametime.setAbsolute({years: 0, months: 0, days: 0, hours:0, minutes: 0, seconds:0})
+    } else {
+      let now = Gametime.DTNow();
+      templateData.dt = new DateTime();
+      templateData.dt.months = data.months;
+      templateData.dt.daysOfTheWeek = data.daysOfTheWeek;
+      DateTime.updateDTC(); // set the calendar spec for correct date time calculations
+
+      templateData.dt.currentWeekday = templateData.dt.daysOfTheWeek[now.dow()];
+      templateData.dt.genDateWordy();
+      templateData.dt.era = data.era;
+      templateData.dt.dayLength = Gametime.DTC.hpd;
+      templateData.dt.timeDisp = now.shortDate().time;
+      templateData.dt.weather = data.weather;
+      templateData.dt.seasons = data.seasons;
+      templateData.dt.reEvents = data.reEvents;
+      templateData.dt.events = data.events;
+    }
   }
 
   checkEventBoxes() {
@@ -659,8 +693,8 @@ class Calendar extends Application {
     templateData.dt.addWeekday("Thursday");
     templateData.dt.setYear(2020);
     templateData.dt.setEra("AD");
-    templateData.dt.setWeekday("Monday")
-    templateData.dt.setDayLength(24);
+    templateData.dt.numDayOfTheWeek(0)
+    StemplateData.dt.setDayLength(24);
     templateData.dt.genDateWordy();
     templateData.dt.weather.generate();
   }
@@ -671,39 +705,40 @@ class Calendar extends Application {
       game.Gametime.stopRunning();
       console.log("calendar-weather | Pausing real time clock.")
     } else {
-      if (templateData.dt.isRunning) {
         game.Gametime.startRunning();
         console.log("calendar-weather | Resuming real time clock.")
-      }
     }
   }
 
+
   rebuild(obj) {
+    templateData.dt = new DateTime();
     if (obj.months.length != 0) {
       templateData.dt.months = obj.months;
     }
     if (obj.daysOfTheWeek != []) {
       templateData.dt.daysOfTheWeek = obj.daysOfTheWeek;
     }
-    if (obj.year != 0) {
-      templateData.dt.year = obj.year;
+    let now = Gametime.DTNow();
+    if (obj.dayLength != 0) {
+      templateData.dt.dayLength = obj.dayLength;
     }
-    if (obj.day != 0) {
-      templateData.dt.day = obj.day;
-    }
+    let years = obj.year !== 0 ? obj.year : now.years;
+    let months = obj.currentMonth;
+    let days = obj.day !== 0 ? obj.day : now.days;
+    Gametime.setAbsolute(now.setAbsolute({years, months, days}));
     templateData.dt.numDayOfTheWeek = obj.numDayOfTheWeek;
-    templateData.dt.currentMonth = obj.currentMonth;
+
+    /*
     if (obj.currentWeekday != "") {
       templateData.dt.currentWeekday = obj.currentWeekday;
     }
+    */
     if (obj.dateWordy != "") {
       templateData.dt.dateWordy = obj.dateWordy;
     }
     if (obj.era != "") {
       templateData.dt.era = obj.era;
-    }
-    if (obj.dayLength != 0) {
-      templateData.dt.dayLength = obj.dayLength;
     }
     if (obj.dateNum != "") {
       templateData.dt.dateNum = obj.dateNum;
@@ -712,6 +747,7 @@ class Calendar extends Application {
     templateData.dt.genDateWordy();
   }
 
+ 
   setEvents(data) {
     data = JSON.parse(data);
     templateData.dt.seasons = data.seasons
@@ -721,27 +757,19 @@ class Calendar extends Application {
   }
 
   updateSettings() {
-    game.settings.update('calendar-weather.dateTime', {
-      name: "Date/Time Data",
-      scope: 'world',
-      config: false,
-      default: this.toObject(),
-      type: Object,
-    });
+    game.settings.set("calendar-weather", "dateTime", this.toObject());
     game.Gametime._save(true);
-  }
-
-  isRunning(){
-    return templateData.dt.isRunning;
   }
 
   updateDisplay() {
+    templateData.dt.genDateWordy();
+    let now = game.Gametime.DTNow();
     document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
-    document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
+    document.getElementById("calendar-weekday").innerHTML = Gametime.DTC.weekDays[now.dow()];
     templateData.dt.setTimeDisp();
     document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
-    game.Gametime._save(true);
+    // game.Gametime._save(true);
   }
 
   toObject() {
@@ -761,9 +789,7 @@ class Calendar extends Application {
       weather: templateData.dt.weather,
       seasons: templateData.dt.seasons,
       reEvents: templateData.dt.reEvents,
-      events: templateData.dt.events,
-      isRunning: templateData.dt.isRunning,
-    }
+      events: templateData.dt.events    }
   }
 
   activateListeners(html) {
@@ -785,7 +811,7 @@ class Calendar extends Application {
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM) {
+      if (!this.isOpen && Gametime.isMaster()) {
         console.log("calendar-weather | Advancing to 7am.");
         templateData.dt.advanceMorning();
         this.updateSettings();
@@ -794,7 +820,7 @@ class Calendar extends Application {
     //Quick Action
     html.find(quickAction).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM) {
+      if (!this.isOpen && Gametime.isMaster()) {
         console.log("calendar-weather | Advancing 15 min.");
         templateData.dt.quickAction();
         this.updateSettings();
@@ -803,7 +829,7 @@ class Calendar extends Application {
     //1 sec advance
     html.find(sec).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM && !templateData.dt.isRunning) {
+      if (!this.isOpen && game.Gametime.isMaster() && !Gametime.isRunning()) {
         console.log("calendar-weather | Advancing 1 sec.");
         game.Gametime.advanceClock(1)
       }
@@ -811,7 +837,7 @@ class Calendar extends Application {
     //advance 30s
     html.find(halfMin).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM && !templateData.dt.isRunning) {
+      if (!this.isOpen && game.Gametime.isMaster() && !Gametim.isRunning()) {
         console.log("calendar-weather | Advancing 30 sec");
         game.Gametime.advanceClock(30)
       }
@@ -819,7 +845,7 @@ class Calendar extends Application {
     //advance 1 min
     html.find(min).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM) {
+      if (!this.isOpen && game.Gametime.isMaster()) {
         console.log("calendar-weather | Advancing 1 min.");
         game.Gametime.advanceTime({
           minutes: 1
@@ -829,7 +855,7 @@ class Calendar extends Application {
     //advance 5 min
     html.find(fiveMin).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM) {
+      if (!this.isOpen && game.Gametime.isMaster()) {
         console.log("calendar-weather | Advancing 5 min.");
         game.Gametime.advanceTime({
           minutes: 5
@@ -839,7 +865,7 @@ class Calendar extends Application {
     //Long Action
     html.find(longAction).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM) {
+      if (!this.isOpen && game.Gametime.isMaster()) {
         console.log("calendar-weather | Advancing 1 hour.");
         templateData.dt.advanceHour();
         this.updateSettings();
@@ -848,7 +874,7 @@ class Calendar extends Application {
     //To Midnight
     html.find(nightSkip).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM) {
+      if (!this.isOpen && game.Gametime.isMaster()) {
         console.log("calendar-weather | Advancing to midnight.");
         templateData.dt.advanceNight();
         this.updateSettings();
@@ -857,11 +883,11 @@ class Calendar extends Application {
     //toggles real time clock on off, disabling granular controls
     html.find(toggleClock).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.user.isGM) {
-        if (templateData.dt.isRunning) {
+      if (!this.isOpen && game.Gametime.isMaster()) {
+        if (Gametime.isRunning()) {
           console.log("calendar-weather | Stopping about-time pseudo clock.");
-          templateData.dt.isRunning = false;
           game.Gametime.stopRunning();
+
           document.getElementById('calendar-btn-sec').disabled = false;
           document.getElementById('calendar-btn-halfMin').disabled = false;
           document.getElementById('calendar-btn-sec').style.cursor = 'pointer';
@@ -870,8 +896,7 @@ class Calendar extends Application {
           document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
         } else {
           console.log("calendar-weather | Starting about-time pseudo clock.");
-          templateData.dt.isRunning = true;
-          game.Gametime.startRunning();
+          Gametime.startRunning();
           document.getElementById('calendar-btn-sec').disabled = true;
           document.getElementById('calendar-btn-halfMin').disabled = true;
           document.getElementById('calendar-btn-sec').style.cursor = 'not-allowed';
@@ -885,25 +910,25 @@ class Calendar extends Application {
     //handles hover events because can't access css hover property
     html.find(sec).mouseover(ev => {
       ev.preventDefault();
-      if (!this.clockIsRunning) {
+      if (!Gametime.isRunning()) {
         document.getElementById('calendar-btn-sec').style.color = "#FFF"
       }
     });
     html.find(sec).mouseleave(ev => {
       ev.preventDefault();
-      if (!this.clockIsRunning) {
+      if (!Gametime.isRunning()) {
         document.getElementById('calendar-btn-sec').style.color = "#000"
       }
     });
     html.find(halfMin).mouseover(ev => {
       ev.preventDefault();
-      if (!this.clockIsRunning) {
+      if (!Gametime.isRunning()) {
         document.getElementById('calendar-btn-halfMin').style.color = "#FFF"
       }
     });
     html.find(halfMin).mouseleave(ev => {
       ev.preventDefault();
-      if (!this.clockIsRunning) {
+      if (!Gametime.isRunning()) {
         document.getElementById('calendar-btn-halfMin').style.color = "#000"
       }
     });
@@ -1115,40 +1140,129 @@ class WeatherTracker {
 }
 
 class DateTime {
-  months = [];
-  daysOfTheWeek = [];
-  year = 0;
-  day = 0;
-  numDayOfTheWeek = 0;
-  currentMonth = 0;
-  currentWeekday = "";
-  dateWordy = "";
-  era = "";
+    
+  static myCalendarSpec = {
+    "leap_year_rule": (year) => 0,
+    "clock_start_year": 0,
+    "first_day": 0,
+    "notes": {},
+    "hours_per_day": 24,
+    "seconds_per_minute": 60,
+    "minutes_per_hour": 60,
+    "has_year_0": true,
+    "month_len": {},
+    "weekdays": []
+  };
+
+  static updateDTC() { // update the calendar spec so that about-time will know the new calendar
+    Gametime.DTC.createFromData(DateTime.myCalendarSpec)
+  }
+
+  static updateFromDTC(calendarName) {
+    let calSpec = duplicate(game.Gametime.calendars[calendarName]);
+    if (calSpec) {
+      DateTime.myCalendarSpec = calSpec;
+      DateTime.myCalendarSpec.leap_year_rule = game.Gametime.calendars[calendarName].leap_year_rule;
+      // Remove this when leap years are supported in this module
+      DateTime.myCalendarSpec.leap_year_rule = (year) => 0;
+      this._months = Object.keys(calSpec.month_len).map((k, i) => {
+        let m = calSpec.month_len[k];
+        return new Month(k, m.days[0], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
+      })
+      this._daysOfTheWeek = calSpec.weekdays;
+      game.Gametime.DTC.createFromData(DateTime.myCalendarSpec);
+    }
+
+  }
+  _months = [];
+  _daysOfTheWeek = [];
+  _year = 0;
+  // currentMonth = 0;
+  _dateWordy = "";
+  _era = "";
   timeDisp = "";
-  dateNum = "";
+  _dateNum = "";
   weather = new WeatherTracker();
   seasons = [];
-  reEvents = [];
-  events = [];
-  isRunning = true;
+  static _reEvents = [];
+  static _events = [];
 
+  get reEvents() {return DateTime._reEvents};
+  set reEvents(reEvents) {DateTime._reEvents = reEvents};
+
+  get events() {return DateTime._events};
+  set events(events) {DateTime._events = events};
+
+  get year() {
+    return Gametime.DTNow().years;
+  }
+  get day() {
+    return Gametime.DTNow().days
+  }
+
+  get dateWordy() {return this._dateWordy;}
+  set dateWordy(dateWordy) {this._dateWordy = dateWordy;}
+
+  set months(months) {
+    DateTime.myCalendarSpec.month_len = {};
+    months.forEach(m => DateTime.myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.length)], "intercalary": !m.isNumbered})
+    this._months = months;
+  }
+  get months() { return this._months}
+
+  set daysOfTheWeek(days) {
+    DateTime.myCalendarSpec.weekdays = days;
+    this._daysOfTheWeek = days;
+  }
+  get daysOfTheWeek() { 
+    return this._daysOfTheWeek}
+
+  set year(y) {
+    this.setYear(y)
+  }
+
+  get currentWeekDay () {
+    return Gametime.weekDays[Gametime.DTNow().dow()];
+  }
+  
   addMonth(month) {
-    this.months.push(month)
+    this._months.push(month);
+    DateTime.myCalendarSpec.month_len[month.name]={days:[Number(month.length), Number(month.length)]};
+    // Gametime.DTC.createFromData(DateTime.myCalendarSpec);
   };
+
   addWeekday(day) {
-    this.daysOfTheWeek.push(day)
+    DateTime.myCalendarSpec.weekdays.push(day);
+    this._daysOfTheWeek.push(day);
+    // Gametime.DTC.createFromData(DateTime.myCalendarSpec);
   };
+
   setYear(year) {
-    this.year = year
+    Gametime.setAbsolute(Gametime.DTNow().setAbsolute({years: Number(year)}));
+    this._year = year
   }
-  setEra(era) {
-    this.era = era
-  }
+
+  get currentMonth() {return Gametime.DTNow().months}
+  set currentMonth(currentMonth) {Gametime.setAbsolute(Gametime.DTNow().setAbsolute({months: Number(currentMonth)}))}
+
+  set era(era) {this._era = era}
+  get era() {return this._era}
+  setEra(era) {this._era = era}
+
   setDayLength(length) {
-    this.dayLength = length
+    DateTime.myCalendarSpec.hours_per_day = length;
+    // this.updateFromDTC("Warhammer");
   }
+  
+  set numDayOfTheWeek(dow) {game.Gametime.DTNow().setCalDow(dow)}
+  get numDayOfTheWeek() {return Gametime.DTNow().dow()}
+
+  get dateNum() { return this._datenum}
+  set dateNum(dateNum) {this._datenum = dateNum};
+
   setWeekday(day) {
-    this.currentWeekday = day
+    console.warn("set week day not implemented", day);
+
   }
 
   checkEvents() {
@@ -1156,9 +1270,10 @@ class DateTime {
 
     //Find reoccuring events
     let messageLvl = ChatMessage.getWhisperIDs("GM")
-    let combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day
+    let currentMonth = this.currentMonth;
+    let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
     let filtReEvents = [];
-    if(this.reEvents){
+    if (this.reEvents){
       filtReEvents = this.reEvents.filter(function (event) {
         return event.date.combined == combinedDate;
       });
@@ -1176,13 +1291,14 @@ class DateTime {
       })
     }
 
-    combinedDate = (this.months[this.currentMonth].abbrev) + "-" + this.day + "-" + this.year
+    combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day+1) + "-" + this.year
     let filtEvents = [];
     if(this.events){
       filtEvents = this.events.filter(function (event) {
         return event.date.combined == combinedDate;
       });
     }
+
 
 
     if (filtEvents) {
@@ -1198,7 +1314,7 @@ class DateTime {
           });
         } else {
 
-          let eventMessage = () => {
+          let eventMessage = (event) => {
             let hours = event.date.hours;
             let minutes = event.date.minutes;
             let sec = event.date.seconds;
@@ -1222,25 +1338,25 @@ class DateTime {
               content: chatOut,
             });
           }
-          let dt = game.Gametime.DTNow()
-          let time = game.Gametime.DMf({
+          let dt = game.Gametime.DTNow().setAbsolute({hours: event.date.hours, minutes: event.date.minutes, seconds: event.date.seconds});
+          /*let time = game.Gametime.DTf({
             years: dt.years,
             days: dt.days,
             months: dt.months,
             hours: event.date.hours,
             minutes: event.date.minutes,
             seconds: event.date.seconds
-          })
-          game.Gametime.doAt(time, eventMessage)
+          })*/
+          game.Gametime.doAt(dt, eventMessage, event)
         }
       })
-      if(this.events){
+       if(this.events){
         this.events = this.events.filter(function (event) {
           return event.date.combined != combinedDate;
         });
       }
-    }
-    // this.events.find()
+    } 
+       // this.events.find()
   }
 
   getWeatherObj() {
@@ -1283,87 +1399,53 @@ class DateTime {
   }
 
   quickAction() {
-    let dt = game.Gametime.DTNow();
-    let prevDay = dt.days;
-    let prevMonth = dt.months;
-    game.Gametime.advanceTime({
-      minutes: 15
-    })
-    dt = game.Gametime.DTNow();
-    if (prevDay != dt.days || prevMonth != dt.months) {
-      this.advanceDay();
-    }
+    Gametime.advanceTime({minutes: 15});
     this.setTimeDisp();
+    this.genDateWordy();
   }
 
   advanceHour() {
-    let dt = game.Gametime.DTNow();
-    let prevDay = dt.days;
-    let prevMonth = dt.months;
-    game.Gametime.advanceTime({
-      hours: 1
-    })
-    dt = game.Gametime.DTNow();
-    if (prevDay != dt.days || prevMonth != dt.months) {
-      this.advanceDay();
-    }
+    Gametime.advanceTime({hours: 1});
     this.setTimeDisp();
+    this.genDateWordy();
   }
 
   advanceNight() {
-    this.advanceDay();
-    game.Gametime.setTime({
-      hours: 0
-    });
-    this.setTimeDisp();
+    let newDT = Gametime.DTNow().add({days: 1}).setAbsolute({ hours: 0, minutes: 0, seconds: 0 });
+    Gametime.setAbsolute(newDT);
+    this.genDateWordy();
   }
 
   advanceMorning() {
-    this.advanceDay();
-    game.Gametime.setTime({
-      hours: 7
-    });
+    let now = Gametime.DTNow();
+    let newDT = now.add({days: now.hours < 7 ? 0 : 1}).setAbsolute({ hours: 7, minutes: 0, seconds: 0 });
+    Gametime.setAbsolute(newDT);
+    this.genDateWordy();
     this.setTimeDisp();
   }
 
   genDateWordy() {
+    let now = Gametime.DTNow();
+    let days = now.days + 1;
     let dayAppendage = "";
-    if (this.day % 10 == 1 && this.day != 11) {
+    if (days % 10 == 1 && days != 11) {
       dayAppendage = "st";
-    } else if (this.day % 10 == 2 && this.day != 12) {
+    } else if (days % 10 == 2 && days != 12) {
       dayAppendage = "nd";
-    } else if (this.day % 10 == 3 && this.day != 13) {
+    } else if (days % 10 == 3 && days != 13) {
       dayAppendage = "rd";
     } else {
       dayAppendage = "th";
     }
-    this.dateWordy = this.day + dayAppendage + " of " +
-      this.months[this.currentMonth].name + ", " + this.year + " " + this.era;
+    this._dateWordy = days + dayAppendage + " of " +
+      this.months[now.months].name + ", " + now.years + " " + this.era;
 
-    this.dateNum = this.day + "/" + this.months[this.currentMonth].abbrev + "/" + this.year + " " + this.era;
+    let abbrev = this.months[now.months] ? this.months[now.months].abbrev : now.months;
+    this.dateNum = days + "/" + abbrev + "/" + now.years + " " + this.era;
   }
 
   advanceDay() {
-    if (this.day == this.months[this.currentMonth].length) {
-      this.day = 1;
-      this.advanceMonth();
-      if (this.daysOfTheWeek[this.numDayOfTheWeek + 1] == null) {
-        this.numDayOfTheWeek = 0;
-        this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
-      } else {
-        this.numDayOfTheWeek += 1;
-        this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
-      }
-    } else {
-      this.day += 1;
-      if (this.daysOfTheWeek[this.numDayOfTheWeek + 1] == null) {
-        this.numDayOfTheWeek = 0;
-        this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
-      } else {
-        this.numDayOfTheWeek += 1;
-        this.currentWeekday = this.daysOfTheWeek[this.numDayOfTheWeek];
-      }
-    }
+    Gametime.setAbsolute(Gametime.DTNow().add({days: 1}));
     // this.weather.generate();
     // console.log(this.weather.temp + " " + this.weather.precipitation);
     this.genDateWordy();
@@ -1371,15 +1453,8 @@ class DateTime {
   }
 
   advanceMonth() {
-    let lookforward = parseInt(this.currentMonth) + 1;
-    if (lookforward == this.months.length) {
-      this.currentMonth = 0;
-      this.year += 1;
-    } else {
-      this.currentMonth = parseInt(this.currentMonth) + 1;
-    }
+    Gametime.setAbsolute(Gametime.DTNow().add({months: 1}));
   }
-
 }
 
 $(document).ready(() => {
@@ -1389,65 +1464,15 @@ $(document).ready(() => {
     dt: new DateTime()
   }
 
-  const GregorianCalendar = {
-    "month_len": {
-      "January": {
-        days: [31, 31]
-      },
-      "February": {
-        days: [28, 29]
-      },
-      "March": {
-        days: [31, 31]
-      },
-      "April": {
-        days: [30, 30]
-      },
-      "May": {
-        days: [31, 31]
-      },
-      "June": {
-        days: [30, 30]
-      },
-      "July": {
-        days: [31, 31]
-      },
-      "August": {
-        days: [31, 31]
-      },
-      "September": {
-        days: [30, 30]
-      },
-      "October": {
-        days: [31, 31]
-      },
-      "November": {
-        days: [30, 30]
-      },
-      "December": {
-        days: [31, 31]
-      },
-    },
-    "leap_year_rule": (year) => Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400),
-    "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    "clock_start_year": 1970,
-    "first_day": 0,
-    "notes": {},
-    "hours_per_day": 24,
-    "seconds_per_minute": 60,
-    "minutes_per_hour": 60,
-    "has_year_0": false
-  };
-
   let c = new Calendar();
   // Init settings so they can be wrote to later
   Hooks.on('init', () => {
-    c.populateData();
+    // c.populateData();
     game.settings.register('calendar-weather', 'dateTime', {
       name: "Date/Time Data",
       scope: 'world',
       config: false,
-      default: c.toObject(),
+      default: {},
       type: Object,
     });
     game.settings.register('calendar-weather', 'calendarDisplay', {
@@ -1458,7 +1483,7 @@ $(document).ready(() => {
       default: true,
       type: Boolean,
     });
-    c.loadSettings();
+  //  c.loadSettings();
   });
 
   Hooks.on('renderCalendarEvents', () => {
@@ -1489,23 +1514,21 @@ $(document).ready(() => {
   Hooks.on('closeCalendarForm', () => {
     console.log("calendar-settings | Closing Calendar form");
     c.settingsOpen(false);
-
   });
 
+  let lastDays = 0;
   Hooks.on("pseudoclockSet", () => {
+    // c.loadSettings();
+    let newDays = Gametime.DTNow().toDays().days;
     if (document.getElementById('calendar-weather-container')) {
       c.updateDisplay();
     }
-    if(c.isRunning()){
-      game.Gametime.startRunning();
-    } else {
-      game.Gametime.stopRunning();
-    }
+    if (lastDays !== newDays) templateData.dt.checkEvents();
+    lastDays = newDays;
   })
 
   Hooks.on("renderCalendar", ()=>{
-    if (c.isRunning()) {
-      game.Gametime.startRunning();
+    if (Gametime.isRunning()) {
       document.getElementById('calendar-btn-sec').disabled = true;
       document.getElementById('calendar-btn-halfMin').disabled = true;
       document.getElementById('calendar-btn-sec').style.cursor = 'not-allowed';
@@ -1513,7 +1536,6 @@ $(document).ready(() => {
       document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
       document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
     } else {
-      game.Gametime.stopRunning();
       document.getElementById('calendar-btn-sec').disabled = false;
       document.getElementById('calendar-btn-halfMin').disabled = false;
       document.getElementById('calendar-btn-sec').style.cursor = 'pointer';
@@ -1524,17 +1546,11 @@ $(document).ready(() => {
   })
 
   Hooks.on('ready', () => {
-    if (!c.getPlayerDisp()) {
-      if (game.user.isGM) {
-        renderTemplate(templatePath, templateData).then(html => {
-          c.render(true);
-        });
-      }
-    } else {
+    c.loadSettings();
+    if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, templateData).then(html => {
         c.render(true);
       });
     }
-    game.Gametime.DTC.createFromData(GregorianCalendar);
   });
 });

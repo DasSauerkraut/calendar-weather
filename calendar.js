@@ -650,7 +650,7 @@ class WeatherForm extends Application {
       this.isOpen = true;
       this.data = newData;
       renderTemplate(templatePath, this.data).then(html => {
-        this.render(true)
+        this.render(true);
       });
     }
   }
@@ -789,7 +789,6 @@ class Calendar extends Application {
 
   updateDisplay() {
     document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
-    console.log(document.getElementById("calendar-date"))
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
     document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
     templateData.dt.setTimeDisp();
@@ -797,9 +796,9 @@ class Calendar extends Application {
     let temp = document.getElementById("calendar-weather-temp")
     if(temp){
       temp.innerHTML = templateData.dt.getWeatherObj().temp;
-      console.log(document.getElementById("calendar-weather-precip"))
       document.getElementById("calendar-weather-precip").innerHTML = templateData.dt.getWeatherObj().precipitation
-      
+      let offset = document.getElementById("calendar").offsetWidth + 225
+      document.getElementById("calendar-weather-container").style.left = offset + 'px'
     }
     game.Gametime._save(true);
   }
@@ -1616,6 +1615,10 @@ $(document).ready(() => {
       game.Gametime.stopRunning();
     }
   })
+  Hooks.on("renderWeatherForm", ()=>{
+    let offset = document.getElementById("calendar").offsetWidth + 225
+    document.getElementById("calendar-weather-container").style.left = offset + 'px'  
+  })
 
   Hooks.on("renderCalendar", ()=>{
     if (c.isRunning()) {
@@ -1649,7 +1652,7 @@ $(document).ready(() => {
         c.render(true);
       });
     }
-    CONFIG.debug.hooks = true;
+    // CONFIG.debug.hooks = true;
     game.Gametime.DTC.createFromData(GregorianCalendar);
   });
 });

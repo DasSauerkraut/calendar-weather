@@ -1,9 +1,9 @@
-<style>
+<style style="visibility: hidden;">
 	#calendar-weather-container{
   position: fixed;
 	bottom: 75px;
 	left: 450px;
-	width: fit-content;
+	width: min-content;
 	height: 72px;
 	margin: 0;
 	padding: 0;
@@ -17,23 +17,34 @@
 		padding: 4px;
 		height: 25px;
 		width: fit-content;
+    display: grid;
 		border-bottom: 1px solid #111;
     color: #CCC;
 	}
   #calendar-weather-temp{
     cursor: pointer;
+    grid-row: 1;
+    grid-column: 1;
   }
   #calendar-weather-climate{
     background-color: rgba(255, 255, 255, 0.5);
     height: 20px;
     position: relative;
     bottom: 3px;
+    grid-row: 1;
+    grid-column: 3;
+  }
+  #calendar-weather-units{
+    grid-row: 1;
+    grid-column: 2;
+    padding-right: 3px;
   }
   #calendar-weather-precip{
     color: #CCC;
     text-align: center;
     padding-left: 5px;
     padding-right: 5px;
+    width: 100%;
   }
 </style>
 <div id="calendar-weather-container">

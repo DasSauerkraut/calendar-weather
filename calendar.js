@@ -604,12 +604,56 @@ class CalendarForm extends FormApplication {
 }
 
 class WeatherForm extends Application {
+  isOpen = false;
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar-weather.html";
     options.popOut = false;
     options.resizable = false;
     return options;
+  }
+
+  getData() {
+    return this.data;
+  }
+
+  updateDisplay(){
+    let units = " °F";
+    if(this.data.isC){
+      units = " °C"
+      document.getElementById("calendar-weather-temp").innerHTML = 
+      ((this.data.temp - 32) * 5/9).toFixed(2);
+    } else {
+      document.getElementById("calendar-weather-temp").innerHTML = this.data.temp
+    }
+    document.getElementById("calendar-weather-units").innerHTML = units;
+
+  }
+
+  activateListeners(html) {
+    const toggleTemp = '#calendar-weather-temp';
+
+    html.find(toggleTemp).click(ev => {
+      ev.preventDefault();
+      if (game.user.isGM) {
+        this.data.isC = !this.data.isC;
+        this.updateDisplay()
+      }
+    });
+  }
+
+  toggleForm(newData) {
+    let templatePath = "modules/calendar-weather/templates/calendar-weather.html";
+    if(this.isOpen){
+      this.isOpen = false;
+      this.close();
+    } else {
+      this.isOpen = true;
+      this.data = newData;
+      renderTemplate(templatePath, this.data).then(html => {
+        this.render(true)
+      });
+    }
   }
 }
 
@@ -746,10 +790,17 @@ class Calendar extends Application {
 
   updateDisplay() {
     document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
+    console.log(document.getElementById("calendar-date"))
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
     document.getElementById("calendar-weekday").innerHTML = templateData.dt.currentWeekday;
     templateData.dt.setTimeDisp();
     document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
+    let temp = document.getElementById("calendar-weather-temp")
+    if(temp){
+      temp.innerHTML = templateData.dt.getWeatherObj().temp;
+      console.log(document.getElementById("calendar-weather-precip"))
+      document.getElementById("calendar-weather-precip").innerHTML = templateData.dt.getWeatherObj().precipitation
+    }
     game.Gametime._save(true);
   }
 
@@ -788,9 +839,11 @@ class Calendar extends Application {
     const fiveMin = '#calendar-btn-fiveMin';
     const toggleClock = '#calendar-time';
     const events = '#calendar-events';
+    const weather = '#calendar-weather';
     this.updateDisplay()
     templateData.dt.checkEvents();
     let form = new CalendarForm(JSON.stringify(this.toObject()));
+    let weatherForm = new WeatherForm();
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
@@ -934,6 +987,12 @@ class Calendar extends Application {
       ev.preventDefault();
       if (game.user.isGM) {
         this.eventsForm.renderForm(JSON.stringify(this.toObject()));
+      }
+    })
+    html.find(weather).click(ev => {
+      ev.preventDefault();
+      if (game.user.isGM) {
+        weatherForm.toggleForm(templateData.dt.getWeatherObj());
       }
     })
   }
@@ -1134,7 +1193,6 @@ class WeatherTracker {
     } else {
       tempOut = tempOut + " °F"
     }
-    console.log(this.temp)
     let messageLvl = ChatMessage.getWhisperIDs("GM")
     let chatOut = "<b>" + tempOut + "</b> - " + this.precipitation;
     ChatMessage.create({
@@ -1549,7 +1607,7 @@ $(document).ready(() => {
   });
 
   Hooks.on("pseudoclockSet", () => {
-    if (document.getElementById('calendar-weather-container')) {
+    if (document.getElementById('calendar-time-container')) {
       c.updateDisplay();
     }
     if(c.isRunning()){
@@ -1591,6 +1649,7 @@ $(document).ready(() => {
         c.render(true);
       });
     }
+    CONFIG.debug.hooks = true;
     game.Gametime.DTC.createFromData(GregorianCalendar);
   });
 });

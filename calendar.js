@@ -472,6 +472,7 @@ class CalendarForm extends FormApplication {
       dayLength: game.Gametime.DTC.hpd,
       timeDisp: savedData.timeDisp,
       dateNum: savedData.dateNum,
+      events: DateTime._events
     }
     console.log("calendar-weather | Building new calendar with the following object:", returnData)
     return JSON.stringify(returnData);
@@ -788,9 +789,7 @@ class Calendar extends Application {
       weather: templateData.dt.weather,
       seasons: templateData.dt.seasons,
       reEvents: templateData.dt.reEvents,
-      events: templateData.dt.events,
-      wantRunning: templateData.dt.Running,
-    }
+      events: templateData.dt.events    }
   }
 
   activateListeners(html) {
@@ -1185,11 +1184,20 @@ class DateTime {
   _dateNum = "";
   weather = new WeatherTracker();
   seasons = [];
-  reEvents = [];
-  events = [];
+  static _reEvents = [];
+  static _events = [];
+
+  get reEvents() {return DateTime._reEvents};
+  set reEvents(reEvents) {DateTime._reEvents = reEvents};
+
+  get events() {return DateTime._events};
+  set events(events) {DateTime._events = events};
 
   get year() {
     return Gametime.DTNow().years;
+  }
+  get day() {
+    return Gametime.DTNow().days
   }
 
   get dateWordy() {return this._dateWordy;}
@@ -1270,7 +1278,7 @@ class DateTime {
     let currentMonth = this.currentMonth;
     let combinedDate = (this.months[currentMonth].abbrev) + "-" + this.day
     let filtReEvents = [];
-    if(this.reEvents){
+    if (this.reEvents){
       filtReEvents = this.reEvents.filter(function (event) {
         return event.date.combined == combinedDate;
       });
@@ -1310,7 +1318,7 @@ class DateTime {
           });
         } else {
 
-          let eventMessage = () => {
+          let eventMessage = (event) => {
             let hours = event.date.hours;
             let minutes = event.date.minutes;
             let sec = event.date.seconds;
@@ -1334,7 +1342,7 @@ class DateTime {
               content: chatOut,
             });
           }
-          let dt = game.Gametime.DTNow().setAbsolute({hours: event.data.hours, minutes: event.data.minutes, seconds: event.data.seconds})
+          let dt = game.Gametime.DTNow().setAbsolute({hours: event.data.hours, minutes: event.data.minutes, seconds: event.data.seconds});
           /*let time = game.Gametime.DTf({
             years: dt.years,
             days: dt.days,
@@ -1343,7 +1351,7 @@ class DateTime {
             minutes: event.date.minutes,
             seconds: event.date.seconds
           })*/
-          game.Gametime.doAt(dt, eventMessage)
+          game.Gametime.doAt(dt, eventMessage, event)
         }
       })
        if(this.events){
@@ -1462,7 +1470,7 @@ $(document).ready(() => {
 
   let c = new Calendar();
   // Init settings so they can be wrote to later
-  Hooks.on('setup', () => {
+  Hooks.on('init', () => {
     // c.populateData();
     game.settings.register('calendar-weather', 'dateTime', {
       name: "Date/Time Data",
@@ -1512,11 +1520,15 @@ $(document).ready(() => {
     c.settingsOpen(false);
   });
 
+  let lastDays = 0;
   Hooks.on("pseudoclockSet", () => {
     // c.loadSettings();
+    let newDays = Gametime.DTNow().toDays().days;
     if (document.getElementById('calendar-weather-container')) {
       c.updateDisplay();
     }
+    if (lastDays !== newDays) templateData.dt.checkEvents();
+    lastDays = newDays;
   })
 
   Hooks.on("renderCalendar", ()=>{

@@ -1221,11 +1221,6 @@ class DateTime {
     this.setYear(y)
   }
 
-
-  get year() { 
-    if (game.Gametime) this._years = Gametime.DTNow().years;
-    this._years;
-  }
   get currentWeekDay () {
     return Gametime.weekDays[Gametime.DTNow().dow()];
   }
@@ -1276,7 +1271,7 @@ class DateTime {
     //Find reoccuring events
     let messageLvl = ChatMessage.getWhisperIDs("GM")
     let currentMonth = this.currentMonth;
-    let combinedDate = (this.months[currentMonth].abbrev) + "-" + this.day
+    let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
     let filtReEvents = [];
     if (this.reEvents){
       filtReEvents = this.reEvents.filter(function (event) {
@@ -1296,13 +1291,14 @@ class DateTime {
       })
     }
 
-    combinedDate = (this.months[currentMonth].abbrev) + "-" + this.day + "-" + this.year
+    combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day+1) + "-" + this.year
     let filtEvents = [];
     if(this.events){
       filtEvents = this.events.filter(function (event) {
         return event.date.combined == combinedDate;
       });
     }
+
 
 
     if (filtEvents) {
@@ -1342,7 +1338,7 @@ class DateTime {
               content: chatOut,
             });
           }
-          let dt = game.Gametime.DTNow().setAbsolute({hours: event.data.hours, minutes: event.data.minutes, seconds: event.data.seconds});
+          let dt = game.Gametime.DTNow().setAbsolute({hours: event.date.hours, minutes: event.date.minutes, seconds: event.date.seconds});
           /*let time = game.Gametime.DTf({
             years: dt.years,
             days: dt.days,

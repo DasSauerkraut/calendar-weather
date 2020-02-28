@@ -785,7 +785,7 @@ class Calendar extends Application {
   loadSettings() {
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
-    console.log(data.default.weather)
+    templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
     templateData.dt.months = data.default.months;
     templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
     templateData.dt.year = data.default.year;
@@ -1142,6 +1142,7 @@ class WeatherTracker {
   precipitation = "";
   isVolcanic = false;
   outputToChat = true;
+  showFX = true;
   isC = false;
   cTemp = 21.11
 
@@ -1248,12 +1249,36 @@ class WeatherTracker {
   }
 
   genPrecip(roll) {
-    if (roll < 1) {
+    let fxAvailable = false;
+    let effects = undefined;
+    if(this.showFX){
+      if(game.modules.find(module => module.id === 'fxmaster')){
+        fxAvailable = true;
+      }
+    }
+    console.log()
+    if (roll < 0) {
       roll = this.rand(1, 6);
     }
     if (roll <= 3) {
       if (this.isVolcanic) {
         return "Ashen skies today";
+      }
+      if(fxAvailable){
+        effects = {
+          type: 'Rain',
+          config: {
+            density:1,
+            speed:1,
+            scale:1,
+            tint:1,
+            direction:1,
+            apply_tint:1,
+          }
+        }
+        canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
+          canvas.scene.setFlag("fxmaster", "effects", effects);
+        });
       }
       return "Clear sky today.";
     } else if (roll <= 6) {
@@ -1828,6 +1853,14 @@ $(document).ready(() => {
       default: true,
       type: Boolean,
     });
+    game.settings.register('calendar-weather', 'fxDisplay', {
+      name: "Display Weather Effects? (Requires FXMaster)",
+      hint: "If true, each time weather is generated it will activate a weather effect on the currently active scene.",
+      scope: 'world',
+      config: true,
+      default: true,
+      type: Boolean,
+    });
     c.loadSettings();
   });
 
@@ -1928,7 +1961,6 @@ $(document).ready(() => {
         c.render(true);
       });
     }
-    // CONFIG.debug.hooks = true;
     game.Gametime.DTC.createFromData(GregorianCalendar);
   });
 });

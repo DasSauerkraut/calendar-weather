@@ -1276,9 +1276,9 @@ class WeatherTracker {
             apply_tint:1,
           }
         }
-        canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
-          canvas.scene.setFlag("fxmaster", "effects", effects);
-        });
+        // canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
+          // canvas.scene.setFlag("fxmaster", "effects", effects);
+        // });
       }
       return "Clear sky today.";
     } else if (roll <= 6) {

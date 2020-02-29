@@ -1769,6 +1769,39 @@ class DateTime {
 
 }
 
+class WarningSystem{
+  constructor(){}
+
+  static validateAboutTime(){
+    let aboutTime = game.modules.find(module => module.id === 'about-time' && module.active);
+    if(!aboutTime && game.user.isGM){
+      return WarningSystem.generateDialog();
+    }
+  }
+
+  static generateDialog(){
+    new Dialog({
+      title: "About Time is not found",
+      content: "The Calendar/Weather mod requires AboutTime by Tim Posney in order to run properly.",
+      buttons: {
+        one: {
+        icon: '<i class="fas fa-check"></i>',
+        label: "Open the Gitlab page now",
+        callback: () => window.open('https://gitlab.com/tposney/about-time/-/tree/master/src', '_blank',"fullscreen=no")
+        },
+        two: {
+        icon: '<i class="fas fa-times"></i>',
+        label: "Disregard this message",
+        callback: () => {}
+        }
+      },
+      default: "two",
+      close: () => {}
+      }).render(true);
+  }
+}
+
+
 $(document).ready(() => {
   const templatePath = "modules/calendar-weather/templates/calendar.html";
 
@@ -1950,6 +1983,7 @@ $(document).ready(() => {
   })
 
   Hooks.on('ready', () => {
+    WarningSystem.validateAboutTime();
     if (!c.getPlayerDisp()) {
       if (game.user.isGM) {
         renderTemplate(templatePath, templateData).then(html => {

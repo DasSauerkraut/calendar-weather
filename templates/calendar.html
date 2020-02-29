@@ -1,9 +1,9 @@
-<style>
-	#calendar-weather-container{
-		position: fixed;
+<style style="visibility: hidden;">
+	#calendar-time-container{
+		position: absolute;
 		bottom: 75px;
 		left: 223px;
-		display: grid;
+		display: block;
 	}
 	#calendar{
 	min-width: 150px;
@@ -239,12 +239,12 @@
 		cursor: pointer;
 	}
 </style>
-<div id="calendar-weather-container">
+<div id="calendar-time-container">
 	<div id="calendar">
 		<h3 id="calendar-hdr">
 			<i id=calendar-events class="far fa-calendar-alt" title="Events"></i>
 			<span id="calendar-date" title="Edit Calendar">Date</span><span title="Edit Calendar" id="calendar-date-num">DateNum</span>
-			<i id=calendar-weather class="fas fa-cloud-sun" title="Weather - Under Construction"></i>
+			<i id=calendar-weather class="fas fa-cloud-sun" title="Weather"></i>
 		</h3>
 		<div class="calendar-container">
 			<div class="calendar-btn-container-left">
@@ -264,8 +264,5 @@
 				<i id="calendar-btn-night" class="fas fa-moon" title="Advance to midnight"></i>
 			</div>
 		</div>
-	</div>
-	<div class="calendar-weather">
-		
 	</div>
 </div>

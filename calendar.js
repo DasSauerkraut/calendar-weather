@@ -569,7 +569,7 @@ class CalendarForm extends FormApplication {
     this.data.numDayOfTheWeek = now.dow();
     this.data.currentMonth = now.months;
     this.data.currentWeekday = game.Gametime.DTC.weekDays[now.dow()];
-    this.data.hours = now.hours;
+    this.data.hours = ((now.hours + 11) % 12 + 1);
     this.data.minutes = now.minutes;
     this.data.seconds = now.seconds;
     return this.data;
@@ -657,7 +657,7 @@ class Calendar extends Application {
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
     // Also check intercalary days
 
-    if (!data) {
+    if (!data || !data.months) {
       this.populateData();
       Gametime.setAbsolute({years: 0, months: 0, days: 0, hours:0, minutes: 0, seconds:0})
     } else {
@@ -693,8 +693,8 @@ class Calendar extends Application {
     templateData.dt.addWeekday("Thursday");
     templateData.dt.setYear(2020);
     templateData.dt.setEra("AD");
-    templateData.dt.numDayOfTheWeek(0)
-    StemplateData.dt.setDayLength(24);
+    templateData.dt.numDayOfTheWeek = 0
+    templateData.dt.setDayLength(24);
     templateData.dt.genDateWordy();
     templateData.dt.weather.generate();
   }
@@ -837,7 +837,7 @@ class Calendar extends Application {
     //advance 30s
     html.find(halfMin).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.Gametime.isMaster() && !Gametim.isRunning()) {
+      if (!this.isOpen && game.Gametime.isMaster() && !Gametime.isRunning()) {
         console.log("calendar-weather | Advancing 30 sec");
         game.Gametime.advanceClock(30)
       }

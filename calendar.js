@@ -456,7 +456,6 @@ class CalendarForm extends FormApplication {
     savedData.numDayOfTheWeek = weekdayTarget;
 
     savedData.setTimeDisp();
-    savedData.genDateWordy();
     savedData.genAbbrev();
     let now = game.Gametime.DTNow();
     let returnData = {
@@ -668,7 +667,6 @@ class Calendar extends Application {
       DateTime.updateDTC(); // set the calendar spec for correct date time calculations
 
       templateData.dt.currentWeekday = templateData.dt.daysOfTheWeek[now.dow()];
-      templateData.dt.genDateWordy();
       templateData.dt.era = data.era;
       templateData.dt.dayLength = Gametime.DTC.hpd;
       templateData.dt.timeDisp = now.shortDate().time;
@@ -729,11 +727,6 @@ class Calendar extends Application {
     Gametime.setAbsolute(now.setAbsolute({years, months, days}));
     templateData.dt.numDayOfTheWeek = obj.numDayOfTheWeek;
 
-    /*
-    if (obj.currentWeekday != "") {
-      templateData.dt.currentWeekday = obj.currentWeekday;
-    }
-    */
     if (obj.dateWordy != "") {
       templateData.dt.dateWordy = obj.dateWordy;
     }
@@ -762,7 +755,6 @@ class Calendar extends Application {
   }
 
   updateDisplay() {
-    templateData.dt.genDateWordy();
     let now = game.Gametime.DTNow();
     document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
@@ -1401,26 +1393,22 @@ class DateTime {
   quickAction() {
     Gametime.advanceTime({minutes: 15});
     this.setTimeDisp();
-    this.genDateWordy();
   }
 
   advanceHour() {
     Gametime.advanceTime({hours: 1});
     this.setTimeDisp();
-    this.genDateWordy();
   }
 
   advanceNight() {
     let newDT = Gametime.DTNow().add({days: 1}).setAbsolute({ hours: 0, minutes: 0, seconds: 0 });
     Gametime.setAbsolute(newDT);
-    this.genDateWordy();
   }
 
   advanceMorning() {
     let now = Gametime.DTNow();
     let newDT = now.add({days: now.hours < 7 ? 0 : 1}).setAbsolute({ hours: 7, minutes: 0, seconds: 0 });
     Gametime.setAbsolute(newDT);
-    this.genDateWordy();
     this.setTimeDisp();
   }
 
@@ -1446,10 +1434,6 @@ class DateTime {
 
   advanceDay() {
     Gametime.setAbsolute(Gametime.DTNow().add({days: 1}));
-    // this.weather.generate();
-    // console.log(this.weather.temp + " " + this.weather.precipitation);
-    this.genDateWordy();
-    this.checkEvents();
   }
 
   advanceMonth() {
@@ -1520,11 +1504,16 @@ $(document).ready(() => {
   Hooks.on("pseudoclockSet", () => {
     // c.loadSettings();
     let newDays = Gametime.DTNow().toDays().days;
+
+
+    if (lastDays !== newDays) {
+      templateData.dt.genDateWordy();
+      templateData.dt.checkEvents();
+    }
+    lastDays = newDays;
     if (document.getElementById('calendar-weather-container')) {
       c.updateDisplay();
     }
-    if (lastDays !== newDays) templateData.dt.checkEvents();
-    lastDays = newDays;
   })
 
   Hooks.on("renderCalendar", ()=>{

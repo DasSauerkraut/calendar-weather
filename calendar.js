@@ -415,26 +415,29 @@ class CalendarEvents extends FormApplication {
       this.render(true);
     });
 
-    let reText =  html.find(".calendar-reEvent-text");
-    for (let i = 0; i < reText.length; i++) reText[i].ondrop =  this.onDrop.bind(null, reText[i]);
-    let evText =  html.find(".calendar-event-content");
-    for (let i = 0; i < evText.length; i++) evText[i].ondrop =  this.onDrop.bind(null, evText[i]);
+    let reText = html.find(".calendar-reEvent-text");
+    for (let i = 0; i < reText.length; i++) reText[i].ondrop = this.onDrop.bind(null, reText[i]);
+    let evText = html.find(".calendar-event-content");
+    for (let i = 0; i < evText.length; i++) evText[i].ondrop = this.onDrop.bind(null, evText[i]);
 
   }
 
   onDrop = (html, event) => {
-    const collections = {JournalEntry: JournalEntry, Macro: Macro};
+    const collections = {
+      JournalEntry: JournalEntry,
+      Macro: Macro
+    };
     try {
-        let data = JSON.parse(event.dataTransfer.getData("text"));
-        if (collections[data.type]) {
-            event.preventDefault();
-            let name = collections[data.type].collection.get(data.id).data.name;
-            html.value = `@${data.type}[${data.id}]{${name}}`;
-        }
-      } catch(err) {
-          console.log(event.dataTransfer.getData("text"));
-          console.warn(err);
+      let data = JSON.parse(event.dataTransfer.getData("text"));
+      if (collections[data.type]) {
+        event.preventDefault();
+        let name = collections[data.type].collection.get(data.id).data.name;
+        html.value = `@${data.type}[${data.id}]{${name}}`;
       }
+    } catch (err) {
+      console.log(event.dataTransfer.getData("text"));
+      console.warn(err);
+    }
   }
 
   renderForm(newData) {
@@ -456,9 +459,9 @@ class CalendarForm extends FormApplication {
       months: newData.months,
       daysOfTheWeek: newData.daysOfTheWeek,
       year: now.years,
-      day: now.days+1,
+      day: now.days + 1,
       numDayOfTheWeek: now.dow(),
-      currentMonth: now.months+1,
+      currentMonth: now.months + 1,
       currentWeekday: game.Gametime.DTC.weekDays[now.dow()],
       era: newData.era,
       hours: now.hours,
@@ -549,7 +552,7 @@ class CalendarForm extends FormApplication {
     }
     if (weekDays.length < 1) weekDays = ["Weekday"];
     savedData.daysOfTheWeek = weekDays;
- 
+
     savedData.setDayLength(24);
 
     DateTime.updateDTC();
@@ -568,7 +571,14 @@ class CalendarForm extends FormApplication {
     }
     day -= 1;
 
-    Gametime.setAbsolute({years: year, months: monthTarget, days: day, hours: hours, minutes: minutes, seconds: seconds})
+    Gametime.setAbsolute({
+      years: year,
+      months: monthTarget,
+      days: day,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds
+    })
 
     let weekdayTarget = 0;
     if (document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null) {
@@ -664,7 +674,7 @@ class CalendarForm extends FormApplication {
               await this.render(true);
               try {
                 await this.checkBoxes();
-              } catch(err) {}
+              } catch (err) {}
             }
           },
           no: {
@@ -687,8 +697,8 @@ class CalendarForm extends FormApplication {
 
   getData() {
     let now = game.Gametime.DTNow();
-    this.data.year =  now.years;
-    this.data.day = now.days+1;
+    this.data.year = now.years;
+    this.data.day = now.days + 1;
     this.data.numDayOfTheWeek = now.dow();
     this.data.currentMonth = now.months;
     this.data.currentWeekday = game.Gametime.DTC.weekDays[now.dow()];
@@ -820,6 +830,7 @@ class Calendar extends Application {
   isOpen = false;
   showToPlayers = true;
   eventsForm = new CalendarEvents();
+  weatherForm = new WeatherForm();
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -843,7 +854,14 @@ class Calendar extends Application {
 
     if (!data || !data.months) {
       this.populateData();
-      Gametime.setAbsolute({years: 0, months: 0, days: 0, hours:0, minutes: 0, seconds:0})
+      Gametime.setAbsolute({
+        years: 0,
+        months: 0,
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+      })
     } else {
       let now = Gametime.DTNow();
       templateData.dt = new DateTime();
@@ -888,8 +906,8 @@ class Calendar extends Application {
       game.Gametime.stopRunning();
       console.log("calendar-weather | Pausing real time clock.")
     } else {
-        game.Gametime.startRunning();
-        console.log("calendar-weather | Resuming real time clock.")
+      game.Gametime.startRunning();
+      console.log("calendar-weather | Resuming real time clock.")
     }
   }
 
@@ -909,7 +927,11 @@ class Calendar extends Application {
     let years = obj.year !== 0 ? obj.year : now.years;
     let months = obj.currentMonth;
     let days = obj.day !== 0 ? obj.day : now.days;
-    Gametime.setAbsolute(now.setAbsolute({years, months, days}));
+    Gametime.setAbsolute(now.setAbsolute({
+      years,
+      months,
+      days
+    }));
     templateData.dt.numDayOfTheWeek = obj.numDayOfTheWeek;
 
     if (obj.dateWordy != "") {
@@ -940,7 +962,11 @@ class Calendar extends Application {
 
   updateDisplay() {
     let now = game.Gametime.DTNow();
-    document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
+    if(templateData.dt.dateWordy == ""){
+      document.getElementById("calendar-date").innerHTML = "Calendar Loading...";
+    } else {
+      document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
+    }
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
     document.getElementById("calendar-weekday").innerHTML = Gametime.DTC.weekDays[now.dow()];
     templateData.dt.setTimeDisp();
@@ -978,7 +1004,7 @@ class Calendar extends Application {
       weather: templateData.dt.weather,
       seasons: templateData.dt.seasons,
       reEvents: templateData.dt.reEvents,
-      events: templateData.dt.events    
+      events: templateData.dt.events
     }
   }
 
@@ -1179,6 +1205,7 @@ class WeatherTracker {
   temp = 0;
   lastTemp = 70;
   season = "";
+  seasonColor = "";
   seasonTemp = 0;
   seasonHumidity = 0;
   climate = "temperate";
@@ -1198,6 +1225,7 @@ class WeatherTracker {
     this.cTemp = newData.cTemp;
     this.lastTemp = newData.lastTemp;
     this.season = newData.season;
+    this.seasonColor = newData.seasonColor
     this.seasonTemp = newData.seasonTemp;
     this.seasonHumidity = newData.seasonHumidity;
     this.climate = newData.climate;
@@ -1296,6 +1324,8 @@ class WeatherTracker {
 
   genPrecip(roll) {
     let fxAvailable = false;
+    let weather = "";
+    let effects = [];
     if (this.showFX && game.modules.find(module => module.id === 'fxmaster')) {
       fxAvailable = true;
     }
@@ -1304,119 +1334,463 @@ class WeatherTracker {
     }
     if (roll <= 3) {
       if (this.isVolcanic) {
-        return "Ashen skies today";
+        weather = "Ashen skies today";
+      } else {
+        weather = "Clear sky today.";
       }
-      return "Clear sky today.";
     } else if (roll <= 6) {
       this.humidity += 1;
       if (this.isVolcanic) {
-        return "Dark, smokey skies today";
+        effects.push({
+          "darkcloudsID": {
+            type: 'clouds',
+            config: {
+              density: "4",
+              speed: "29",
+              scale: "20",
+              tint: "#4a4a4a",
+              direction: "50",
+              apply_tint: true
+            }
+          }
+        })
+        weather = "Dark, smokey skies today";
+      } else {
+        effects.push({
+          "lightcloudsID": {
+            type: 'clouds',
+            config: {
+              density: "4",
+              speed: "29",
+              scale: "20",
+              tint: "#bcbcbc",
+              direction: "50",
+              apply_tint: true
+            }
+          }
+        })
+        weather = "Scattered clouds, but mostly clear today."
       }
-      return "Scattered clouds, but mostly clear today."
     } else if (roll == 7) {
       if (this.isVolcanic) {
-        return "The sun is completely obscured by ash, possible ashfall today";
-      }
-      if (this.temp < 25) {
-        return "Completely overcast with some snow flurries possible.";
-      } else if (this.temp < 32) {
-        return "Completely overcast with light freezing rain possible.";
+        weather = "The sun is completely obscured by ash, possible ashfall today";
       } else {
-        return "Completely overcast; light drizzles possible.";
+        if (this.temp < 25) {
+          effects.push({
+            "lightcloudsID": {
+              type: 'clouds',
+              config: {
+                density: "4",
+                speed: "29",
+                scale: "20",
+                tint: "#bcbcbc",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightcloudsID": {
+              type: 'snow',
+              config: {
+                density: "8",
+                speed: "50",
+                scale: "30",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Completely overcast with some snow flurries possible.";
+        } else if (this.temp < 32) {
+          effects.push({
+            "lightcloudsID": {
+              type: 'clouds',
+              config: {
+                density: "40",
+                speed: "29",
+                scale: "20",
+                tint: "#bcbcbc",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightrainID": {
+              type: 'rain',
+              config: {
+                density: "8",
+                speed: "50",
+                scale: "15",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "8",
+                speed: "50",
+                scale: "15",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Completely overcast with light freezing rain possible.";
+        } else {
+          effects.push({
+            "lightcloudsID": {
+              type: 'clouds',
+              config: {
+                density: "40",
+                speed: "29",
+                scale: "20",
+                tint: "#bcbcbc",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightcloudsID": {
+              type: 'rain',
+              config: {
+                density: "40",
+                speed: "50",
+                scale: "30",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Completely overcast; light drizzles possible.";
+        }
       }
     } else if (roll == 8) {
       this.humidity -= 1;
       if (this.isVolcanic) {
-        return "Large ashfall today.";
-      }
-      if (this.temp < 25) {
-        canvas.scene.setFlag("fxmaster", "effects", {
+        effects.push({
           "lightsnowID": {
             type: 'snow',
             config: {
-              density: 50,
-              speed: 50,
-              scale: 50,
-              tint: "#ffffff",
-              direction: 50,
+              density: "50",
+              speed: "50",
+              scale: "50",
+              tint: "#000000",
+              direction: "50",
               apply_tint: true
             }
           }
-        });
-        return "A light to moderate amount of snow today.";
-      } else if (this.temp < 32) {
-        canvas.scene.setFlag("fxmaster", "effects", {
+        })
+        effects.push({
           "lightsnowID": {
-            type: 'snow',
+            type: 'embers',
             config: {
-              density: 25,
-              speed: 50,
-              scale: 25,
-              tint: "#ffffff",
-              direction: 50,
+              density: "50",
+              speed: "50",
+              scale: "50",
+              tint: "#ff1c1c",
+              direction: "50",
               apply_tint: true
             }
           }
-        });
-        canvas.scene.setFlag("fxmaster", "effects", {
-          "lightRainID": {
-            type: 'Rain',
-            config: {
-              density: 25,
-              speed: 50,
-              scale: 50,
-              tint: "#acd2cd",
-              direction: 50,
-              apply_tint: true
-            }
-          }
-        });
-        return "Light to moderate freezing rain today.";
+        })
+        weather = "Large ashfall today.";
       } else {
-        canvas.scene.setFlag("fxmaster", "effects", {
-          "lightRainID": {
-            type: 'Rain',
-            config: {
-              density: 50,
-              speed: 50,
-              scale: 50,
-              tint: "#acd2cd",
-              direction: 50,
-              apply_tint: true
+        if (this.temp < 25) {
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
             }
-          }
-        });
-        return "Light to moderate rain today.";
+          })
+          weather = "A light to moderate amount of snow today.";
+        } else if (this.temp < 32) {
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "25",
+                speed: "50",
+                scale: "25",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightRainID": {
+              type: 'rain',
+              config: {
+                density: "25",
+                speed: "50",
+                scale: "50",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Light to moderate freezing rain today.";
+        } else {
+          effects.push({
+            "lightRainID": {
+              type: 'rain',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Light to moderate rain today.";
+        }
       }
+
     } else if (roll == 9) {
       this.humidity -= 2;
       if (this.isVolcanic) {
-        return "Firey rain today, take cover.";
-      }
-      if (this.temp < 25) {
-        return "Large amount of snowfall today.";
-      } else if (this.temp < 32) {
-        return "Large amount of freezing rain today.";
+        effects.push({
+          "lightsnowID": {
+            type: 'rain',
+            config: {
+              density: "72",
+              speed: "50",
+              scale: "67",
+              tint: "#ff8040",
+              direction: "50",
+              apply_tint: true
+            }
+          }
+        })
+        effects.push({
+          "lightsnowID": {
+            type: 'embers',
+            config: {
+              density: "50",
+              speed: "50",
+              scale: "50",
+              tint: "#ff1c1c",
+              direction: "50",
+              apply_tint: true
+            }
+          }
+        })
+        weather = "Firey rain today, take cover.";
       } else {
-        return "Heavy Rain today.";
-      }
-    } else if (roll >= 10) {
-      if (this.rand(1, 20) == 20) {
-        return this.extremeWeather();
-      } else {
-        this.humidity -= 2;
-        if (this.isVolcanic) {
-          return "Earthquake, firey rain, and toxic gases today.";
-        }
         if (this.temp < 25) {
-          return "Blizzard today.";
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "72",
+                speed: "50",
+                scale: "67",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Large amount of snowfall today.";
         } else if (this.temp < 32) {
-          return "Icestorm today.";
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightRainID": {
+              type: 'rain',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Large amount of freezing rain today.";
         } else {
-          return "Torrential rains today.";
+          effects.push({
+            "lightsnowID": {
+              type: 'rain',
+              config: {
+                density: "72",
+                speed: "50",
+                scale: "67",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Heavy Rain today.";
         }
+      }
+
+    } else if (roll >= 10) {
+      this.humidity -= 2;
+      if (this.rand(1, 20) == 20) {
+        weather = this.extremeWeather();
+      } else {
+        if (this.isVolcanic) {
+          effects.push({
+            "lightsnowID": {
+              type: 'rain',
+              config: {
+                density: "100",
+                speed: "75",
+                scale: "100",
+                tint: "#ff8040",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightsnowID": {
+              type: 'embers',
+              config: {
+                density: "100",
+                speed: "50",
+                scale: "100",
+                tint: "#ff1c1c",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightsnowID": {
+              type: 'clouds',
+              config: {
+                density: "50",
+                speed: "8",
+                scale: "50",
+                tint: "#d2e8ce",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Earthquake, firey rain, and toxic gases today.";
+        } else {
+          if (this.temp < 25) {
+            effects.push({
+              "lightsnowID": {
+                type: 'snow',
+                config: {
+                  density: "100",
+                  speed: "75",
+                  scale: "100",
+                  tint: "#ffffff",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            weather = "Blizzard today.";
+          } else if (this.temp < 32) {
+            effects.push({
+              "lightsnowID": {
+                type: 'snow',
+                config: {
+                  density: "50",
+                  speed: "50",
+                  scale: "50",
+                  tint: "#ffffff",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            effects.push({
+              "lightsnowID": {
+                type: 'rain',
+                config: {
+                  density: "83",
+                  speed: "17",
+                  scale: "100",
+                  tint: "#ffffff",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            weather = "Icestorm today.";
+          } else {
+            effects.push({
+              "lightsnowID": {
+                type: 'rain',
+                config: {
+                  density: "100",
+                  speed: "75",
+                  scale: "100",
+                  tint: "#acd2cd",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            weather = "Torrential rains today.";
+          }
+        }
+
       }
     }
+    if(fxAvailable){
+        canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
+        if(effects){
+          effects.forEach((effect) => {
+            canvas.scene.setFlag("fxmaster", "effects", effect);
+          })
+        }
+      });
+    }
+    return weather;
   }
 
   output() {
@@ -1502,6 +1876,7 @@ class WeatherTracker {
         icon.style.color = "#000"
         break
     }
+    this.seasonColor = season.color;
   }
 }
 
@@ -1532,7 +1907,7 @@ class DateTime {
       DateTime.myCalendarSpec.leap_year_rule = (year) => 0;
       this._months = Object.keys(calSpec.month_len).map((k, i) => {
         let m = calSpec.month_len[k];
-        return new Month(k, m.days[0],  m.days[1], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
+        return new Month(k, m.days[0], m.days[1], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
       })
       this._daysOfTheWeek = calSpec.weekdays;
       game.Gametime.DTC.createFromData(DateTime.myCalendarSpec);
@@ -1551,17 +1926,33 @@ class DateTime {
   static _reEvents = [];
   static _events = [];
 
-  get reEvents() {return DateTime._reEvents};
-  set reEvents(reEvents) {DateTime._reEvents = reEvents};
+  get reEvents() {
+    return DateTime._reEvents
+  };
+  set reEvents(reEvents) {
+    DateTime._reEvents = reEvents
+  };
 
-  get events() {return DateTime._events};
-  set events(events) {DateTime._events = events};
+  get events() {
+    return DateTime._events
+  };
+  set events(events) {
+    DateTime._events = events
+  };
 
-  get seasons() {return DateTime._seasons};
-  set seasons(seasons) {DateTime._seasons = seasons};
+  get seasons() {
+    return DateTime._seasons
+  };
+  set seasons(seasons) {
+    DateTime._seasons = seasons
+  };
 
-  get weather() {return DateTime._weather}
-  set weather(weather) {DateTime._weather = weather}
+  get weather() {
+    return DateTime._weather
+  }
+  set weather(weather) {
+    DateTime._weather = weather
+  }
 
   get year() {
     return Gametime.DTNow().years;
@@ -1571,34 +1962,46 @@ class DateTime {
   }
 
 
-  get dateWordy() {return this._dateWordy;}
-  set dateWordy(dateWordy) {this._dateWordy = dateWordy;}
+  get dateWordy() {
+    return this._dateWordy;
+  }
+  set dateWordy(dateWordy) {
+    this._dateWordy = dateWordy;
+  }
 
   set months(months) {
     DateTime.myCalendarSpec.month_len = {};
-    months.forEach(m => DateTime.myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.leapLength)], "intercalary": !m.isNumbered})
+    months.forEach(m => DateTime.myCalendarSpec.month_len[m.name] = {
+      "days": [Number(m.length), Number(m.leapLength)],
+      "intercalary": !m.isNumbered
+    })
     this._months = months;
   }
-  get months() { return this._months}
+  get months() {
+    return this._months
+  }
   set daysOfTheWeek(days) {
     DateTime.myCalendarSpec.weekdays = days;
     this._daysOfTheWeek = days;
   }
-  get daysOfTheWeek() { 
-    return this._daysOfTheWeek}
+  get daysOfTheWeek() {
+    return this._daysOfTheWeek
+  }
 
 
   set year(y) {
     this.setYear(y)
   }
 
-  get currentWeekDay () {
+  get currentWeekDay() {
     return Gametime.weekDays[Gametime.DTNow().dow()];
   }
-  
+
   addMonth(month) {
     this._months.push(month);
-    DateTime.myCalendarSpec.month_len[month.name]={days:[Number(month.length), Number(month.leapLength)]};
+    DateTime.myCalendarSpec.month_len[month.name] = {
+      days: [Number(month.length), Number(month.leapLength)]
+    };
     // Gametime.DTC.createFromData(DateTime.myCalendarSpec);
   };
 
@@ -1609,28 +2012,52 @@ class DateTime {
   };
 
   setYear(year) {
-    Gametime.setAbsolute(Gametime.DTNow().setAbsolute({years: Number(year)}));
+    Gametime.setAbsolute(Gametime.DTNow().setAbsolute({
+      years: Number(year)
+    }));
     this._year = year
   }
 
-  get currentMonth() {return Gametime.DTNow().months}
-  set currentMonth(currentMonth) {Gametime.setAbsolute(Gametime.DTNow().setAbsolute({months: Number(currentMonth)}))}
+  get currentMonth() {
+    return Gametime.DTNow().months
+  }
+  set currentMonth(currentMonth) {
+    Gametime.setAbsolute(Gametime.DTNow().setAbsolute({
+      months: Number(currentMonth)
+    }))
+  }
 
-  set era(era) {this._era = era}
-  get era() {return this._era}
-  setEra(era) {this._era = era}
+  set era(era) {
+    this._era = era
+  }
+  get era() {
+    return this._era
+  }
+  setEra(era) {
+    this._era = era
+  }
 
   setDayLength(length) {
     DateTime.myCalendarSpec.hours_per_day = length;
   }
-  
-  set numDayOfTheWeek(dow) {game.Gametime.DTNow().setCalDow(dow)}
-  get numDayOfTheWeek() {return Gametime.DTNow().dow()}
 
-  get dateNum() { return this._datenum}
-  set dateNum(dateNum) {this._datenum = dateNum};
+  set numDayOfTheWeek(dow) {
+    game.Gametime.DTNow().setCalDow(dow)
+  }
+  get numDayOfTheWeek() {
+    return Gametime.DTNow().dow()
+  }
 
-  get weekday() { return this._daysOfTheWeek[this.numDayOfTheWeek]}
+  get dateNum() {
+    return this._datenum
+  }
+  set dateNum(dateNum) {
+    this._datenum = dateNum
+  };
+
+  get weekday() {
+    return this._daysOfTheWeek[this.numDayOfTheWeek]
+  }
   set weekday(day) {
     let newDow = this._daysOfTheWeek.indexOf(day);
     if (newDow != -1) this.numDayOfTheWeek = newDow;
@@ -1643,97 +2070,106 @@ class DateTime {
         // match by id
         let entity = collection.get(macroMatch[1])
         // if no match search by name
-        if (!entity) entity = collection.entities.find(m=>m.name === macroMatch[1]);
+        if (!entity) entity = collection.entities.find(m => m.name === macroMatch[1]);
         return entity;
       }
     }
     return null;
   }
 
-findSeason(dateTime){
-  let targetDay = dateTime.days + 1;
-  let targetMonth = dateTime.months;
+  findSeason(dateTime) {
+    let targetDay = dateTime.days + 1;
+    let targetMonth = dateTime.months;
 
-  let abbrevs = this.months.map(m=>""+m.abbrev); // need text abbreviations here so they can be looked up
+    let abbrevs = this.months.map(m => "" + m.abbrev); // need text abbreviations here so they can be looked up
 
-  // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
-  let season = this.seasons.find(s=>{let smn = abbrevs.indexOf(s.date.month); return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)});
-  let index = season ? ((this.seasons.indexOf(season) - 1  + this.seasons.length) % this.seasons.length) : this.seasons.length - 1;
-
-  return this.seasons[index];
-}
-
-checkEvents() {
-  if (!Gametime.isMaster()) return;
-
-  let currentMonth = this.currentMonth;
-  let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
-
-  // seasons
-  let newSeason = this.findSeason(Gametime.DTNow());
-  if (this.weather.season !== newSeason.name) {
-    // season change
-    this.weather.setSeason(newSeason)
-    let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
-    ChatMessage.create({
-      speaker: {
-        alias: "Season Change:",
-      },
-      whisper: ChatMessage.getWhisperIDs("GM"),
-      content: chatOut,
+    // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
+    let season = this.seasons.find(s => {
+      let smn = abbrevs.indexOf(s.date.month);
+      return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)
     });
+    let index = season ? ((this.seasons.indexOf(season) - 1 + this.seasons.length) % this.seasons.length) : this.seasons.length - 1;
+
+    return this.seasons[index];
   }
 
-  //Find reoccuring events
-  const macroRe = /\@Macro\[(.*)\].*/;
-  const journalRe = /\@\@JournalEntry\[(.*)\].*/
+  checkEvents() {
+    if (!Gametime.isMaster()) return;
 
-  let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
-  filtReEvents.forEach((event) => {
-    let macro = this.getEntity(event.text, game.macros, macroRe);
-    if (macro) {
-      macro.execute();
-    } else {
-      let journal = this.getEntity(event.text, game.journal, journalRe);
-      let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + (journal ? journal.data.content : event.text);
+    let currentMonth = this.currentMonth;
+    let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
+
+    // seasons
+    let newSeason = this.findSeason(Gametime.DTNow());
+    if (newSeason && this.weather.season !== newSeason.name) {
+      // season change
+      this.weather.setSeason(newSeason)
+      let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
       ChatMessage.create({
         speaker: {
-          alias: "Reoccuring Event:",
+          alias: "Season Change:",
         },
         whisper: ChatMessage.getWhisperIDs("GM"),
         content: chatOut,
       });
     }
-  })
 
-  combinedDate += "-" + this.year
-  let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
-  this.events = this.events.filter(event => event.date.combined !== combinedDate)
+    //Find reoccuring events
+    const macroRe = /\@Macro\[(.*)\].*/;
+    const journalRe = /\@\@JournalEntry\[(.*)\].*/
 
-  filtEvents.forEach((event) => {
-    let dt = game.Gametime.DTNow();
-    let timeOut = "";
-    if (event.allDay) {
-      dt = dt.setAbsolute({hours: 0, minutes: 0, seconds: 0});
-    } else {
-      let hours = event.date.hours;
-      let AmOrPm = hours >= 12 ? 'PM' : 'AM';
-      hours = (hours % 12) || 12;
-      timeOut = ", " + hours + ":" + `${event.date.minutes}`.padStart(2,"0") + ":" + `${event.date.seconds}`.padStart(2,"0") + " " + AmOrPm;
-      dt = dt.setAbsolute({hours: event.date.hours, minutes: event.date.minutes, seconds: event.date.seconds});
-    }
-    let macro = this.getEntity(event.text, game.macros, macroRe);
-    if (macro) {
-      game.Gametime.doAt(dt, macro.name)
-    }
-    else
-    {
-      let journal = this.getEntity(event.text, game.journal, journalRe);
-      let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + timeOut + "<hr>" + journal ? journal.data.content : event.text;
-      game.Gametime.reminderAt(dt, chatOut, "Event:", "GM");
-    } 
-  })
-}
+    let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
+    filtReEvents.forEach((event) => {
+      let macro = this.getEntity(event.text, game.macros, macroRe);
+      if (macro) {
+        macro.execute();
+      } else {
+        let journal = this.getEntity(event.text, game.journal, journalRe);
+        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + (journal ? journal.data.content : event.text);
+        ChatMessage.create({
+          speaker: {
+            alias: "Reoccuring Event:",
+          },
+          whisper: ChatMessage.getWhisperIDs("GM"),
+          content: chatOut,
+        });
+      }
+    })
+
+    combinedDate += "-" + this.year
+    let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
+    this.events = this.events.filter(event => event.date.combined !== combinedDate)
+
+    filtEvents.forEach((event) => {
+      let dt = game.Gametime.DTNow();
+      let timeOut = "";
+      if (event.allDay) {
+        dt = dt.setAbsolute({
+          hours: 0,
+          minutes: 0,
+          seconds: 0
+        });
+      } else {
+        let hours = event.date.hours;
+        let AmOrPm = hours >= 12 ? 'PM' : 'AM';
+        hours = (hours % 12) || 12;
+        timeOut = ", " + hours + ":" + `${event.date.minutes}`.padStart(2, "0") + ":" + `${event.date.seconds}`.padStart(2, "0") + " " + AmOrPm;
+        dt = dt.setAbsolute({
+          hours: event.date.hours,
+          minutes: event.date.minutes,
+          seconds: event.date.seconds
+        });
+      }
+      let macro = this.getEntity(event.text, game.macros, macroRe);
+      if (macro) {
+        game.Gametime.doAt(dt, macro.name)
+      } else {
+        let journal = this.getEntity(event.text, game.journal, journalRe);
+        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + timeOut + "<hr>" + journal ? journal.data.content : event.text;
+        game.Gametime.reminderAt(dt, chatOut, "Event:", "GM");
+      }
+    })
+  }
 
   getWeatherObj() {
     return {
@@ -1778,23 +2214,39 @@ checkEvents() {
   }
 
   quickAction() {
-    Gametime.advanceTime({minutes: 15});
+    Gametime.advanceTime({
+      minutes: 15
+    });
     this.setTimeDisp();
   }
 
   advanceHour() {
-    Gametime.advanceTime({hours: 1});
+    Gametime.advanceTime({
+      hours: 1
+    });
     this.setTimeDisp();
   }
 
   advanceNight() {
-    let newDT = Gametime.DTNow().add({days: 1}).setAbsolute({ hours: 0, minutes: 0, seconds: 0 });
+    let newDT = Gametime.DTNow().add({
+      days: 1
+    }).setAbsolute({
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    });
     Gametime.setAbsolute(newDT);
   }
 
   advanceMorning() {
     let now = Gametime.DTNow();
-    let newDT = now.add({days: now.hours < 7 ? 0 : 1}).setAbsolute({ hours: 7, minutes: 0, seconds: 0 });
+    let newDT = now.add({
+      days: now.hours < 7 ? 0 : 1
+    }).setAbsolute({
+      hours: 7,
+      minutes: 0,
+      seconds: 0
+    });
     Gametime.setAbsolute(newDT);
     this.setTimeDisp();
   }
@@ -1819,15 +2271,17 @@ checkEvents() {
     this.dateNum = days + "/" + abbrev + "/" + now.years + " " + this.era;
   }
 
-  advanceDay(suppress = false) {
-    Gametime.setAbsolute(Gametime.DTNow().add({days: 1}));
-    if(!suppress){
-      this.weather.generate();
-    }
+  advanceDay() {
+    Gametime.setAbsolute(Gametime.DTNow().add({
+      days: 1
+    }));
+    this.weather.generate();
   }
 
   advanceMonth() {
-    Gametime.setAbsolute(Gametime.DTNow().add({months: 1}));
+    Gametime.setAbsolute(Gametime.DTNow().add({
+      months: 1
+    }));
   }
 }
 
@@ -1950,6 +2404,7 @@ $(document).ready(() => {
     if (lastDays !== newDays) {
       templateData.dt.genDateWordy();
       templateData.dt.checkEvents();
+      templateData.dt.weather.generate();
     }
     lastDays = newDays;
 
@@ -1981,7 +2436,7 @@ $(document).ready(() => {
     c.updateSettings();
   });
 
-  Hooks.on("renderCalendar", ()=>{
+  Hooks.on("renderCalendar", () => {
     if (Gametime.isRunning()) {
       document.getElementById('calendar-btn-sec').disabled = true;
       document.getElementById('calendar-btn-halfMin').disabled = true;
@@ -1996,6 +2451,30 @@ $(document).ready(() => {
       document.getElementById('calendar-btn-halfMin').style.cursor = 'pointer';
       document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
       document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
+    }
+    let icon = document.getElementById('calendar-weather');
+    switch (templateData.dt.weather.seasonColor) {
+      case 'red':
+        icon.style.color = "#B12E2E"
+        break;
+      case 'orange':
+        icon.style.color = "#B1692E"
+        break;
+      case 'yellow':
+        icon.style.color = "#B99946"
+        break;
+      case 'green':
+        icon.style.color = "#258E25"
+        break;
+      case 'blue':
+        icon.style.color = "#5b80a5"
+        break;
+      case 'white':
+        icon.style.color = "#CCC"
+        break;
+      default:
+        icon.style.color = "#000"
+        break
     }
   })
 

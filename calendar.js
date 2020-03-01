@@ -833,20 +833,54 @@ class Calendar extends Application {
   }
 
   loadSettings() {
+
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
     templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
 
     if (!data || !data.months) {
-      this.populateData();
-      Gametime.setAbsolute({years: 0, months: 0, days: 0, hours:0, minutes: 0, seconds:0})
+      if (data.default) {
+        console.log("calendar-weather | rebuilding data", data.default);
+        // recover previous data
+        templateData.dt = new DateTime();
+        data.default.months = data.default.months.map(m=>{m.leapLength = m.length; return m});
+        templateData.dt.months = data.default.months;
+        templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
+        templateData.dt.setDayLength(data.default.dayLength);
+        DateTime.updateDTC(); // set the calendar spec for correct date time calculations
+
+        templateData.dt.era = data.default.era;
+        templateData.dt.weather = templateData.dt.weather.load(data.default.weather);
+        templateData.dt.seasons = data.default.seasons;
+        templateData.dt.reEvents = data.default.reEvents;
+        templateData.dt.events = data.default.events;
+        let timeout = game.settings.get("about-time", "election-timeout");
+        setTimeout(function(){ 
+          if (game.Gametime.isMaster()) {
+            Gametime.setAbsolute({years: data.default.year, months: data.default.currentMonth, days: data.default.day-1, hours:0, minutes: 0, seconds:0})
+            let now = Gametime.DTNow();
+            templateData.dt.currentWeekday = templateData.dt.daysOfTheWeek[now.dow()];
+            templateData.dt.timeDisp = now.shortDate().time;
+          }
+        }, timeout * 1000 + 100);
+
+      } else {
+        this.populateData();
+        let timeout = game.settings.get("about-time", "election-timeout");
+        setTimeout(() => { 
+          if (game.Gametime.isMaster()) {
+              Gametime.setAbsolute({years: data.default.year, months: data.default.currentMonth, days: data.default.day-1, hours:0, minutes: 0, seconds:0})
+          }
+        }, timeout * 1000 + 100);
+
+      }
     } else {
       let now = Gametime.DTNow();
       templateData.dt = new DateTime();
       templateData.dt.months = data.months;
       templateData.dt.daysOfTheWeek = data.daysOfTheWeek;
+      templateData.dt.setDayLength(data.dayLength);
       DateTime.updateDTC(); // set the calendar spec for correct date time calculations
-
       templateData.dt.currentWeekday = templateData.dt.daysOfTheWeek[now.dow()];
       templateData.dt.era = data.era;
       templateData.dt.dayLength = Gametime.DTC.hpd;
@@ -856,7 +890,6 @@ class Calendar extends Application {
       templateData.dt.reEvents = data.reEvents;
       templateData.dt.events = data.events;
     }
-
   }
 
   checkEventBoxes() {
@@ -1635,7 +1668,7 @@ checkEvents() {
 
   // seasons
   let newSeason = this.findSeason(Gametime.DTNow());
-  if (this.weather.season !== newSeason.name) {
+  if (newSeason && this.weather.season !== newSeason.name) {
     // season change
     this.weather.setSeason(newSeason)
     let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
@@ -1839,11 +1872,12 @@ $(document).ready(() => {
   // Init settings so they can be wrote to later
   Hooks.on('init', () => {
     // c.populateData();
+
     game.settings.register('calendar-weather', 'dateTime', {
       name: "Date/Time Data",
       scope: 'world',
       config: false,
-      default: {},
+      // default: {},
       type: Object,
     });
     game.settings.register('calendar-weather', 'calendarDisplay', {

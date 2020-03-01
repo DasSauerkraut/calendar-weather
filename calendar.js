@@ -927,8 +927,7 @@ class Calendar extends Application {
     templateData.dt.seasons = data.seasons
     templateData.dt.reEvents = data.reEvents
     templateData.dt.events = data.events
-    templateData.dt.findSeasonEvents();
-    // templateData.dt.checkEvents();
+    templateData.dt.checkEvents();
   }
 
   updateSettings() {
@@ -1511,8 +1510,8 @@ class DateTime {
   _era = "";
   timeDisp = "";
   _dateNum = "";
-  weather = new WeatherTracker();
-  seasons = [];
+  static _weather = new WeatherTracker();
+  static _seasons = [];
   static _reEvents = [];
   static _events = [];
 
@@ -1522,12 +1521,19 @@ class DateTime {
   get events() {return DateTime._events};
   set events(events) {DateTime._events = events};
 
+  get seasons() {return DateTime._seasons};
+  set seasons(seasons) {DateTime._seasons = seasons};
+
+  get weather() {return DateTime._weather}
+  set weather(weather) {DateTime._weather = weather}
+
   get year() {
     return Gametime.DTNow().years;
   }
   get day() {
     return Gametime.DTNow().days
   }
+
 
   get dateWordy() {return this._dateWordy;}
   set dateWordy(dateWordy) {this._dateWordy = dateWordy;}
@@ -1588,8 +1594,9 @@ class DateTime {
   get dateNum() { return this._datenum}
   set dateNum(dateNum) {this._datenum = dateNum};
 
-  setWeekday(day) {
-    let newDow = this._months.indexOf(day);
+  get weekday() { return this._daysOfTheWeek[this.numDayOfTheWeek]}
+  set weekday(day) {
+    let newDow = this._daysOfTheWeek.indexOf(day);
     if (newDow != -1) this.numDayOfTheWeek = newDow;
   }
 
@@ -1607,29 +1614,31 @@ class DateTime {
     return null;
   }
 
-findSeasonEvents(){
-  let tempDT = Gametime.DTNow();
-  let targetDay = tempDT.days + 1;
-  let targetMonth = tempDT.month + 1;
+findSeason(dateTime){
+  let targetDay = dateTime.days + 1;
+  let targetMonth = dateTime.months;
 
-  // If the first season after the desired day is the 3rd one (index 2) the map returns [0,0,1,2,3....], find picks the first one > 0 and if none match defaults to 0
-  let index = this.seasons.map((s,i) => (s.date.month >= targetMonth || (s.date.month === targetMonth && s.date.day >= targetDay)) ? i - 1 : 0).find(i=> i > 0) || 0;
-  this.weather.setSeason(this.seasons[index]);
-  this.checkEvents();
+  let abbrevs = this.months.map(m=>""+m.abbrev); // need text abbreviations here so they can be looked up
+
+  // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
+  let season = this.seasons.find(s=>{let smn = abbrevs.indexOf(s.date.month); return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)});
+  let index = season ? Math.clamped(this.seasons.indexOf(season) - 1, 0, +Infinity) : this.seasons.length - 1;
+
+  return this.seasons[index];
 }
 
 checkEvents() {
-  console.log(this);
   if (!Gametime.isMaster()) return;
 
   let currentMonth = this.currentMonth;
   let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
 
   // seasons
-  let season = this.seasons.find(s=> s.date.combined == combinedDate)
-  if (season) {
-    this.weather.setSeason(season)
-    let chatOut = "<b>" + season.name + "</b> - " + this.dateNum;
+  let newSeason = this.findSeason(Gametime.DTNow());
+  if (this.weather.season !== newSeason.name) {
+    // season change
+    this.weather.setSeason(newSeason)
+    let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
     ChatMessage.create({
       speaker: {
         alias: "Season Change:",
@@ -1644,6 +1653,7 @@ checkEvents() {
   const journalRe = /\@\@JournalEntry\[(.*)\].*/
 
   let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
+  console.log("Checking re events", this.reEvents)
   filtReEvents.forEach((event) => {
     let macro = this.getEntity(event.text, game.macros, macroRe);
     if (macro) {

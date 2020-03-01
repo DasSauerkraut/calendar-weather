@@ -850,7 +850,6 @@ class Calendar extends Application {
   loadSettings() {
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
-    templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
 
     if (!data || !data.months) {
       this.populateData();
@@ -1214,7 +1213,7 @@ class WeatherTracker {
   precipitation = "";
   isVolcanic = false;
   outputToChat = true;
-  showFX = true;
+  showFX = false;
   isC = false;
   cTemp = 21.11
 
@@ -2352,14 +2351,6 @@ $(document).ready(() => {
       default: true,
       type: Boolean,
     });
-    game.settings.register('calendar-weather', 'fxDisplay', {
-      name: "Display Weather Effects? (Requires FXMaster)",
-      hint: "If true, each time weather is generated it will activate a weather effect on the currently active scene.",
-      scope: 'world',
-      config: true,
-      default: true,
-      type: Boolean,
-    });
   });
 
   Hooks.on('renderCalendarEvents', () => {
@@ -2478,11 +2469,12 @@ $(document).ready(() => {
     }
   })
 
-  Hooks.on("renderSceneConfig", (app, html, data) => {  
+  Hooks.on("renderSceneConfig", (app, html, data) => {
+    let loadedData = canvas.scene.getFlag('calendar-weather', 'showFX');
     const fxHtml = `
     <div class="form-group">
         <label>Calendar/Weather - Weather Effects</label>
-        <input type="checkbox" name="calendarFX" data-dtype="Boolean">
+        <input type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''} onChange="canvas.scene.setFlag('calendar-weather', 'showFX', this.checked);">
         <p class="notes">When checked, and the FXMaster module is enabled, generating new weather will change the scene's current effect.</p>
     </div>
     `
@@ -2492,10 +2484,19 @@ $(document).ready(() => {
     formGroup.after(fxHtml);
 });
 
+  Hooks.on("canvasInit", async canvas => {
+    console.log("loading Da Flag:" + canvas.scene.getFlag('calendar-weather', 'showFX'));
+    templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+  });
+
+  Hooks.on("closeSceneConfig", () => {
+    console.log("loading Da Flag:" + canvas.scene.getFlag('calendar-weather', 'showFX'));
+    templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+  });
+
   Hooks.on('ready', () => {
     c.loadSettings();
     WarningSystem.validateAboutTime();
-    CONFIG.debug.hooks = true
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, templateData).then(html => {
         c.render(true);

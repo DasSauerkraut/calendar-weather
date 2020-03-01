@@ -1622,7 +1622,8 @@ findSeason(dateTime){
 
   // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
   let season = this.seasons.find(s=>{let smn = abbrevs.indexOf(s.date.month); return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)});
-  let index = season ? Math.clamped(this.seasons.indexOf(season) - 1, 0, +Infinity) : this.seasons.length - 1;
+  let index = season ? ((this.seasons.indexOf(season) - 1  + this.seasons.length) % this.seasons.length) : this.seasons.length - 1;
+  console.log("check events season num is ", index, season)
 
   return this.seasons[index];
 }

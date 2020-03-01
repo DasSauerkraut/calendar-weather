@@ -2478,9 +2478,24 @@ $(document).ready(() => {
     }
   })
 
+  Hooks.on("renderSceneConfig", (app, html, data) => {  
+    const fxHtml = `
+    <div class="form-group">
+        <label>Calendar/Weather - Weather Effects</label>
+        <input type="checkbox" name="calendarFX" data-dtype="Boolean">
+        <p class="notes">When checked, and the FXMaster module is enabled, generating new weather will change the scene's current effect.</p>
+    </div>
+    `
+
+    const fxFind = html.find("select[name ='weather']");
+    const formGroup = fxFind.closest(".form-group");
+    formGroup.after(fxHtml);
+});
+
   Hooks.on('ready', () => {
     c.loadSettings();
     WarningSystem.validateAboutTime();
+    CONFIG.debug.hooks = true
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, templateData).then(html => {
         c.render(true);

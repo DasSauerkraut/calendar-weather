@@ -1608,13 +1608,12 @@ class DateTime {
   }
 
 findSeasonEvents(){
-  console.log(this.seasons);
   let tempDT = Gametime.DTNow();
   let targetDay = tempDT.days + 1;
   let targetMonth = tempDT.month + 1;
 
   // If the first season after the desired day is the 3rd one (index 2) the map returns [0,0,1,2,3....], find picks the first one > 0 and if none match defaults to 0
-  let index = this.seasons.map((s,i) => (s.date.month >= targetMonth && s.date.day >= targetDay) ? i - 1 : 0).find(i=> i > 0) || 0;
+  let index = this.seasons.map((s,i) => (s.date.month >= targetMonth || s.date.day >= targetDay) ? i - 1 : 0).find(i=> i > 0) || 0;
   this.weather.setSeason(this.seasons[index]);
   this.checkEvents();
 }

@@ -282,7 +282,7 @@ class CalendarEvents extends FormApplication {
         name: "",
         date: {
           month: this.data.months[dt.months].abbrev,
-          day: this.data.day,
+          day: this.data.day + 1,
           year: this.data.year,
           hours: dt.hours,
           minutes: dt.minutes,
@@ -317,6 +317,27 @@ class CalendarEvents extends FormApplication {
       this.data.events.splice(index, 1);
       this.render(true);
     });
+
+    let reText =  html.find(".calendar-reEvent-text");
+    for (let i = 0; i < reText.length; i++) reText[i].ondrop =  this.onDrop.bind(null, reText[i]);
+    let evText =  html.find(".calendar-event-content");
+    for (let i = 0; i < evText.length; i++) evText[i].ondrop =  this.onDrop.bind(null, evText[i]);
+
+  }
+
+  onDrop = (html, event) => {
+    const collections = {JournalEntry: JournalEntry, Macro: Macro};
+    try {
+        let data = JSON.parse(event.dataTransfer.getData("text"));
+        if (collections[data.type]) {
+            event.preventDefault();
+            let name = collections[data.type].collection.get(data.id).data.name;
+            html.value = `@${data.type}[${data.id}]{${name}}`;
+        }
+      } catch(err) {
+          console.log(event.dataTransfer.getData("text"));
+          console.warn(err);
+      }
   }
 
   renderForm(newData) {
@@ -396,17 +417,19 @@ class CalendarForm extends FormApplication {
 
     let newMonths = [];
     if (newMonthsName.length < 1) {
-      savedData.addMonth(new Month("Month 1", 30, true));
+      savedData.addMonth(new Month("Month 1", 30, 30, true));
     }
 
     for (var i = 0; i < newMonthsName.length; i++) {
-      let tempMonth = new Month("Month 1", 30, true);
+      let tempMonth = new Month("Month 1", 30, 30, true);
       if (newMonthsName[i].value == "") {
         tempMonth.name = "New Month"
       } else {
         tempMonth.name = newMonthsName[i].value;
       }
       tempMonth.length = newMonthsLength[i].value;
+      // change this for leapYears
+      tempMonth.leapLength = newMonthsLength[i].value;
       tempMonth.isNumbered = !newMonthsIsNum[i].checked;
       if (newMonthsIsNum[i].checked) {
         if (newMonthsAbbrev[i].value) {
@@ -428,7 +451,7 @@ class CalendarForm extends FormApplication {
     }
     if (weekDays.length < 1) weekDays = ["Weekday"];
     savedData.daysOfTheWeek = weekDays;
-   
+ 
     savedData.setDayLength(24);
 
     DateTime.updateDTC();
@@ -439,14 +462,14 @@ class CalendarForm extends FormApplication {
     } else {
       monthTarget = document.querySelector('input[class="calendar-form-month-radio"]:checked').value;
     }
-
+    monthTarget = Number(monthTarget);
     let day = parseInt(document.getElementById("calendar-form-cDay-input").value);
     if (savedData.months[monthTarget].length < day) {
       day = savedData.months[monthTarget].length;
     }
     day -= 1;
     Gametime.setAbsolute({years: year, months: monthTarget, days: day, hours: hours, minutes: minutes, seconds: seconds})
-    
+
     let weekdayTarget = 0;
     if (document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null) {
       weekdayTarget = savedData.daysOfTheWeek.length - 1
@@ -499,7 +522,7 @@ class CalendarForm extends FormApplication {
     html.find(addMonth).click(ev => {
       ev.preventDefault();
       this.data = JSON.parse(this.saveData());
-      let newMonth = new Month("", 30, true);
+      let newMonth = new Month("", 30, 30, true);
       this.data.months.push(newMonth);
       this.render(true);
       this.checkBoxes();
@@ -683,7 +706,7 @@ class Calendar extends Application {
   }
 
   populateData() {
-    let newMonth1 = new Month("Month 1", 30, true);
+    let newMonth1 = new Month("Month 1", 30, 30, true);
     templateData.dt.addMonth(newMonth1);
     templateData.dt.addWeekday("Monday");
     templateData.dt.addWeekday("Tuesday");
@@ -950,11 +973,13 @@ class Calendar extends Application {
 class Month {
   name = "";
   length = 0;
+  leapLength = 0;
   isNumbered = true;
   abbrev = "";
-  constructor(name = "", length = 0, isNumbered = true, abbrev = "") {
+  constructor(name = "", length = 0, leapLength = 0, isNumbered = true, abbrev = "") {
     this.name = name;
-    this.length = length;
+    this.length = Number(length);
+    this.leapLength = Number(leapLength) || 1;
     this.isNumbered = isNumbered;
     this.abbrev = abbrev;
   }
@@ -1159,7 +1184,7 @@ class DateTime {
       DateTime.myCalendarSpec.leap_year_rule = (year) => 0;
       this._months = Object.keys(calSpec.month_len).map((k, i) => {
         let m = calSpec.month_len[k];
-        return new Month(k, m.days[0], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
+        return new Month(k, m.days[0],  m.days[1], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
       })
       this._daysOfTheWeek = calSpec.weekdays;
       game.Gametime.DTC.createFromData(DateTime.myCalendarSpec);
@@ -1169,7 +1194,6 @@ class DateTime {
   _months = [];
   _daysOfTheWeek = [];
   _year = 0;
-  // currentMonth = 0;
   _dateWordy = "";
   _era = "";
   timeDisp = "";
@@ -1197,7 +1221,7 @@ class DateTime {
 
   set months(months) {
     DateTime.myCalendarSpec.month_len = {};
-    months.forEach(m => DateTime.myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.length)], "intercalary": !m.isNumbered})
+    months.forEach(m => DateTime.myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.leapLength)], "intercalary": !m.isNumbered})
     this._months = months;
   }
   get months() { return this._months}
@@ -1219,7 +1243,7 @@ class DateTime {
   
   addMonth(month) {
     this._months.push(month);
-    DateTime.myCalendarSpec.month_len[month.name]={days:[Number(month.length), Number(month.length)]};
+    DateTime.myCalendarSpec.month_len[month.name]={days:[Number(month.length), Number(month.leapLength)]};
     // Gametime.DTC.createFromData(DateTime.myCalendarSpec);
   };
 
@@ -1243,7 +1267,6 @@ class DateTime {
 
   setDayLength(length) {
     DateTime.myCalendarSpec.hours_per_day = length;
-    // this.updateFromDTC("Warhammer");
   }
   
   set numDayOfTheWeek(dow) {game.Gametime.DTNow().setCalDow(dow)}
@@ -1253,102 +1276,79 @@ class DateTime {
   set dateNum(dateNum) {this._datenum = dateNum};
 
   setWeekday(day) {
-    console.warn("set week day not implemented", day);
+    let newDow = this._months.indexOf(day);
+    if (newDow != -1) this.numDayOfTheWeek = newDow;
+  }
 
+  getEntity(text, collection, matchRe) {
+    if (text && text.startsWith("@")) {
+      let macroMatch = text.match(matchRe);
+      if (macroMatch && macroMatch.length === 2) {
+        // match by id
+        let entity = collection.get(macroMatch[1])
+        // if no match search by name
+        if (!entity) entity = collection.entities.find(m=>m.name === macroMatch[1]);
+        return entity;
+      }
+    }
+    return null;
   }
 
   checkEvents() {
+    const macroRe = /\@Macro\[(.*)\].*/;
+    const journalRe = /\@\@JournalEntry\[(.*)\].*/
     // this.seasons
-
+  
+    if (!Gametime.isMaster()) return;
     //Find reoccuring events
-    let messageLvl = ChatMessage.getWhisperIDs("GM")
     let currentMonth = this.currentMonth;
     let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
-    let filtReEvents = [];
-    if (this.reEvents){
-      filtReEvents = this.reEvents.filter(function (event) {
-        return event.date.combined == combinedDate;
-      });
-    }
-    if (filtReEvents) {
-      filtReEvents.forEach((event) => {
-        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
+
+    let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
+    filtReEvents.forEach((event) => {
+      let macro = this.getEntity(event.text, game.macros, macroRe);
+      if (macro) {
+        macro.execute();
+      } else {
+        let journal = this.getEntity(event.text, game.journal, journalRe);
+        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + (journal ? journal.data.content : event.text);
         ChatMessage.create({
           speaker: {
             alias: "Reoccuring Event:",
           },
-          whisper: messageLvl,
+          whisper: ChatMessage.getWhisperIDs("GM"),
           content: chatOut,
         });
-      })
-    }
-
-    combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day+1) + "-" + this.year
-    let filtEvents = [];
-    if(this.events){
-      filtEvents = this.events.filter(function (event) {
-        return event.date.combined == combinedDate;
-      });
-    }
-
-
-
-    if (filtEvents) {
-      filtEvents.forEach((event) => {
-        if (event.allDay) {
-          let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + event.text;
-          ChatMessage.create({
-            speaker: {
-              alias: "Event:",
-            },
-            whisper: messageLvl,
-            content: chatOut,
-          });
-        } else {
-
-          let eventMessage = (event) => {
-            let hours = event.date.hours;
-            let minutes = event.date.minutes;
-            let sec = event.date.seconds;
-            let AmOrPm = hours >= 12 ? 'PM' : 'AM';
-            if (minutes < 10) {
-              minutes = "0" + minutes;
-            }
-            if (sec < 10) {
-              sec = "0" + sec;
-            }
-            hours = (hours % 12) || 12;
-            let timeOut = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
-            let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + ", " +
-              timeOut + "<hr>" + event.text;
-
-            ChatMessage.create({
-              speaker: {
-                alias: "Event:",
-              },
-              whisper: messageLvl,
-              content: chatOut,
-            });
-          }
-          let dt = game.Gametime.DTNow().setAbsolute({hours: event.date.hours, minutes: event.date.minutes, seconds: event.date.seconds});
-          /*let time = game.Gametime.DTf({
-            years: dt.years,
-            days: dt.days,
-            months: dt.months,
-            hours: event.date.hours,
-            minutes: event.date.minutes,
-            seconds: event.date.seconds
-          })*/
-          game.Gametime.doAt(dt, eventMessage, event)
-        }
-      })
-       if(this.events){
-        this.events = this.events.filter(function (event) {
-          return event.date.combined != combinedDate;
-        });
       }
-    } 
-       // this.events.find()
+    })
+
+    combinedDate += "-" + this.year
+    let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
+    this.events = this.events.filter(event => event.date.combined !== combinedDate)
+
+    filtEvents.forEach((event) => {
+      let dt = game.Gametime.DTNow();
+      let timeOut = "";
+      if (event.allDay) {
+        dt = dt.setAbsolute({hours: 0, minutes: 0, seconds: 0});
+      } else {
+        let hours = event.date.hours;
+        let AmOrPm = hours >= 12 ? 'PM' : 'AM';
+        hours = (hours % 12) || 12;
+        timeOut = ", " + hours + ":" + `${event.date.minutes}`.padStart(2,"0") + ":" + `${event.date.seconds}`.padStart(2,"0") + " " + AmOrPm;
+        dt = dt.setAbsolute({hours: event.date.hours, minutes: event.date.minutes, seconds: event.date.seconds});
+      }
+      let macro = this.getEntity(event.text, game.macros, macroRe);
+      if (macro) {
+        game.Gametime.doAt(dt, macro.name)
+      }
+      else
+      {
+        let journal = this.getEntity(event.text, game.journal, journalRe);
+        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + timeOut + "<hr>" + journal ? journal.data.content : event.text;
+        game.Gametime.reminderAt(dt, chatOut, "Event:", "GM");
+      } 
+    })
   }
 
   getWeatherObj() {
@@ -1474,6 +1474,11 @@ $(document).ready(() => {
     c.checkEventBoxes();
     c.settingsOpen(true);
   })
+
+  // close without save
+  Hooks.on('closeCalendarEvents', () => {
+    c.settingsOpen(false);
+  });
 
   Hooks.on('calendarEventsClose', (newEvents) => {
     console.log("calendar-settings | Saving events.")

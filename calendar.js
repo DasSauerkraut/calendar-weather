@@ -1623,7 +1623,6 @@ findSeason(dateTime){
   // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
   let season = this.seasons.find(s=>{let smn = abbrevs.indexOf(s.date.month); return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)});
   let index = season ? ((this.seasons.indexOf(season) - 1  + this.seasons.length) % this.seasons.length) : this.seasons.length - 1;
-  console.log("check events season num is ", index, season)
 
   return this.seasons[index];
 }
@@ -1654,7 +1653,6 @@ checkEvents() {
   const journalRe = /\@\@JournalEntry\[(.*)\].*/
 
   let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
-  console.log("Checking re events", this.reEvents)
   filtReEvents.forEach((event) => {
     let macro = this.getEntity(event.text, game.macros, macroRe);
     if (macro) {

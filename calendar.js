@@ -720,6 +720,7 @@ class CalendarForm extends FormApplication {
       weekdays[i].checked = i === this.data.numDayOfTheWeek;
     }
 
+    console.log(duplicate(months));
     for (var i = 0, max = this.data.months.length; i < max; i++) {
       if (monthsNum[i]) {
         monthsNum[i].checked = !this.data.months[i].isNumbered;
@@ -877,7 +878,6 @@ class Calendar extends Application {
               Gametime.setAbsolute({years: 2020, months: 0, days: 0, hours:0, minutes: 0, seconds:0})
           }
         }, timeout * 1000 + 100);
-
       }
     } else {
       let now = Gametime.DTNow();
@@ -1253,7 +1253,6 @@ class WeatherTracker {
   }
 
   extremeWeather() {
-    console.log("-------------------------EXTREME WEATHER")
     let roll = this.rand(1, 5);
     let event = "";
     if (this.isVolcanic) {
@@ -1456,7 +1455,6 @@ class WeatherTracker {
           })
           weather = "Completely overcast with light freezing rain possible.";
         } else {
-          console.log(effects)
           effects.push({
             "lightcloudsID": {
               type: 'clouds',
@@ -1470,7 +1468,6 @@ class WeatherTracker {
               }
             }
           })
-          console.log(effects)
           effects.push({
             "lightrainID": {
               type: 'rain',
@@ -2251,6 +2248,7 @@ checkEvents() {
       this.months[now.months].name + ", " + now.years + " " + this.era;
 
     let abbrev = this.months[now.months] ? this.months[now.months].abbrev : now.months;
+
     this.dateNum = days + "/" + `${abbrev}` + "/" + now.years + " " + this.era;
   }
 
@@ -2465,12 +2463,10 @@ $(document).ready(() => {
 });
 
   Hooks.on("canvasInit", async canvas => {
-    console.log("loading Da Flag:" + canvas.scene.getFlag('calendar-weather', 'showFX'));
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
   });
 
   Hooks.on("closeSceneConfig", () => {
-    console.log("loading Da Flag:" + canvas.scene.getFlag('calendar-weather', 'showFX'));
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
   });
 

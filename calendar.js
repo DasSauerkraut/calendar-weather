@@ -911,6 +911,12 @@ class Calendar extends Application {
     templateData.dt.addWeekday("Wednesday");
     templateData.dt.addWeekday("Thursday");
     templateData.dt.setDayLength(24);
+    templateData.dt.settings = [];
+    templateData.dt.events = [];
+    templateData.dt.reEvents = [];
+    templateData.dt.settings = [];
+    templateData.dt.weather = new WeatherTracker();
+
     DateTime.updateDTC();
     templateData.dt.setEra("AD");
   }
@@ -1231,6 +1237,7 @@ class WeatherTracker {
 
   load(newData) {
     this.outputToChat = game.settings.get('calendar-weather', 'weatherDisplay');
+    if (!newData) return this;
     this.humidity = newData.humidity;
     this.temp = newData.temp;
     this.cTemp = newData.cTemp;
@@ -1936,6 +1943,7 @@ class DateTime {
   }
 
   static updateFromDTC(calendarName) {
+    console.log(calendarName);
     let calSpec = duplicate(game.Gametime.calendars[calendarName]);
     if (calSpec) {
       DateTime.myCalendarSpec = calSpec;
@@ -1964,30 +1972,16 @@ class DateTime {
   static _events = [];
 
   get reEvents() {return DateTime._reEvents};
-  set reEvents(reEvents) {DateTime._reEvents = reEvents};
+  set reEvents(reEvents) {if (!reEvents) DateTime._reEvents = []; else DateTime._reEvents = reEvents};
 
   get events() {return DateTime._events};
-  set events(events) {DateTime._events = events};
+  set events(events) {if (!events) DateTime._events = []; DateTime._events = events};
 
   get seasons() {return DateTime._seasons};
-  set seasons(seasons) {DateTime._seasons = seasons};
+  set seasons(seasons) {if (!seasons) DateTIme._seasons = []; else DateTime._seasons = seasons};
 
   get weather() {return DateTime._weather}
-  set weather(weather) {DateTime._weather = weather}
-
-  get seasons() {
-    return DateTime._seasons
-  };
-  set seasons(seasons) {
-    DateTime._seasons = seasons
-  };
-
-  get weather() {
-    return DateTime._weather
-  }
-  set weather(weather) {
-    DateTime._weather = weather
-  }
+  set weather(weather) {if (!weather) DateTime._weather = new WeatherTracker(); else DateTime._weather = weather}
 
   get year() {
     return Gametime.DTNow().years;

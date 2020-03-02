@@ -1389,7 +1389,7 @@ class WeatherTracker {
             }
           })
           effects.push({
-            "lightcloudsID": {
+            "snowID": {
               type: 'snow',
               config: {
                 density: "8",
@@ -1444,6 +1444,7 @@ class WeatherTracker {
           })
           weather = "Completely overcast with light freezing rain possible.";
         } else {
+          console.log(effects)
           effects.push({
             "lightcloudsID": {
               type: 'clouds',
@@ -1457,8 +1458,9 @@ class WeatherTracker {
               }
             }
           })
+          console.log(effects)
           effects.push({
-            "lightcloudsID": {
+            "lightrainID": {
               type: 'rain',
               config: {
                 density: "40",
@@ -1470,6 +1472,7 @@ class WeatherTracker {
               }
             }
           })
+          console.log(effects)
           weather = "Completely overcast; light drizzles possible.";
         }
       }
@@ -1490,7 +1493,7 @@ class WeatherTracker {
           }
         })
         effects.push({
-          "lightsnowID": {
+          "embersID": {
             type: 'embers',
             config: {
               density: "50",
@@ -1582,7 +1585,7 @@ class WeatherTracker {
           }
         })
         effects.push({
-          "lightsnowID": {
+          "embers": {
             type: 'embers',
             config: {
               density: "50",
@@ -1677,7 +1680,7 @@ class WeatherTracker {
             }
           })
           effects.push({
-            "lightsnowID": {
+            "embers": {
               type: 'embers',
               config: {
                 density: "100",
@@ -1703,7 +1706,7 @@ class WeatherTracker {
             }
           })
           effects.push({
-            "lightsnowID": {
+            "clouds": {
               type: 'clouds',
               config: {
                 density: "50",
@@ -1731,6 +1734,19 @@ class WeatherTracker {
                 }
               }
             })
+            effects.push({
+              "snow2": {
+                type: 'snow',
+                config: {
+                  density: "100",
+                  speed: "75",
+                  scale: "100",
+                  tint: "#ffffff",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
             weather = "Blizzard today.";
           } else if (this.temp < 32) {
             effects.push({
@@ -1747,7 +1763,7 @@ class WeatherTracker {
               }
             })
             effects.push({
-              "lightsnowID": {
+              "rain": {
                 type: 'rain',
                 config: {
                   density: "83",
@@ -1763,6 +1779,19 @@ class WeatherTracker {
           } else {
             effects.push({
               "lightsnowID": {
+                type: 'rain',
+                config: {
+                  density: "100",
+                  speed: "75",
+                  scale: "100",
+                  tint: "#acd2cd",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            effects.push({
+              "rain": {
                 type: 'rain',
                 config: {
                   density: "100",

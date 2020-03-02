@@ -1977,7 +1977,7 @@ class DateTime {
   set events(events) {if (!events) DateTime._events = []; DateTime._events = events};
 
   get seasons() {return DateTime._seasons};
-  set seasons(seasons) {if (!seasons) DateTIme._seasons = []; else DateTime._seasons = seasons};
+  set seasons(seasons) {if (!seasons) DateTime._seasons = []; else DateTime._seasons = seasons};
 
   get weather() {return DateTime._weather}
   set weather(weather) {if (!weather) DateTime._weather = new WeatherTracker(); else DateTime._weather = weather}

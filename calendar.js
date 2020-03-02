@@ -535,7 +535,7 @@ class CalendarForm extends FormApplication {
           console.log("calendar-weather| Generating month abbrev")
           tempMonth.abbrev = tempMonth.name.substring(0, 2).toUpperCase();
         }
-      }
+      } else tempMonth.abbrev = newMonthsAbbrev[i].value;
       newMonths.push(tempMonth);
     }
     savedData.months = newMonths;
@@ -843,13 +843,13 @@ class Calendar extends Application {
 
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
-
+    // templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
     if (!data || !data.months) {
       if (data.default) {
         console.log("calendar-weather | rebuilding data", data.default);
         // recover previous data
         templateData.dt = new DateTime();
-        data.default.months = data.default.months.map(m=>{m.leapLength = m.length; return m});
+        data.default.months = data.default.months.map((m, i)=>{m.leapLength = m.length; if (!m.abbrev) m.abbrev = `${i+1}`; return m});
         templateData.dt.months = data.default.months;
         templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
         templateData.dt.setDayLength(data.default.dayLength);
@@ -875,7 +875,7 @@ class Calendar extends Application {
         let timeout = game.settings.get("about-time", "election-timeout");
         setTimeout(() => { 
           if (game.Gametime.isMaster()) {
-              Gametime.setAbsolute({years: data.default.year, months: data.default.currentMonth, days: data.default.day-1, hours:0, minutes: 0, seconds:0})
+              Gametime.setAbsolute({years: 2020, months: 0, days: 0, hours:0, minutes: 0, seconds:0})
           }
         }, timeout * 1000 + 100);
       }
@@ -903,17 +903,16 @@ class Calendar extends Application {
   }
 
   populateData() {
-    let newMonth1 = new Month("Month 1", 30, 30, true);
+    templateData.dt = new DateTime();
+    let newMonth1 = new Month("Month 1", 30, 30, true, "1");
     templateData.dt.addMonth(newMonth1);
     templateData.dt.addWeekday("Monday");
     templateData.dt.addWeekday("Tuesday");
     templateData.dt.addWeekday("Wednesday");
     templateData.dt.addWeekday("Thursday");
-    templateData.dt.setYear(2020);
-    templateData.dt.setEra("AD");
-    templateData.dt.numDayOfTheWeek = 0
     templateData.dt.setDayLength(24);
-    templateData.dt.genDateWordy();
+    DateTime.updateDTC();
+    templateData.dt.setEra("AD");
   }
 
   settingsOpen(isOpen) {
@@ -1997,7 +1996,6 @@ class DateTime {
     return Gametime.DTNow().days
   }
 
-
   get dateWordy() {return this._dateWordy;}
   set dateWordy(dateWordy) {this._dateWordy = dateWordy;}
 
@@ -2026,14 +2024,14 @@ class DateTime {
   }
   
   addMonth(month) {
-    this._months.push(month);
+    DateTime._months.push(month);
     DateTime.myCalendarSpec.month_len[month.name]={days:[Number(month.length), Number(month.leapLength)]};
     // Gametime.DTC.createFromData(DateTime.myCalendarSpec);
   };
 
   addWeekday(day) {
     DateTime.myCalendarSpec.weekdays.push(day);
-    this._daysOfTheWeek.push(day);
+    DateTime._daysOfTheWeek.push(day);
     // Gametime.DTC.createFromData(DateTime.myCalendarSpec);
   };
 
@@ -2050,7 +2048,12 @@ class DateTime {
   setEra(era) {this._era = era}
 
   setDayLength(length) {
-    DateTime.myCalendarSpec.hours_per_day = length;
+    DateTime.myCalendarSpec.hours_per_day = Number(length);
+    if (isNaN(DateTime.myCalendarSpec.hours_per_day)) {
+      console.warn("Error setting day length to", length)
+      DateTime.myCalendarSpec.hours_per_day = 24;
+
+    }
   }
   
   set numDayOfTheWeek(dow) {game.Gametime.DTNow().setCalDow(dow)}
@@ -2083,7 +2086,7 @@ findSeason(dateTime){
   let targetDay = dateTime.days + 1;
   let targetMonth = dateTime.months;
 
-  let abbrevs = this.months.map(m=>""+m.abbrev); // need text abbreviations here so they can be looked up
+  let abbrevs = this.months.map(m=>`${m.abbrev}`); // need text abbreviations here so they can be looked up
 
   // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
   let season = this.seasons.find(s=>{let smn = abbrevs.indexOf(s.date.month); return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)});
@@ -2245,14 +2248,8 @@ checkEvents() {
       this.months[now.months].name + ", " + now.years + " " + this.era;
 
     let abbrev = this.months[now.months] ? this.months[now.months].abbrev : now.months;
-    this.dateNum = days + "/" + abbrev + "/" + now.years + " " + this.era;
-  }
 
-  advanceDay(suppress = false) {
-    Gametime.setAbsolute(Gametime.DTNow().add({days: 1}));
-    if(!suppress){
-      this.weather.generate();
-    }
+    this.dateNum = days + "/" + `${abbrev}` + "/" + now.years + " " + this.era;
   }
 
   advanceMonth() {
@@ -2369,11 +2366,14 @@ $(document).ready(() => {
   let lastDays = 0;
   Hooks.on("pseudoclockSet", () => {
     let newDays = Gametime.DTNow().toDays().days;
-
     if (lastDays !== newDays) {
       templateData.dt.genDateWordy();
-      templateData.dt.checkEvents();
-      templateData.dt.weather.generate();
+      if (Gametime.isMaster()) {
+        templateData.dt.checkEvents();
+        // need to check for suppress - could not find where it is set.
+        let suppress = false;
+        if (suppress) templateData.dt.weather.generate();
+      }
     }
     lastDays = newDays;
 

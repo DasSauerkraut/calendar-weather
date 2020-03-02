@@ -535,7 +535,7 @@ class CalendarForm extends FormApplication {
           console.log("calendar-weather| Generating month abbrev")
           tempMonth.abbrev = tempMonth.name.substring(0, 2).toUpperCase();
         }
-      }
+      } else tempMonth.abbrev = newMonthsAbbrev[i].value;
       newMonths.push(tempMonth);
     }
     savedData.months = newMonths;
@@ -720,7 +720,6 @@ class CalendarForm extends FormApplication {
       weekdays[i].checked = i === this.data.numDayOfTheWeek;
     }
 
-    console.log(duplicate(months));
     for (var i = 0, max = this.data.months.length; i < max; i++) {
       if (monthsNum[i]) {
         monthsNum[i].checked = !this.data.months[i].isNumbered;
@@ -2054,7 +2053,7 @@ class DateTime {
   setDayLength(length) {
     DateTime.myCalendarSpec.hours_per_day = Number(length);
     if (isNaN(DateTime.myCalendarSpec.hours_per_day)) {
-      console.warn("Effor setting day length to", length)
+      console.warn("Error setting day length to", length)
       DateTime.myCalendarSpec.hours_per_day = 24;
 
     }
@@ -2090,7 +2089,7 @@ findSeason(dateTime){
   let targetDay = dateTime.days + 1;
   let targetMonth = dateTime.months;
 
-  let abbrevs = this.months.map(m=>""+m.abbrev); // need text abbreviations here so they can be looked up
+  let abbrevs = this.months.map(m=>`${m.abbrev}`); // need text abbreviations here so they can be looked up
 
   // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
   let season = this.seasons.find(s=>{let smn = abbrevs.indexOf(s.date.month); return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)});
@@ -2252,14 +2251,7 @@ checkEvents() {
       this.months[now.months].name + ", " + now.years + " " + this.era;
 
     let abbrev = this.months[now.months] ? this.months[now.months].abbrev : now.months;
-    this.dateNum = days + "/" + abbrev + "/" + now.years + " " + this.era;
-  }
-
-  advanceDay(suppress = false) {
-    Gametime.setAbsolute(Gametime.DTNow().add({days: 1}));
-    if(!suppress){
-      this.weather.generate();
-    }
+    this.dateNum = days + "/" + `${abbrev}` + "/" + now.years + " " + this.era;
   }
 
   advanceMonth() {
@@ -2376,11 +2368,14 @@ $(document).ready(() => {
   let lastDays = 0;
   Hooks.on("pseudoclockSet", () => {
     let newDays = Gametime.DTNow().toDays().days;
-
     if (lastDays !== newDays) {
       templateData.dt.genDateWordy();
-      templateData.dt.checkEvents();
-      templateData.dt.weather.generate();
+      if (Gametime.isMaster()) {
+        templateData.dt.checkEvents();
+        // need to check for suppress - could not find where it is set.
+        let suppress = false;
+        if (suppress) templateData.dt.weather.generate();
+      }
     }
     lastDays = newDays;
 

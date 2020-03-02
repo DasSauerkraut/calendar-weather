@@ -2371,8 +2371,7 @@ $(document).ready(() => {
       if (Gametime.isMaster()) {
         templateData.dt.checkEvents();
         // need to check for suppress - could not find where it is set.
-        let suppress = false;
-        if (suppress) templateData.dt.weather.generate();
+        templateData.dt.weather.generate();
       }
     }
     lastDays = newDays;

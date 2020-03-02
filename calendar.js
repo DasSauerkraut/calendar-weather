@@ -419,7 +419,6 @@ class CalendarEvents extends FormApplication {
     for (let i = 0; i < reText.length; i++) reText[i].ondrop =  this.onDrop.bind(null, reText[i]);
     let evText =  html.find(".calendar-event-content");
     for (let i = 0; i < evText.length; i++) evText[i].ondrop =  this.onDrop.bind(null, evText[i]);
-
   }
 
   onDrop = (html, event) => {
@@ -823,6 +822,7 @@ class Calendar extends Application {
   isOpen = false;
   showToPlayers = true;
   eventsForm = new CalendarEvents();
+  weatherForm = new WeatherForm();
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.template = "modules/calendar-weather/templates/calendar.html";
@@ -843,7 +843,7 @@ class Calendar extends Application {
 
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
-    templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
+    // templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
     if (!data || !data.months) {
       if (data.default) {
         console.log("calendar-weather | rebuilding data", data.default);
@@ -974,7 +974,11 @@ class Calendar extends Application {
 
   updateDisplay() {
     let now = game.Gametime.DTNow();
-    document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
+    if(templateData.dt.dateWordy == ""){
+      document.getElementById("calendar-date").innerHTML = "Calendar Loading...";
+    } else {
+      document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
+    }
     document.getElementById("calendar-date-num").innerHTML = templateData.dt.dateNum;
     document.getElementById("calendar-weekday").innerHTML = Gametime.DTC.weekDays[now.dow()];
     templateData.dt.setTimeDisp();
@@ -1213,6 +1217,7 @@ class WeatherTracker {
   temp = 0;
   lastTemp = 70;
   season = "";
+  seasonColor = "";
   seasonTemp = 0;
   seasonHumidity = 0;
   climate = "temperate";
@@ -1221,7 +1226,7 @@ class WeatherTracker {
   precipitation = "";
   isVolcanic = false;
   outputToChat = true;
-  showFX = true;
+  showFX = false;
   isC = false;
   cTemp = 21.11
 
@@ -1232,6 +1237,7 @@ class WeatherTracker {
     this.cTemp = newData.cTemp;
     this.lastTemp = newData.lastTemp;
     this.season = newData.season;
+    this.seasonColor = newData.seasonColor
     this.seasonTemp = newData.seasonTemp;
     this.seasonHumidity = newData.seasonHumidity;
     this.climate = newData.climate;
@@ -1330,6 +1336,8 @@ class WeatherTracker {
 
   genPrecip(roll) {
     let fxAvailable = false;
+    let weather = "";
+    let effects = [];
     if (this.showFX && game.modules.find(module => module.id === 'fxmaster')) {
       fxAvailable = true;
     }
@@ -1338,119 +1346,492 @@ class WeatherTracker {
     }
     if (roll <= 3) {
       if (this.isVolcanic) {
-        return "Ashen skies today";
+        weather = "Ashen skies today";
+      } else {
+        weather = "Clear sky today.";
       }
-      return "Clear sky today.";
     } else if (roll <= 6) {
       this.humidity += 1;
       if (this.isVolcanic) {
-        return "Dark, smokey skies today";
+        effects.push({
+          "darkcloudsID": {
+            type: 'clouds',
+            config: {
+              density: "4",
+              speed: "29",
+              scale: "20",
+              tint: "#4a4a4a",
+              direction: "50",
+              apply_tint: true
+            }
+          }
+        })
+        weather = "Dark, smokey skies today";
+      } else {
+        effects.push({
+          "lightcloudsID": {
+            type: 'clouds',
+            config: {
+              density: "4",
+              speed: "29",
+              scale: "20",
+              tint: "#bcbcbc",
+              direction: "50",
+              apply_tint: true
+            }
+          }
+        })
+        weather = "Scattered clouds, but mostly clear today."
       }
-      return "Scattered clouds, but mostly clear today."
     } else if (roll == 7) {
       if (this.isVolcanic) {
-        return "The sun is completely obscured by ash, possible ashfall today";
-      }
-      if (this.temp < 25) {
-        return "Completely overcast with some snow flurries possible.";
-      } else if (this.temp < 32) {
-        return "Completely overcast with light freezing rain possible.";
+        weather = "The sun is completely obscured by ash, possible ashfall today";
       } else {
-        return "Completely overcast; light drizzles possible.";
+        if (this.temp < 25) {
+          effects.push({
+            "lightcloudsID": {
+              type: 'clouds',
+              config: {
+                density: "4",
+                speed: "29",
+                scale: "20",
+                tint: "#bcbcbc",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "snowID": {
+              type: 'snow',
+              config: {
+                density: "8",
+                speed: "50",
+                scale: "30",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Completely overcast with some snow flurries possible.";
+        } else if (this.temp < 32) {
+          effects.push({
+            "lightcloudsID": {
+              type: 'clouds',
+              config: {
+                density: "40",
+                speed: "29",
+                scale: "20",
+                tint: "#bcbcbc",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightrainID": {
+              type: 'rain',
+              config: {
+                density: "8",
+                speed: "50",
+                scale: "15",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "8",
+                speed: "50",
+                scale: "15",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Completely overcast with light freezing rain possible.";
+        } else {
+          console.log(effects)
+          effects.push({
+            "lightcloudsID": {
+              type: 'clouds',
+              config: {
+                density: "40",
+                speed: "29",
+                scale: "20",
+                tint: "#bcbcbc",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          console.log(effects)
+          effects.push({
+            "lightrainID": {
+              type: 'rain',
+              config: {
+                density: "40",
+                speed: "50",
+                scale: "30",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          console.log(effects)
+          weather = "Completely overcast; light drizzles possible.";
+        }
       }
     } else if (roll == 8) {
       this.humidity -= 1;
       if (this.isVolcanic) {
-        return "Large ashfall today.";
-      }
-      if (this.temp < 25) {
-        canvas.scene.setFlag("fxmaster", "effects", {
+        effects.push({
           "lightsnowID": {
             type: 'snow',
             config: {
-              density: 50,
-              speed: 50,
-              scale: 50,
-              tint: "#ffffff",
-              direction: 50,
+              density: "50",
+              speed: "50",
+              scale: "50",
+              tint: "#000000",
+              direction: "50",
               apply_tint: true
             }
           }
-        });
-        return "A light to moderate amount of snow today.";
-      } else if (this.temp < 32) {
-        canvas.scene.setFlag("fxmaster", "effects", {
-          "lightsnowID": {
-            type: 'snow',
+        })
+        effects.push({
+          "embersID": {
+            type: 'embers',
             config: {
-              density: 25,
-              speed: 50,
-              scale: 25,
-              tint: "#ffffff",
-              direction: 50,
+              density: "50",
+              speed: "50",
+              scale: "50",
+              tint: "#ff1c1c",
+              direction: "50",
               apply_tint: true
             }
           }
-        });
-        canvas.scene.setFlag("fxmaster", "effects", {
-          "lightRainID": {
-            type: 'Rain',
-            config: {
-              density: 25,
-              speed: 50,
-              scale: 50,
-              tint: "#acd2cd",
-              direction: 50,
-              apply_tint: true
-            }
-          }
-        });
-        return "Light to moderate freezing rain today.";
+        })
+        weather = "Large ashfall today.";
       } else {
-        canvas.scene.setFlag("fxmaster", "effects", {
-          "lightRainID": {
-            type: 'Rain',
-            config: {
-              density: 50,
-              speed: 50,
-              scale: 50,
-              tint: "#acd2cd",
-              direction: 50,
-              apply_tint: true
+        if (this.temp < 25) {
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
             }
-          }
-        });
-        return "Light to moderate rain today.";
+          })
+          weather = "A light to moderate amount of snow today.";
+        } else if (this.temp < 32) {
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "25",
+                speed: "50",
+                scale: "25",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightRainID": {
+              type: 'rain',
+              config: {
+                density: "25",
+                speed: "50",
+                scale: "50",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Light to moderate freezing rain today.";
+        } else {
+          effects.push({
+            "lightRainID": {
+              type: 'rain',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Light to moderate rain today.";
+        }
       }
+
     } else if (roll == 9) {
       this.humidity -= 2;
       if (this.isVolcanic) {
-        return "Firey rain today, take cover.";
-      }
-      if (this.temp < 25) {
-        return "Large amount of snowfall today.";
-      } else if (this.temp < 32) {
-        return "Large amount of freezing rain today.";
+        effects.push({
+          "lightsnowID": {
+            type: 'rain',
+            config: {
+              density: "72",
+              speed: "50",
+              scale: "67",
+              tint: "#ff8040",
+              direction: "50",
+              apply_tint: true
+            }
+          }
+        })
+        effects.push({
+          "embers": {
+            type: 'embers',
+            config: {
+              density: "50",
+              speed: "50",
+              scale: "50",
+              tint: "#ff1c1c",
+              direction: "50",
+              apply_tint: true
+            }
+          }
+        })
+        weather = "Firey rain today, take cover.";
       } else {
-        return "Heavy Rain today.";
-      }
-    } else if (roll >= 10) {
-      if (this.rand(1, 20) == 20) {
-        return this.extremeWeather();
-      } else {
-        this.humidity -= 2;
-        if (this.isVolcanic) {
-          return "Earthquake, firey rain, and toxic gases today.";
-        }
         if (this.temp < 25) {
-          return "Blizzard today.";
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "72",
+                speed: "50",
+                scale: "67",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Large amount of snowfall today.";
         } else if (this.temp < 32) {
-          return "Icestorm today.";
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightRainID": {
+              type: 'rain',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Large amount of freezing rain today.";
         } else {
-          return "Torrential rains today.";
+          effects.push({
+            "lightsnowID": {
+              type: 'rain',
+              config: {
+                density: "72",
+                speed: "50",
+                scale: "67",
+                tint: "#acd2cd",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Heavy Rain today.";
         }
+      }
+
+    } else if (roll >= 10) {
+      this.humidity -= 2;
+      if (this.rand(1, 20) == 20) {
+        weather = this.extremeWeather();
+      } else {
+        if (this.isVolcanic) {
+          effects.push({
+            "lightsnowID": {
+              type: 'rain',
+              config: {
+                density: "100",
+                speed: "75",
+                scale: "100",
+                tint: "#ff8040",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "embers": {
+              type: 'embers',
+              config: {
+                density: "100",
+                speed: "50",
+                scale: "100",
+                tint: "#ff1c1c",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "lightsnowID": {
+              type: 'snow',
+              config: {
+                density: "50",
+                speed: "50",
+                scale: "50",
+                tint: "#ffffff",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          effects.push({
+            "clouds": {
+              type: 'clouds',
+              config: {
+                density: "50",
+                speed: "8",
+                scale: "50",
+                tint: "#d2e8ce",
+                direction: "50",
+                apply_tint: true
+              }
+            }
+          })
+          weather = "Earthquake, firey rain, and toxic gases today.";
+        } else {
+          if (this.temp < 25) {
+            effects.push({
+              "lightsnowID": {
+                type: 'snow',
+                config: {
+                  density: "100",
+                  speed: "75",
+                  scale: "100",
+                  tint: "#ffffff",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            effects.push({
+              "snow2": {
+                type: 'snow',
+                config: {
+                  density: "100",
+                  speed: "75",
+                  scale: "100",
+                  tint: "#ffffff",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            weather = "Blizzard today.";
+          } else if (this.temp < 32) {
+            effects.push({
+              "lightsnowID": {
+                type: 'snow',
+                config: {
+                  density: "50",
+                  speed: "50",
+                  scale: "50",
+                  tint: "#ffffff",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            effects.push({
+              "rain": {
+                type: 'rain',
+                config: {
+                  density: "83",
+                  speed: "17",
+                  scale: "100",
+                  tint: "#ffffff",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            weather = "Icestorm today.";
+          } else {
+            effects.push({
+              "lightsnowID": {
+                type: 'rain',
+                config: {
+                  density: "100",
+                  speed: "75",
+                  scale: "100",
+                  tint: "#acd2cd",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            effects.push({
+              "rain": {
+                type: 'rain',
+                config: {
+                  density: "100",
+                  speed: "75",
+                  scale: "100",
+                  tint: "#acd2cd",
+                  direction: "50",
+                  apply_tint: true
+                }
+              }
+            })
+            weather = "Torrential rains today.";
+          }
+        }
+
       }
     }
+    if(fxAvailable){
+        canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
+        if(effects){
+          effects.forEach((effect) => {
+            canvas.scene.setFlag("fxmaster", "effects", effect);
+          })
+        }
+      });
+    }
+    return weather;
   }
 
   output() {
@@ -1536,6 +1917,7 @@ class WeatherTracker {
         icon.style.color = "#000"
         break
     }
+    this.seasonColor = season.color;
   }
 }
 
@@ -1597,6 +1979,20 @@ class DateTime {
   get weather() {return DateTime._weather}
   set weather(weather) {DateTime._weather = weather}
 
+  get seasons() {
+    return DateTime._seasons
+  };
+  set seasons(seasons) {
+    DateTime._seasons = seasons
+  };
+
+  get weather() {
+    return DateTime._weather
+  }
+  set weather(weather) {
+    DateTime._weather = weather
+  }
+
   get year() {
     return Gametime.DTNow().years;
   }
@@ -1620,6 +2016,7 @@ class DateTime {
   }
   get daysOfTheWeek() { 
     return DateTime._daysOfTheWeek}
+
 
 
   set year(y) {
@@ -1938,14 +2335,6 @@ $(document).ready(() => {
       default: true,
       type: Boolean,
     });
-    game.settings.register('calendar-weather', 'fxDisplay', {
-      name: "Display Weather Effects? (Requires FXMaster)",
-      hint: "If true, each time weather is generated it will activate a weather effect on the currently active scene.",
-      scope: 'world',
-      config: true,
-      default: true,
-      type: Boolean,
-    });
   });
 
   Hooks.on('renderCalendarEvents', () => {
@@ -1991,6 +2380,7 @@ $(document).ready(() => {
     if (lastDays !== newDays) {
       templateData.dt.genDateWordy();
       templateData.dt.checkEvents();
+      templateData.dt.weather.generate();
     }
     lastDays = newDays;
 
@@ -2038,7 +2428,56 @@ $(document).ready(() => {
       document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
       document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
     }
+    let icon = document.getElementById('calendar-weather');
+    switch (templateData.dt.weather.seasonColor) {
+      case 'red':
+        icon.style.color = "#B12E2E"
+        break;
+      case 'orange':
+        icon.style.color = "#B1692E"
+        break;
+      case 'yellow':
+        icon.style.color = "#B99946"
+        break;
+      case 'green':
+        icon.style.color = "#258E25"
+        break;
+      case 'blue':
+        icon.style.color = "#5b80a5"
+        break;
+      case 'white':
+        icon.style.color = "#CCC"
+        break;
+      default:
+        icon.style.color = "#000"
+        break
+    }
   })
+
+  Hooks.on("renderSceneConfig", (app, html, data) => {
+    let loadedData = canvas.scene.getFlag('calendar-weather', 'showFX');
+    const fxHtml = `
+    <div class="form-group">
+        <label>Calendar/Weather - Weather Effects</label>
+        <input type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''} onChange="canvas.scene.setFlag('calendar-weather', 'showFX', this.checked);">
+        <p class="notes">When checked, and the FXMaster module is enabled, generating new weather will change the scene's current effect.</p>
+    </div>
+    `
+
+    const fxFind = html.find("select[name ='weather']");
+    const formGroup = fxFind.closest(".form-group");
+    formGroup.after(fxHtml);
+});
+
+  Hooks.on("canvasInit", async canvas => {
+    console.log("loading Da Flag:" + canvas.scene.getFlag('calendar-weather', 'showFX'));
+    templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+  });
+
+  Hooks.on("closeSceneConfig", () => {
+    console.log("loading Da Flag:" + canvas.scene.getFlag('calendar-weather', 'showFX'));
+    templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+  });
 
   Hooks.on('ready', () => {
     c.loadSettings();

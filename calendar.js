@@ -878,7 +878,6 @@ class Calendar extends Application {
               Gametime.setAbsolute({years: data.default.year, months: data.default.currentMonth, days: data.default.day-1, hours:0, minutes: 0, seconds:0})
           }
         }, timeout * 1000 + 100);
-
       }
     } else {
       let now = Gametime.DTNow();
@@ -2464,12 +2463,10 @@ $(document).ready(() => {
 });
 
   Hooks.on("canvasInit", async canvas => {
-    console.log("loading Da Flag:" + canvas.scene.getFlag('calendar-weather', 'showFX'));
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
   });
 
   Hooks.on("closeSceneConfig", () => {
-    console.log("loading Da Flag:" + canvas.scene.getFlag('calendar-weather', 'showFX'));
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
   });
 

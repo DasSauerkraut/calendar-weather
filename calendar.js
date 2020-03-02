@@ -860,8 +860,6 @@ class Calendar extends Application {
         templateData.dt.seasons = data.default.seasons;
         templateData.dt.reEvents = data.default.reEvents;
         templateData.dt.events = data.default.events;
-        console.log(data.default.events);
-        console.log(templateData.dt.events);
         let timeout = game.settings.get("about-time", "election-timeout");
         setTimeout(function(){ 
           if (game.Gametime.isMaster()) {
@@ -1257,7 +1255,6 @@ class WeatherTracker {
   }
 
   extremeWeather() {
-    console.log("-------------------------EXTREME WEATHER")
     let roll = this.rand(1, 5);
     let event = "";
     if (this.isVolcanic) {

@@ -415,29 +415,25 @@ class CalendarEvents extends FormApplication {
       this.render(true);
     });
 
-    let reText = html.find(".calendar-reEvent-text");
-    for (let i = 0; i < reText.length; i++) reText[i].ondrop = this.onDrop.bind(null, reText[i]);
-    let evText = html.find(".calendar-event-content");
-    for (let i = 0; i < evText.length; i++) evText[i].ondrop = this.onDrop.bind(null, evText[i]);
-
+    let reText =  html.find(".calendar-reEvent-text");
+    for (let i = 0; i < reText.length; i++) reText[i].ondrop =  this.onDrop.bind(null, reText[i]);
+    let evText =  html.find(".calendar-event-content");
+    for (let i = 0; i < evText.length; i++) evText[i].ondrop =  this.onDrop.bind(null, evText[i]);
   }
 
   onDrop = (html, event) => {
-    const collections = {
-      JournalEntry: JournalEntry,
-      Macro: Macro
-    };
+    const collections = {JournalEntry: JournalEntry, Macro: Macro};
     try {
-      let data = JSON.parse(event.dataTransfer.getData("text"));
-      if (collections[data.type]) {
-        event.preventDefault();
-        let name = collections[data.type].collection.get(data.id).data.name;
-        html.value = `@${data.type}[${data.id}]{${name}}`;
+        let data = JSON.parse(event.dataTransfer.getData("text"));
+        if (collections[data.type]) {
+            event.preventDefault();
+            let name = collections[data.type].collection.get(data.id).data.name;
+            html.value = `@${data.type}[${data.id}]{${name}}`;
+        }
+      } catch(err) {
+          console.log(event.dataTransfer.getData("text"));
+          console.warn(err);
       }
-    } catch (err) {
-      console.log(event.dataTransfer.getData("text"));
-      console.warn(err);
-    }
   }
 
   renderForm(newData) {
@@ -459,9 +455,9 @@ class CalendarForm extends FormApplication {
       months: newData.months,
       daysOfTheWeek: newData.daysOfTheWeek,
       year: now.years,
-      day: now.days + 1,
+      day: now.days+1,
       numDayOfTheWeek: now.dow(),
-      currentMonth: now.months + 1,
+      currentMonth: now.months+1,
       currentWeekday: game.Gametime.DTC.weekDays[now.dow()],
       era: newData.era,
       hours: now.hours,
@@ -552,7 +548,7 @@ class CalendarForm extends FormApplication {
     }
     if (weekDays.length < 1) weekDays = ["Weekday"];
     savedData.daysOfTheWeek = weekDays;
-
+ 
     savedData.setDayLength(24);
 
     DateTime.updateDTC();
@@ -571,14 +567,7 @@ class CalendarForm extends FormApplication {
     }
     day -= 1;
 
-    Gametime.setAbsolute({
-      years: year,
-      months: monthTarget,
-      days: day,
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds
-    })
+    Gametime.setAbsolute({years: year, months: monthTarget, days: day, hours: hours, minutes: minutes, seconds: seconds})
 
     let weekdayTarget = 0;
     if (document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null) {
@@ -607,7 +596,7 @@ class CalendarForm extends FormApplication {
       events: DateTime._events
     }
 
-    console.log("calendar-weather | Building new calendar with the following object:")
+    console.log("calendar-weather | Building new calendar with the following object:", returnData)
     return JSON.stringify(returnData);
   }
 
@@ -674,7 +663,7 @@ class CalendarForm extends FormApplication {
               await this.render(true);
               try {
                 await this.checkBoxes();
-              } catch (err) {}
+              } catch(err) {}
             }
           },
           no: {
@@ -697,8 +686,8 @@ class CalendarForm extends FormApplication {
 
   getData() {
     let now = game.Gametime.DTNow();
-    this.data.year = now.years;
-    this.data.day = now.days + 1;
+    this.data.year =  now.years;
+    this.data.day = now.days+1;
     this.data.numDayOfTheWeek = now.dow();
     this.data.currentMonth = now.months;
     this.data.currentWeekday = game.Gametime.DTC.weekDays[now.dow()];
@@ -731,12 +720,15 @@ class CalendarForm extends FormApplication {
       weekdays[i].checked = i === this.data.numDayOfTheWeek;
     }
 
+    console.log(duplicate(months));
     for (var i = 0, max = this.data.months.length; i < max; i++) {
-      monthsNum[i].checked = !this.data.months[i].isNumbered;
-      if (monthsNum[i].checked) {
-        monthsAbbrev[i].disabled = false;
-        monthsAbbrev[i].style.cursor = 'auto'
-        monthsAbbrev[i].value = this.data.months[i].abbrev;
+      if (monthsNum[i]) {
+        monthsNum[i].checked = !this.data.months[i].isNumbered;
+        if (monthsNum[i].checked) {
+          monthsAbbrev[i].disabled = false;
+          monthsAbbrev[i].style.cursor = 'auto'
+          monthsAbbrev[i].value = this.data.months[i].abbrev;
+        }
       }
     }
     months[this.data.currentMonth].checked = true;
@@ -848,26 +840,53 @@ class Calendar extends Application {
   }
 
   loadSettings() {
+
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
 
     if (!data || !data.months) {
-      this.populateData();
-      Gametime.setAbsolute({
-        years: 0,
-        months: 0,
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0
-      })
+      if (data.default) {
+        console.log("calendar-weather | rebuilding data", data.default);
+        // recover previous data
+        templateData.dt = new DateTime();
+        data.default.months = data.default.months.map(m=>{m.leapLength = m.length; return m});
+        templateData.dt.months = data.default.months;
+        templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
+        templateData.dt.setDayLength(data.default.dayLength);
+        DateTime.updateDTC(); // set the calendar spec for correct date time calculations
+
+        templateData.dt.era = data.default.era;
+        templateData.dt.weather = templateData.dt.weather.load(data.default.weather);
+        templateData.dt.seasons = data.default.seasons;
+        templateData.dt.reEvents = data.default.reEvents;
+        templateData.dt.events = data.default.events;
+        let timeout = game.settings.get("about-time", "election-timeout");
+        setTimeout(function(){ 
+          if (game.Gametime.isMaster()) {
+            Gametime.setAbsolute({years: data.default.year, months: data.default.currentMonth, days: data.default.day-1, hours:0, minutes: 0, seconds:0})
+            let now = Gametime.DTNow();
+            templateData.dt.currentWeekday = templateData.dt.daysOfTheWeek[now.dow()];
+            templateData.dt.timeDisp = now.shortDate().time;
+          }
+        }, timeout * 1000 + 100);
+
+      } else {
+        this.populateData();
+        let timeout = game.settings.get("about-time", "election-timeout");
+        setTimeout(() => { 
+          if (game.Gametime.isMaster()) {
+              Gametime.setAbsolute({years: data.default.year, months: data.default.currentMonth, days: data.default.day-1, hours:0, minutes: 0, seconds:0})
+          }
+        }, timeout * 1000 + 100);
+
+      }
     } else {
       let now = Gametime.DTNow();
       templateData.dt = new DateTime();
       templateData.dt.months = data.months;
       templateData.dt.daysOfTheWeek = data.daysOfTheWeek;
+      templateData.dt.setDayLength(data.dayLength);
       DateTime.updateDTC(); // set the calendar spec for correct date time calculations
-
       templateData.dt.currentWeekday = templateData.dt.daysOfTheWeek[now.dow()];
       templateData.dt.era = data.era;
       templateData.dt.dayLength = Gametime.DTC.hpd;
@@ -877,7 +896,6 @@ class Calendar extends Application {
       templateData.dt.reEvents = data.reEvents;
       templateData.dt.events = data.events;
     }
-
   }
 
   checkEventBoxes() {
@@ -905,8 +923,8 @@ class Calendar extends Application {
       game.Gametime.stopRunning();
       console.log("calendar-weather | Pausing real time clock.")
     } else {
-      game.Gametime.startRunning();
-      console.log("calendar-weather | Resuming real time clock.")
+        game.Gametime.startRunning();
+        console.log("calendar-weather | Resuming real time clock.")
     }
   }
 
@@ -926,11 +944,7 @@ class Calendar extends Application {
     let years = obj.year !== 0 ? obj.year : now.years;
     let months = obj.currentMonth;
     let days = obj.day !== 0 ? obj.day : now.days;
-    Gametime.setAbsolute(now.setAbsolute({
-      years,
-      months,
-      days
-    }));
+    Gametime.setAbsolute(now.setAbsolute({years, months, days}));
     templateData.dt.numDayOfTheWeek = obj.numDayOfTheWeek;
 
     if (obj.dateWordy != "") {
@@ -1003,7 +1017,7 @@ class Calendar extends Application {
       weather: templateData.dt.weather,
       seasons: templateData.dt.seasons,
       reEvents: templateData.dt.reEvents,
-      events: templateData.dt.events
+      events: templateData.dt.events    
     }
   }
 
@@ -1935,15 +1949,15 @@ class DateTime {
       DateTime.myCalendarSpec.leap_year_rule = (year) => 0;
       this._months = Object.keys(calSpec.month_len).map((k, i) => {
         let m = calSpec.month_len[k];
-        return new Month(k, m.days[0], m.days[1], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
+        return new Month(k, m.days[0],  m.days[1], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
       })
       this._daysOfTheWeek = calSpec.weekdays;
       game.Gametime.DTC.createFromData(DateTime.myCalendarSpec);
     }
 
   }
-  _months = [];
-  _daysOfTheWeek = [];
+  static _months = [];
+  static _daysOfTheWeek = [];
   _year = 0;
   _dateWordy = "";
   _era = "";
@@ -1954,19 +1968,17 @@ class DateTime {
   static _reEvents = [];
   static _events = [];
 
-  get reEvents() {
-    return DateTime._reEvents
-  };
-  set reEvents(reEvents) {
-    DateTime._reEvents = reEvents
-  };
+  get reEvents() {return DateTime._reEvents};
+  set reEvents(reEvents) {DateTime._reEvents = reEvents};
 
-  get events() {
-    return DateTime._events
-  };
-  set events(events) {
-    DateTime._events = events
-  };
+  get events() {return DateTime._events};
+  set events(events) {DateTime._events = events};
+
+  get seasons() {return DateTime._seasons};
+  set seasons(seasons) {DateTime._seasons = seasons};
+
+  get weather() {return DateTime._weather}
+  set weather(weather) {DateTime._weather = weather}
 
   get seasons() {
     return DateTime._seasons
@@ -1990,46 +2002,36 @@ class DateTime {
   }
 
 
-  get dateWordy() {
-    return this._dateWordy;
-  }
-  set dateWordy(dateWordy) {
-    this._dateWordy = dateWordy;
-  }
+  get dateWordy() {return this._dateWordy;}
+  set dateWordy(dateWordy) {this._dateWordy = dateWordy;}
 
   set months(months) {
     DateTime.myCalendarSpec.month_len = {};
-    months.forEach(m => DateTime.myCalendarSpec.month_len[m.name] = {
-      "days": [Number(m.length), Number(m.leapLength)],
-      "intercalary": !m.isNumbered
-    })
-    this._months = months;
+    months.forEach(m => DateTime.myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.leapLength)], "intercalary": !m.isNumbered})
+    DateTime._months = months;
   }
-  get months() {
-    return this._months
-  }
+  get months() { return DateTime._months}
+
   set daysOfTheWeek(days) {
     DateTime.myCalendarSpec.weekdays = days;
-    this._daysOfTheWeek = days;
+    DateTime._daysOfTheWeek = days;
   }
-  get daysOfTheWeek() {
-    return this._daysOfTheWeek
-  }
+  get daysOfTheWeek() { 
+    return DateTime._daysOfTheWeek}
+
 
 
   set year(y) {
     this.setYear(y)
   }
 
-  get currentWeekDay() {
+  get currentWeekDay () {
     return Gametime.weekDays[Gametime.DTNow().dow()];
   }
-
+  
   addMonth(month) {
     this._months.push(month);
-    DateTime.myCalendarSpec.month_len[month.name] = {
-      days: [Number(month.length), Number(month.leapLength)]
-    };
+    DateTime.myCalendarSpec.month_len[month.name]={days:[Number(month.length), Number(month.leapLength)]};
     // Gametime.DTC.createFromData(DateTime.myCalendarSpec);
   };
 
@@ -2040,52 +2042,28 @@ class DateTime {
   };
 
   setYear(year) {
-    Gametime.setAbsolute(Gametime.DTNow().setAbsolute({
-      years: Number(year)
-    }));
+    Gametime.setAbsolute(Gametime.DTNow().setAbsolute({years: Number(year)}));
     this._year = year
   }
 
-  get currentMonth() {
-    return Gametime.DTNow().months
-  }
-  set currentMonth(currentMonth) {
-    Gametime.setAbsolute(Gametime.DTNow().setAbsolute({
-      months: Number(currentMonth)
-    }))
-  }
+  get currentMonth() {return Gametime.DTNow().months}
+  set currentMonth(currentMonth) {Gametime.setAbsolute(Gametime.DTNow().setAbsolute({months: Number(currentMonth)}))}
 
-  set era(era) {
-    this._era = era
-  }
-  get era() {
-    return this._era
-  }
-  setEra(era) {
-    this._era = era
-  }
+  set era(era) {this._era = era}
+  get era() {return this._era}
+  setEra(era) {this._era = era}
 
   setDayLength(length) {
     DateTime.myCalendarSpec.hours_per_day = length;
   }
+  
+  set numDayOfTheWeek(dow) {game.Gametime.DTNow().setCalDow(dow)}
+  get numDayOfTheWeek() {return Gametime.DTNow().dow()}
 
-  set numDayOfTheWeek(dow) {
-    game.Gametime.DTNow().setCalDow(dow)
-  }
-  get numDayOfTheWeek() {
-    return Gametime.DTNow().dow()
-  }
+  get dateNum() { return this._datenum}
+  set dateNum(dateNum) {this._datenum = dateNum};
 
-  get dateNum() {
-    return this._datenum
-  }
-  set dateNum(dateNum) {
-    this._datenum = dateNum
-  };
-
-  get weekday() {
-    return this._daysOfTheWeek[this.numDayOfTheWeek]
-  }
+  get weekday() { return this._daysOfTheWeek[this.numDayOfTheWeek]}
   set weekday(day) {
     let newDow = this._daysOfTheWeek.indexOf(day);
     if (newDow != -1) this.numDayOfTheWeek = newDow;
@@ -2098,106 +2076,97 @@ class DateTime {
         // match by id
         let entity = collection.get(macroMatch[1])
         // if no match search by name
-        if (!entity) entity = collection.entities.find(m => m.name === macroMatch[1]);
+        if (!entity) entity = collection.entities.find(m=>m.name === macroMatch[1]);
         return entity;
       }
     }
     return null;
   }
 
-  findSeason(dateTime) {
-    let targetDay = dateTime.days + 1;
-    let targetMonth = dateTime.months;
+findSeason(dateTime){
+  let targetDay = dateTime.days + 1;
+  let targetMonth = dateTime.months;
 
-    let abbrevs = this.months.map(m => "" + m.abbrev); // need text abbreviations here so they can be looked up
+  let abbrevs = this.months.map(m=>""+m.abbrev); // need text abbreviations here so they can be looked up
 
-    // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
-    let season = this.seasons.find(s => {
-      let smn = abbrevs.indexOf(s.date.month);
-      return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)
+  // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
+  let season = this.seasons.find(s=>{let smn = abbrevs.indexOf(s.date.month); return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)});
+  let index = season ? ((this.seasons.indexOf(season) - 1  + this.seasons.length) % this.seasons.length) : this.seasons.length - 1;
+
+  return this.seasons[index];
+}
+
+checkEvents() {
+  if (!Gametime.isMaster()) return;
+
+  let currentMonth = this.currentMonth;
+  let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
+
+  // seasons
+  let newSeason = this.findSeason(Gametime.DTNow());
+  if (newSeason && this.weather.season !== newSeason.name) {
+    // season change
+    this.weather.setSeason(newSeason)
+    let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
+    ChatMessage.create({
+      speaker: {
+        alias: "Season Change:",
+      },
+      whisper: ChatMessage.getWhisperIDs("GM"),
+      content: chatOut,
     });
-    let index = season ? ((this.seasons.indexOf(season) - 1 + this.seasons.length) % this.seasons.length) : this.seasons.length - 1;
-
-    return this.seasons[index];
   }
 
-  checkEvents() {
-    if (!Gametime.isMaster()) return;
+  //Find reoccuring events
+  const macroRe = /\@Macro\[(.*)\].*/;
+  const journalRe = /\@\@JournalEntry\[(.*)\].*/
 
-    let currentMonth = this.currentMonth;
-    let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
-
-    // seasons
-    let newSeason = this.findSeason(Gametime.DTNow());
-    if (newSeason && this.weather.season !== newSeason.name) {
-      // season change
-      this.weather.setSeason(newSeason)
-      let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
+  let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
+  filtReEvents.forEach((event) => {
+    let macro = this.getEntity(event.text, game.macros, macroRe);
+    if (macro) {
+      macro.execute();
+    } else {
+      let journal = this.getEntity(event.text, game.journal, journalRe);
+      let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + (journal ? journal.data.content : event.text);
       ChatMessage.create({
         speaker: {
-          alias: "Season Change:",
+          alias: "Reoccuring Event:",
         },
         whisper: ChatMessage.getWhisperIDs("GM"),
         content: chatOut,
       });
     }
+  })
 
-    //Find reoccuring events
-    const macroRe = /\@Macro\[(.*)\].*/;
-    const journalRe = /\@\@JournalEntry\[(.*)\].*/
+  combinedDate += "-" + this.year
+  let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
+  this.events = this.events.filter(event => event.date.combined !== combinedDate)
 
-    let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
-    filtReEvents.forEach((event) => {
-      let macro = this.getEntity(event.text, game.macros, macroRe);
-      if (macro) {
-        macro.execute();
-      } else {
-        let journal = this.getEntity(event.text, game.journal, journalRe);
-        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + "<hr>" + (journal ? journal.data.content : event.text);
-        ChatMessage.create({
-          speaker: {
-            alias: "Reoccuring Event:",
-          },
-          whisper: ChatMessage.getWhisperIDs("GM"),
-          content: chatOut,
-        });
-      }
-    })
-
-    combinedDate += "-" + this.year
-    let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
-    this.events = this.events.filter(event => event.date.combined !== combinedDate)
-
-    filtEvents.forEach((event) => {
-      let dt = game.Gametime.DTNow();
-      let timeOut = "";
-      if (event.allDay) {
-        dt = dt.setAbsolute({
-          hours: 0,
-          minutes: 0,
-          seconds: 0
-        });
-      } else {
-        let hours = event.date.hours;
-        let AmOrPm = hours >= 12 ? 'PM' : 'AM';
-        hours = (hours % 12) || 12;
-        timeOut = ", " + hours + ":" + `${event.date.minutes}`.padStart(2, "0") + ":" + `${event.date.seconds}`.padStart(2, "0") + " " + AmOrPm;
-        dt = dt.setAbsolute({
-          hours: event.date.hours,
-          minutes: event.date.minutes,
-          seconds: event.date.seconds
-        });
-      }
-      let macro = this.getEntity(event.text, game.macros, macroRe);
-      if (macro) {
-        game.Gametime.doAt(dt, macro.name)
-      } else {
-        let journal = this.getEntity(event.text, game.journal, journalRe);
-        let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + timeOut + "<hr>" + journal ? journal.data.content : event.text;
-        game.Gametime.reminderAt(dt, chatOut, "Event:", "GM");
-      }
-    })
-  }
+  filtEvents.forEach((event) => {
+    let dt = game.Gametime.DTNow();
+    let timeOut = "";
+    if (event.allDay) {
+      dt = dt.setAbsolute({hours: 0, minutes: 0, seconds: 0});
+    } else {
+      let hours = event.date.hours;
+      let AmOrPm = hours >= 12 ? 'PM' : 'AM';
+      hours = (hours % 12) || 12;
+      timeOut = ", " + hours + ":" + `${event.date.minutes}`.padStart(2,"0") + ":" + `${event.date.seconds}`.padStart(2,"0") + " " + AmOrPm;
+      dt = dt.setAbsolute({hours: event.date.hours, minutes: event.date.minutes, seconds: event.date.seconds});
+    }
+    let macro = this.getEntity(event.text, game.macros, macroRe);
+    if (macro) {
+      game.Gametime.doAt(dt, macro.name)
+    }
+    else
+    {
+      let journal = this.getEntity(event.text, game.journal, journalRe);
+      let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + timeOut + "<hr>" + journal ? journal.data.content : event.text;
+      game.Gametime.reminderAt(dt, chatOut, "Event:", "GM");
+    } 
+  })
+}
 
   getWeatherObj() {
     return {
@@ -2242,39 +2211,23 @@ class DateTime {
   }
 
   quickAction() {
-    Gametime.advanceTime({
-      minutes: 15
-    });
+    Gametime.advanceTime({minutes: 15});
     this.setTimeDisp();
   }
 
   advanceHour() {
-    Gametime.advanceTime({
-      hours: 1
-    });
+    Gametime.advanceTime({hours: 1});
     this.setTimeDisp();
   }
 
   advanceNight() {
-    let newDT = Gametime.DTNow().add({
-      days: 1
-    }).setAbsolute({
-      hours: 0,
-      minutes: 0,
-      seconds: 0
-    });
+    let newDT = Gametime.DTNow().add({days: 1}).setAbsolute({ hours: 0, minutes: 0, seconds: 0 });
     Gametime.setAbsolute(newDT);
   }
 
   advanceMorning() {
     let now = Gametime.DTNow();
-    let newDT = now.add({
-      days: now.hours < 7 ? 0 : 1
-    }).setAbsolute({
-      hours: 7,
-      minutes: 0,
-      seconds: 0
-    });
+    let newDT = now.add({days: now.hours < 7 ? 0 : 1}).setAbsolute({ hours: 7, minutes: 0, seconds: 0 });
     Gametime.setAbsolute(newDT);
     this.setTimeDisp();
   }
@@ -2299,17 +2252,15 @@ class DateTime {
     this.dateNum = days + "/" + abbrev + "/" + now.years + " " + this.era;
   }
 
-  advanceDay() {
-    Gametime.setAbsolute(Gametime.DTNow().add({
-      days: 1
-    }));
-    this.weather.generate();
+  advanceDay(suppress = false) {
+    Gametime.setAbsolute(Gametime.DTNow().add({days: 1}));
+    if(!suppress){
+      this.weather.generate();
+    }
   }
 
   advanceMonth() {
-    Gametime.setAbsolute(Gametime.DTNow().add({
-      months: 1
-    }));
+    Gametime.setAbsolute(Gametime.DTNow().add({months: 1}));
   }
 }
 
@@ -2357,11 +2308,12 @@ $(document).ready(() => {
   // Init settings so they can be wrote to later
   Hooks.on('init', () => {
     // c.populateData();
+
     game.settings.register('calendar-weather', 'dateTime', {
       name: "Date/Time Data",
       scope: 'world',
       config: false,
-      default: {},
+      // default: {},
       type: Object,
     });
     game.settings.register('calendar-weather', 'calendarDisplay', {
@@ -2394,9 +2346,10 @@ $(document).ready(() => {
 
   Hooks.on('calendarEventsClose', (newEvents) => {
     console.log("calendar-settings | Saving events.")
-    c.settingsOpen(false);
     c.setEvents(newEvents);
     c.updateSettings();
+    c.settingsOpen(false);
+
   });
 
   Hooks.on('calendarSettingsOpen', () => {
@@ -2456,7 +2409,7 @@ $(document).ready(() => {
     c.updateSettings();
   });
 
-  Hooks.on("renderCalendar", () => {
+  Hooks.on("renderCalendar", ()=>{
     if (Gametime.isRunning()) {
       document.getElementById('calendar-btn-sec').disabled = true;
       document.getElementById('calendar-btn-halfMin').disabled = true;

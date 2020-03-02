@@ -1457,7 +1457,6 @@ class WeatherTracker {
           })
           weather = "Completely overcast with light freezing rain possible.";
         } else {
-          console.log(effects)
           effects.push({
             "lightcloudsID": {
               type: 'clouds',
@@ -1471,7 +1470,6 @@ class WeatherTracker {
               }
             }
           })
-          console.log(effects)
           effects.push({
             "lightrainID": {
               type: 'rain',

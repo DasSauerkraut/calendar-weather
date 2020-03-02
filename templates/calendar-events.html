@@ -1,4 +1,4 @@
-<style>
+<style style="visibility: hidden;">
   .calendar-season-container {
     display: grid;
     justify-items: center;
@@ -150,9 +150,9 @@
 </style>
 <form id="calendar-events" autocomplete="off" onsubmit="event.preventDefault();" class="calendar-events-container">
   <h1>Events</h1>
-  <h2>Seasons(Under Construction)</h2>
+  <h2>Seasons</h2>
   <div>
-    <p>Enter the start date and weather modifiers for each season. Currently non-functional</p>
+    <p>Enter the start date and weather modifiers for each season. The Color dropdown changes the color of the weather icon for a visual indication of the season</p>
     <div class="calendar-season-container">
       <span class="calendar-season-label-name">
         Name
@@ -173,7 +173,7 @@
     <ol>
       {{#each seasons as |season|}}
       <li class="calendar-season-container">
-        <input class="calendar-season" value="{{season.name}}" type="text" placeholder="ex. Autumn"
+        <input class="calendar-season-name" value="{{season.name}}" type="text" placeholder="ex. Autumn"
           title="Enter the season's name" id="calendar-season-{{@index}}">
         <select class="calendar-season-temp" title="Is the season hotter or colder than average?"
           id="calendar-season-temp-{{@index}}">
@@ -197,7 +197,7 @@
           <option value="white" style="background-color: white;">White</option>
         </select>
         <div class="calendar-season-month">
-          <select title="What month does the season start?" id="calendar-season-month-{{@index}}" onchange="
+          <select class="calendar-season-month-value" title="What month does the season start?" id="calendar-season-month-{{@index}}" onchange="
             let id = {{@index}}
             var element = document.getElementById('calendar-season-day-' + id),
               frag = document.createDocumentFragment();
@@ -217,7 +217,7 @@
               {{month.abbrev}}</option>
             {{/each}}
           </select>
-          <select id="calendar-season-day-{{@index}}"></select>
+          <select class="calendar-season-day" id="calendar-season-day-{{@index}}"></select>
         </div>
         <button class="calendar-season-del" id="calendar-season-del-{{@index}}" name="del-season-{{@index}}"
           title="Delete Season">

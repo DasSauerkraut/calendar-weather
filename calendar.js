@@ -597,7 +597,7 @@ class CalendarForm extends FormApplication {
       events: DateTime._events
     }
 
-    console.log("calendar-weather | Building new calendar with the following object:")
+    console.log("calendar-weather | Building new calendar with the following object:", returnData)
     return JSON.stringify(returnData);
   }
 
@@ -721,12 +721,15 @@ class CalendarForm extends FormApplication {
       weekdays[i].checked = i === this.data.numDayOfTheWeek;
     }
 
+    console.log(duplicate(months));
     for (var i = 0, max = this.data.months.length; i < max; i++) {
-      monthsNum[i].checked = !this.data.months[i].isNumbered;
-      if (monthsNum[i].checked) {
-        monthsAbbrev[i].disabled = false;
-        monthsAbbrev[i].style.cursor = 'auto'
-        monthsAbbrev[i].value = this.data.months[i].abbrev;
+      if (monthsNum[i]) {
+        monthsNum[i].checked = !this.data.months[i].isNumbered;
+        if (monthsNum[i].checked) {
+          monthsAbbrev[i].disabled = false;
+          monthsAbbrev[i].style.cursor = 'auto'
+          monthsAbbrev[i].value = this.data.months[i].abbrev;
+        }
       }
     }
     months[this.data.currentMonth].checked = true;
@@ -1572,8 +1575,8 @@ class DateTime {
     }
 
   }
-  _months = [];
-  _daysOfTheWeek = [];
+  static _months = [];
+  static _daysOfTheWeek = [];
   _year = 0;
   _dateWordy = "";
   _era = "";
@@ -1610,15 +1613,15 @@ class DateTime {
   set months(months) {
     DateTime.myCalendarSpec.month_len = {};
     months.forEach(m => DateTime.myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.leapLength)], "intercalary": !m.isNumbered})
-    this._months = months;
+    DateTime._months = months;
   }
-  get months() { return this._months}
+  get months() { return DateTime._months}
   set daysOfTheWeek(days) {
     DateTime.myCalendarSpec.weekdays = days;
-    this._daysOfTheWeek = days;
+    DateTime._daysOfTheWeek = days;
   }
   get daysOfTheWeek() { 
-    return this._daysOfTheWeek}
+    return DateTime._daysOfTheWeek}
 
 
   set year(y) {
@@ -1954,9 +1957,10 @@ $(document).ready(() => {
 
   Hooks.on('calendarEventsClose', (newEvents) => {
     console.log("calendar-settings | Saving events.")
-    c.settingsOpen(false);
     c.setEvents(newEvents);
     c.updateSettings();
+    c.settingsOpen(false);
+
   });
 
   Hooks.on('calendarSettingsOpen', () => {

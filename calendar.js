@@ -2370,7 +2370,6 @@ $(document).ready(() => {
       templateData.dt.genDateWordy();
       if (Gametime.isMaster()) {
         templateData.dt.checkEvents();
-        // need to check for suppress - could not find where it is set.
         templateData.dt.weather.generate();
       }
     }

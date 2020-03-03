@@ -839,7 +839,6 @@ class Calendar extends Application {
   }
 
   loadSettings() {
-
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
     // templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
@@ -893,6 +892,7 @@ class Calendar extends Application {
       templateData.dt.seasons = data.seasons;
       templateData.dt.reEvents = data.reEvents;
       templateData.dt.events = data.events;
+      templateData.dt.lastDays = 0;
     }
   }
 
@@ -1965,6 +1965,10 @@ class DateTime {
   _era = "";
   timeDisp = "";
   _dateNum = "";
+   _lastDays = 0;
+   get lastDays() {return this._lastDays};
+   set lastDays(days) {this._lastDays = days}
+
   static _weather;
   static _seasons;
   static _reEvents;
@@ -2250,7 +2254,7 @@ checkEvents() {
     } else {
       dayAppendage = "th";
     }
-    this._dateWordy = days + dayAppendage + " of " +
+    this.dateWordy = days + dayAppendage + " of " +
       this.months[now.months].name + ", " + now.years + " " + this.era;
 
     let abbrev = this.months[now.months] ? this.months[now.months].abbrev : now.months;
@@ -2315,6 +2319,7 @@ $(document).ready(() => {
       config: false,
       // default: {},
       type: Object,
+      onChange: c.loadSettings.bind(c)
     });
     game.settings.register('calendar-weather', 'calendarDisplay', {
       name: "Calendar Display for Non-GM",
@@ -2370,17 +2375,17 @@ $(document).ready(() => {
     c.settingsOpen(false);
   });
 
-  let lastDays = 0;
+ 
   Hooks.on("pseudoclockSet", () => {
     let newDays = Gametime.DTNow().toDays().days;
-    if (lastDays !== newDays) {
+    if (templateData.dt.lastDays !== newDays) {
       templateData.dt.genDateWordy();
       if (Gametime.isMaster()) {
         templateData.dt.checkEvents();
         templateData.dt.weather.generate();
       }
     }
-    lastDays = newDays;
+    templateData.dt.lastDays = newDays;
 
     if (document.getElementById('calendar-time-container')) {
       c.updateDisplay();
@@ -2477,6 +2482,7 @@ $(document).ready(() => {
 
   Hooks.on('ready', () => {
     c.loadSettings();
+
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, templateData).then(html => {

@@ -2166,7 +2166,8 @@ checkEvents() {
     else
     {
       let journal = this.getEntity(event.text, game.journal, journalRe);
-      let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + timeOut + "<hr>" + journal ? journal.data.content : event.text;
+      let infoOut = (journal != null) ? journal.data.content : event.text
+      let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + timeOut + "<hr>" + infoOut;
       game.Gametime.reminderAt(dt, chatOut, "Event:", "GM");
     } 
   })

@@ -916,7 +916,6 @@ class Calendar extends Application {
     templateData.dt.reEvents = [];
     templateData.dt.settings = [];
     templateData.dt.weather = new WeatherTracker();
-
     DateTime.updateDTC();
     templateData.dt.setEra("AD");
   }
@@ -1319,7 +1318,7 @@ class WeatherTracker {
         break;
       case "tropical":
         this.climateHumidity = 1;
-        this.climateTemp = 10;
+        this.climateTemp = 20;
         this.climate = "tropical";
         this.generate(true)
         break;

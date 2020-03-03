@@ -2145,8 +2145,11 @@ checkEvents() {
   })
 
   combinedDate += "-" + this.year
-  let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
-  this.events = this.events.filter(event => event.date.combined !== combinedDate)
+  let filtEvents = [];
+  if(this.events){
+    filtEvents = this.events.filter(event => event.date.combined === combinedDate);
+    this.events = this.events.filter(event => event.date.combined !== combinedDate)
+  }
 
   filtEvents.forEach((event) => {
     let dt = game.Gametime.DTNow();

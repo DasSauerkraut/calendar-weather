@@ -720,7 +720,6 @@ class CalendarForm extends FormApplication {
       weekdays[i].checked = i === this.data.numDayOfTheWeek;
     }
 
-    console.log(duplicate(months));
     for (var i = 0, max = this.data.months.length; i < max; i++) {
       if (monthsNum[i]) {
         monthsNum[i].checked = !this.data.months[i].isNumbered;
@@ -1487,7 +1486,6 @@ class WeatherTracker {
               }
             }
           })
-          console.log(effects)
           weather = "Completely overcast; light drizzles possible.";
         }
       }

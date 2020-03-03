@@ -1985,7 +1985,7 @@ class DateTime {
   set reEvents(reEvents) {if (!reEvents) DateTime._reEvents = []; else DateTime._reEvents = reEvents};
 
   get events() {return DateTime._events};
-  set events(events) {if (!events) DateTime._events = []; DateTime._events = events};
+  set events(events) {if (!events) DateTime._events = []; else DateTime._events = events};
 
   get seasons() {return DateTime._seasons};
   set seasons(seasons) {if (!seasons) DateTime._seasons = []; else DateTime._seasons = seasons};

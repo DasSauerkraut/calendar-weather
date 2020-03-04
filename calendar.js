@@ -998,6 +998,12 @@ class Calendar extends Application {
       document.getElementById("calendar-weather-container").style.left = offset + 'px'
       this.weatherForm.updateData(templateData.dt.getWeatherObj())
     }
+    if(Gametime.isRunning()){
+      document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
+    } else {
+      document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
+    }
+
     game.Gametime._save(true);
 
   }
@@ -1119,13 +1125,13 @@ class Calendar extends Application {
         if (Gametime.isRunning()) {
           console.log("calendar-weather | Stopping about-time pseudo clock.");
           game.Gametime.stopRunning();
-
           document.getElementById('calendar-btn-sec').disabled = false;
           document.getElementById('calendar-btn-halfMin').disabled = false;
           document.getElementById('calendar-btn-sec').style.cursor = 'pointer';
           document.getElementById('calendar-btn-halfMin').style.cursor = 'pointer';
           document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
           document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
+          document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
         } else {
           console.log("calendar-weather | Starting about-time pseudo clock.");
           Gametime.startRunning();
@@ -1135,6 +1141,8 @@ class Calendar extends Application {
           document.getElementById('calendar-btn-halfMin').style.cursor = 'not-allowed';
           document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
           document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
+          document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
+          
         }
         this.updateSettings();
       }
@@ -2423,6 +2431,7 @@ $(document).ready(() => {
       document.getElementById('calendar-btn-halfMin').style.cursor = 'not-allowed';
       document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
       document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
+      document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
     } else {
       document.getElementById('calendar-btn-sec').disabled = false;
       document.getElementById('calendar-btn-halfMin').disabled = false;
@@ -2430,6 +2439,7 @@ $(document).ready(() => {
       document.getElementById('calendar-btn-halfMin').style.cursor = 'pointer';
       document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
       document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
+      document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
     }
     let icon = document.getElementById('calendar-weather');
     switch (templateData.dt.weather.seasonColor) {

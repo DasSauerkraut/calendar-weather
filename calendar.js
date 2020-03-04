@@ -568,7 +568,6 @@ class CalendarForm extends FormApplication {
     day -= 1;
 
     Gametime.setAbsolute({years: year, months: monthTarget, days: day, hours: hours, minutes: minutes, seconds: seconds})
-
     let weekdayTarget = 0;
     if (document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null) {
       weekdayTarget = savedData.daysOfTheWeek.length - 1
@@ -576,8 +575,7 @@ class CalendarForm extends FormApplication {
       weekdayTarget = document.querySelector('input[class="calendar-form-weekday-radio"]:checked').value;
     }
 
-    savedData.numDayOfTheWeek = weekdayTarget;
-
+    savedData.numDayOfTheWeek = Number(weekdayTarget);
     savedData.setTimeDisp();
     savedData.genAbbrev();
     let now = game.Gametime.DTNow();
@@ -586,7 +584,7 @@ class CalendarForm extends FormApplication {
       daysOfTheWeek: savedData.daysOfTheWeek,
       year: now.years,
       day: now.days,
-      numDayOfTheWeek: weekdayTarget,
+      numDayOfTheWeek: now.dow(),
       currentMonth: now.months,
       currentWeekday: game.Gametime.DTC.weekDays[now.dow()],
       dateWordy: savedData.dateWordy,
@@ -853,7 +851,6 @@ class Calendar extends Application {
         templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
         templateData.dt.setDayLength(data.default.dayLength);
         DateTime.updateDTC(); // set the calendar spec for correct date time calculations
-
         templateData.dt.era = data.default.era;
         templateData.dt.weather = templateData.dt.weather.load(data.default.weather);
         templateData.dt.seasons = data.default.seasons;
@@ -893,6 +890,7 @@ class Calendar extends Application {
       templateData.dt.seasons = data.seasons;
       templateData.dt.reEvents = data.reEvents;
       templateData.dt.events = data.events;
+      templateData.dt.numDayOfTheWeek = data.numDayOfTheWeek;
       templateData.dt.genDateWordy();
     }
   }
@@ -2460,6 +2458,8 @@ $(document).ready(() => {
 
   Hooks.on('ready', () => {
     c.loadSettings();
+    // we are sending calendar updates so about-time does not need to
+    if (game.Gametime.sendCalendarUpdates) game.Gametime.sendCalendarUpdates(false);
 
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {

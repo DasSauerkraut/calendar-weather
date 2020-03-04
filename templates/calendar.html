@@ -230,13 +230,14 @@
 		margin: auto;
 		border-bottom: 1px solid #111;
 	}
-	#calendar-time{
+	.calendar-time{
 		grid-column: 1;
 		grid-row: 2;
 		padding-top: 1px;
 		text-align: center; 
 		margin: auto;
 		cursor: pointer;
+		display: inline-flex;
 	}
 </style>
 <div id="calendar-time-container">
@@ -255,7 +256,7 @@
 			</div>
 			<div class="calendar-weekday-time">
 				<p id="calendar-weekday">Day of the Week</p>
-				<p id="calendar-time" title="Stop/start psuedo real time clock.">Time</p>
+				<span class="calendar-time"><p id="calendar-time" title="Stop/start psuedo real time clock.">Time</p><span id='calender-time-running'>•</span></span>
 			</div>
 			<div class="calendar-btn-container-right">
 				<i id="calendar-btn-quick" class="fas fa-forward" title="Advance 15 minutes" ></i>

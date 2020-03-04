@@ -568,15 +568,14 @@ class CalendarForm extends FormApplication {
     day -= 1;
 
     Gametime.setAbsolute({years: year, months: monthTarget, days: day, hours: hours, minutes: minutes, seconds: seconds})
-
     let weekdayTarget = 0;
     if (document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null) {
       weekdayTarget = savedData.daysOfTheWeek.length - 1
     } else {
       weekdayTarget = document.querySelector('input[class="calendar-form-weekday-radio"]:checked').value;
     }
-    savedData.numDayOfTheWeek = weekdayTarget;
 
+    savedData.numDayOfTheWeek = Number(weekdayTarget);
     savedData.setTimeDisp();
     savedData.genAbbrev();
     let now = game.Gametime.DTNow();
@@ -852,7 +851,6 @@ class Calendar extends Application {
         templateData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
         templateData.dt.setDayLength(data.default.dayLength);
         DateTime.updateDTC(); // set the calendar spec for correct date time calculations
-
         templateData.dt.era = data.default.era;
         templateData.dt.weather = templateData.dt.weather.load(data.default.weather);
         templateData.dt.seasons = data.default.seasons;
@@ -879,7 +877,7 @@ class Calendar extends Application {
       }
     } else {
       let now = Gametime.DTNow();
-      templateData.dt = new DateTime();
+      if (!templateData.dt) templateData.dt = new DateTime();
       templateData.dt.months = data.months;
       templateData.dt.daysOfTheWeek = data.daysOfTheWeek;
       templateData.dt.setDayLength(data.dayLength);
@@ -892,7 +890,8 @@ class Calendar extends Application {
       templateData.dt.seasons = data.seasons;
       templateData.dt.reEvents = data.reEvents;
       templateData.dt.events = data.events;
-      templateData.dt.lastDays = 0;
+      templateData.dt.numDayOfTheWeek = data.numDayOfTheWeek;
+      templateData.dt.genDateWordy();
     }
   }
 
@@ -951,15 +950,14 @@ class Calendar extends Application {
 
     if (obj.dateWordy != "") {
       templateData.dt.dateWordy = obj.dateWordy;
-    }
+    } else templateData.dt.genDateWordy();
     if (obj.era != "") {
       templateData.dt.era = obj.era;
     }
     if (obj.dateNum != "") {
       templateData.dt.dateNum = obj.dateNum;
     }
-    templateData.dt.setTimeDisp();
-    templateData.dt.genDateWordy();
+
   }
 
   setEvents(data) {
@@ -971,8 +969,10 @@ class Calendar extends Application {
   }
 
   updateSettings() {
-    game.settings.set("calendar-weather", "dateTime", this.toObject());
-    game.Gametime._save(true);
+    if (game.Gametime.isMaster()) {
+      game.settings.set("calendar-weather", "dateTime", this.toObject());
+      game.Gametime._save(true);
+    }
   }
 
   updateDisplay() {
@@ -1051,8 +1051,9 @@ class Calendar extends Application {
       ev.preventDefault();
       if (!this.isOpen && Gametime.isMaster()) {
         console.log("calendar-weather | Advancing to 7am.");
-        templateData.dt.advanceMorning();
-        this.updateSettings();
+        let now = Gametime.DTNow();
+        let newDT = now.add({days: now.hours < 7 ? 0 : 1}).setAbsolute({ hours: 7, minutes: 0, seconds: 0 });
+        Gametime.setAbsolute(newDT);
       }
     });
     //Quick Action
@@ -1060,8 +1061,7 @@ class Calendar extends Application {
       ev.preventDefault();
       if (!this.isOpen && Gametime.isMaster()) {
         console.log("calendar-weather | Advancing 15 min.");
-        templateData.dt.quickAction();
-        this.updateSettings();
+        Gametime.advanceTime({minutes: 15});
       }
     });
     //1 sec advance
@@ -1105,8 +1105,8 @@ class Calendar extends Application {
       ev.preventDefault();
       if (!this.isOpen && game.Gametime.isMaster()) {
         console.log("calendar-weather | Advancing 1 hour.");
-        templateData.dt.advanceHour();
-        this.updateSettings();
+        game.Gametime.advanceTime({hours: 1})
+
       }
     });
     //To Midnight
@@ -1114,8 +1114,8 @@ class Calendar extends Application {
       ev.preventDefault();
       if (!this.isOpen && game.Gametime.isMaster()) {
         console.log("calendar-weather | Advancing to midnight.");
-        templateData.dt.advanceNight();
-        this.updateSettings();
+        let newDT = Gametime.DTNow().add({days: 1}).setAbsolute({ hours: 0, minutes: 0, seconds: 0 });
+        Gametime.setAbsolute(newDT);
       }
     });
     //toggles real time clock on off, disabling granular controls
@@ -1861,6 +1861,7 @@ class WeatherTracker {
   }
 
   generate(force = false) {
+    console.warn("in gen weather");
     let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
     if (force) {
       let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
@@ -1950,7 +1951,6 @@ class DateTime {
   }
 
   static updateFromDTC(calendarName) {
-    console.log(calendarName);
     let calSpec = duplicate(game.Gametime.calendars[calendarName]);
     if (calSpec) {
       _myCalendarSpec = calSpec;
@@ -1973,9 +1973,9 @@ class DateTime {
   _era = "";
   timeDisp = "";
   _dateNum = "";
-   _lastDays = 0;
-   get lastDays() {return this._lastDays};
-   set lastDays(days) {this._lastDays = days}
+   static _lastDays;
+   get lastDays() {return DateTime._lastDays};
+   set lastDays(days) {DateTime._lastDays = days}
 
   static _weather;
   static _seasons;
@@ -1991,16 +1991,16 @@ class DateTime {
     DateTime._events = [];
   }
 
-  get reEvents() {return DateTime._reEvents};
+  get reEvents() {return DateTime._reEvents ? DateTime._reEvents : []};
   set reEvents(reEvents) {if (!reEvents) DateTime._reEvents = []; else DateTime._reEvents = reEvents};
 
-  get events() {return DateTime._events};
+  get events() {return DateTime._events ? DateTime._events : []};
   set events(events) {if (!events) DateTime._events = []; else DateTime._events = events};
 
-  get seasons() {return DateTime._seasons};
+  get seasons() {return DateTime._seasons ? DateTime._seasons : []};
   set seasons(seasons) {if (!seasons) DateTime._seasons = []; else DateTime._seasons = seasons};
 
-  get weather() {return DateTime._weather}
+  get weather() {return DateTime._weather ? DateTime._weather : new WeatherTracker()}
   set weather(weather) {if (!weather) DateTime._weather = new WeatherTracker(); else DateTime._weather = weather}
 
   get year() {
@@ -2070,7 +2070,7 @@ class DateTime {
     }
   }
   
-  set numDayOfTheWeek(dow) {game.Gametime.DTNow().setCalDow(dow)}
+  set numDayOfTheWeek(dow) {Gametime.DTNow().setCalDow(dow)}
   get numDayOfTheWeek() {return Gametime.DTNow().dow()}
 
   get dateNum() { return this._datenum}
@@ -2153,11 +2153,8 @@ checkEvents() {
   })
 
   combinedDate += "-" + this.year
-  let filtEvents = [];
-  if(this.events){
-    filtEvents = this.events.filter(event => event.date.combined === combinedDate);
-    this.events = this.events.filter(event => event.date.combined !== combinedDate)
-  }
+  let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
+  this.events = this.events.filter(event => event.date.combined !== combinedDate)
 
   filtEvents.forEach((event) => {
     let dt = game.Gametime.DTNow();
@@ -2227,28 +2224,6 @@ checkEvents() {
     this.timeDisp = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
   }
 
-  quickAction() {
-    Gametime.advanceTime({minutes: 15});
-    this.setTimeDisp();
-  }
-
-  advanceHour() {
-    Gametime.advanceTime({hours: 1});
-    this.setTimeDisp();
-  }
-
-  advanceNight() {
-    let newDT = Gametime.DTNow().add({days: 1}).setAbsolute({ hours: 0, minutes: 0, seconds: 0 });
-    Gametime.setAbsolute(newDT);
-  }
-
-  advanceMorning() {
-    let now = Gametime.DTNow();
-    let newDT = now.add({days: now.hours < 7 ? 0 : 1}).setAbsolute({ hours: 7, minutes: 0, seconds: 0 });
-    Gametime.setAbsolute(newDT);
-    this.setTimeDisp();
-  }
-
   genDateWordy() {
     let now = Gametime.DTNow();
     let days = now.days + 1;
@@ -2274,6 +2249,7 @@ checkEvents() {
     Gametime.setAbsolute(Gametime.DTNow().add({months: 1}));
   }
 }
+
 DateTime.initStatics();
 
 class WarningSystem {
@@ -2492,6 +2468,9 @@ $(document).ready(() => {
 
   Hooks.on('ready', () => {
     c.loadSettings();
+    // we are sending calendar updates so about-time does not need to
+    if (game.Gametime.sendCalendarUpdates) game.Gametime.sendCalendarUpdates(false);
+
 
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {

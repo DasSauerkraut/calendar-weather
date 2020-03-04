@@ -2388,7 +2388,7 @@ $(document).ready(() => {
     let newDays = Gametime.DTNow().toDays().days;
     if (templateData.dt.lastDays !== newDays) {
       templateData.dt.genDateWordy();
-      if (Gametime.isMaster()) {
+      if (Gametime.isMaster() && templateData.dt.lastDays) {
         templateData.dt.checkEvents();
         templateData.dt.weather.generate();
       }

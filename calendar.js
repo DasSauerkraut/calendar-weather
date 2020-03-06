@@ -1,3 +1,4 @@
+
 class CalendarEvents extends FormApplication {
   data = {
     seasons: [],
@@ -1935,9 +1936,20 @@ _myCalendarSpec = {
   "weekdays": []
 };
 
+class DateTimeStatics {
+  _weather = new WeatherTracker();
+  _seasons = [];
+  _reEvents = [];
+  _events = [];
+  _months = [];;
+  _daysOfTheWeek = [];
+  _lastDays = 0;
+
+}
+
+let dateTimeStatics = new DateTimeStatics(); 
+
 class DateTime {
-
-
   static updateDTC() { // update the calendar spec so that about-time will know the new calendar
     Gametime.DTC.createFromData(_myCalendarSpec)
   }
@@ -1956,44 +1968,27 @@ class DateTime {
       this._daysOfTheWeek = calSpec.weekdays;
       game.Gametime.DTC.createFromData(_myCalendarSpec);
     }
-
   }
-  static _months;
-  static _daysOfTheWeek;
+
   _year = 0;
   _dateWordy = "";
   _era = "";
   timeDisp = "";
   _dateNum = "";
-   static _lastDays;
-   get lastDays() {return DateTime._lastDays};
-   set lastDays(days) {DateTime._lastDays = days}
+   get lastDays() {return dateTimeStatics._lastDays};
+   set lastDays(days) {dateTimeStatics._lastDays = days}
 
-  static _weather;
-  static _seasons;
-  static _reEvents;
-  static _events;
+  get reEvents() {return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : []};
+  set reEvents(reEvents) {dateTimeStatics._reEvents = dateTimeStatics._reEvents || []};
 
-  static initStatics() {
-    DateTime._months = [];
-    DateTime._daysOfTheWeek = [];
-    DateTime._weather = new WeatherTracker();
-    DateTime._seasons = [];
-    DateTime._reEvents = [];
-    DateTime._events = [];
-  }
+  get events() {return dateTimeStatics._events ? dateTimeStatics._events : []};
+  set events(events) {dateTimeStatics._events = dateTimeStatics._events || []};
 
-  get reEvents() {return DateTime._reEvents ? DateTime._reEvents : []};
-  set reEvents(reEvents) {if (!reEvents) DateTime._reEvents = []; else DateTime._reEvents = reEvents};
+  get seasons() {return dateTimeStatics._seasons ? dateTimeStatics._seasons : []};
+  set seasons(seasons) {dateTimeStatics._seasons = dateTimeStatics._seasons || []};
 
-  get events() {return DateTime._events ? DateTime._events : []};
-  set events(events) {if (!events) DateTime._events = []; else DateTime._events = events};
-
-  get seasons() {return DateTime._seasons ? DateTime._seasons : []};
-  set seasons(seasons) {if (!seasons) DateTime._seasons = []; else DateTime._seasons = seasons};
-
-  get weather() {return DateTime._weather ? DateTime._weather : new WeatherTracker()}
-  set weather(weather) {if (!weather) DateTime._weather = new WeatherTracker(); else DateTime._weather = weather}
+  get weather() {return dateTimeStatics._weather ? dateTimeStatics._weather : new WeatherTracker()}
+  set weather(weather) {dateTimeStatics._weather = dateTimeStatics._weather || new WeatherTracker()}
 
   get year() {
     return Gametime.DTNow().years;
@@ -2241,8 +2236,6 @@ checkEvents() {
     Gametime.setAbsolute(Gametime.DTNow().add({months: 1}));
   }
 }
-
-DateTime.initStatics();
 
 class WarningSystem {
   constructor() {}

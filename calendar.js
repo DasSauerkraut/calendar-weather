@@ -1,4 +1,3 @@
-
 class CalendarEvents extends FormApplication {
   data = {
     seasons: [],
@@ -586,6 +585,7 @@ class CalendarForm extends FormApplication {
       year: now.years,
       day: now.days,
       numDayOfTheWeek: now.dow(),
+      frstDay: _myCalendarSpec.first_day,
       currentMonth: now.months,
       currentWeekday: game.Gametime.DTC.weekDays[now.dow()],
       dateWordy: savedData.dateWordy,
@@ -882,6 +882,7 @@ class Calendar extends Application {
       templateData.dt.months = data.months;
       templateData.dt.daysOfTheWeek = data.daysOfTheWeek;
       templateData.dt.setDayLength(data.dayLength);
+      _myCalendarSpec.first_day = data.first_day;
       DateTime.updateDTC(); // set the calendar spec for correct date time calculations
       templateData.dt.currentWeekday = templateData.dt.daysOfTheWeek[now.dow()];
       templateData.dt.era = data.era;
@@ -891,7 +892,6 @@ class Calendar extends Application {
       templateData.dt.seasons = data.seasons;
       templateData.dt.reEvents = data.reEvents;
       templateData.dt.events = data.events;
-      templateData.dt.numDayOfTheWeek = data.numDayOfTheWeek;
       templateData.dt.genDateWordy();
     }
   }
@@ -970,9 +970,14 @@ class Calendar extends Application {
   }
 
   updateSettings() {
-    if (game.Gametime.isMaster()) {
+    if (game.user.isGM) {
       game.settings.set("calendar-weather", "dateTime", this.toObject());
-      game.Gametime._save(true);
+      if (Gametime.DTC.saveUserCalendar && game.user.isGM) {
+        Gametime.DTC.saveUserCalendar(_myCalendarSpec);
+        // set about-time to use our calendar spec on startup
+        if (game.settings.get("about-time", "calendar") !== 0) game.settings.set("about-time", "calendar", 0);
+      }
+      if (Gametime.isMaster()) Gametime._save(true);
     }
   }
 
@@ -1016,6 +1021,7 @@ class Calendar extends Application {
       year: templateData.dt.year,
       day: templateData.dt.day,
       numDayOfTheWeek: templateData.dt.numDayOfTheWeek,
+      first_day: _myCalendarSpec.first_day,
       currentMonth: templateData.dt.currentMonth,
       currentWeekday: templateData.dt.currentWeekday,
       dateWordy: templateData.dt.dateWordy,
@@ -1050,7 +1056,7 @@ class Calendar extends Application {
     //Next Morning
     html.find(nextDay).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && Gametime.isMaster()) {
+      if (!this.isOpen && game.user.isGM) {
         console.log("calendar-weather | Advancing to 7am.");
         let now = Gametime.DTNow();
         let newDT = now.add({days: now.hours < 7 ? 0 : 1}).setAbsolute({ hours: 7, minutes: 0, seconds: 0 });
@@ -1060,7 +1066,7 @@ class Calendar extends Application {
     //Quick Action
     html.find(quickAction).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && Gametime.isMaster()) {
+      if (!this.isOpen && game.user.isGM) {
         console.log("calendar-weather | Advancing 15 min.");
         Gametime.advanceTime({minutes: 15});
       }
@@ -1068,7 +1074,7 @@ class Calendar extends Application {
     //1 sec advance
     html.find(sec).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.Gametime.isMaster() && !Gametime.isRunning()) {
+      if (!this.isOpen && game.user.isGM && !Gametime.isRunning()) {
         console.log("calendar-weather | Advancing 1 sec.");
         game.Gametime.advanceClock(1)
       }
@@ -1076,7 +1082,7 @@ class Calendar extends Application {
     //advance 30s
     html.find(halfMin).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.Gametime.isMaster() && !Gametime.isRunning()) {
+      if (!this.isOpen && game.user.isGM && !Gametime.isRunning()) {
         console.log("calendar-weather | Advancing 30 sec");
         game.Gametime.advanceClock(30)
       }
@@ -1084,7 +1090,7 @@ class Calendar extends Application {
     //advance 1 min
     html.find(min).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.Gametime.isMaster()) {
+      if (!this.isOpen && game.user.isGM) {
         console.log("calendar-weather | Advancing 1 min.");
         game.Gametime.advanceTime({
           minutes: 1
@@ -1094,7 +1100,7 @@ class Calendar extends Application {
     //advance 5 min
     html.find(fiveMin).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.Gametime.isMaster()) {
+      if (!this.isOpen && game.user.isGM) {
         console.log("calendar-weather | Advancing 5 min.");
         game.Gametime.advanceTime({
           minutes: 5
@@ -1104,7 +1110,7 @@ class Calendar extends Application {
     //Long Action
     html.find(longAction).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.Gametime.isMaster()) {
+      if (!this.isOpen && game.user.isGM) {
         console.log("calendar-weather | Advancing 1 hour.");
         game.Gametime.advanceTime({hours: 1})
 
@@ -1113,7 +1119,7 @@ class Calendar extends Application {
     //To Midnight
     html.find(nightSkip).click(ev => {
       ev.preventDefault();
-      if (!this.isOpen && game.Gametime.isMaster()) {
+      if (!this.isOpen && game.user.isGM) {
         console.log("calendar-weather | Advancing to midnight.");
         let newDT = Gametime.DTNow().add({days: 1}).setAbsolute({ hours: 0, minutes: 0, seconds: 0 });
         Gametime.setAbsolute(newDT);
@@ -1959,7 +1965,7 @@ let dateTimeStatics = new DateTimeStatics();
 
 class DateTime {
   static updateDTC() { // update the calendar spec so that about-time will know the new calendar
-    Gametime.DTC.createFromData(_myCalendarSpec)
+    Gametime.DTC.createFromData(_myCalendarSpec);
   }
 
   static updateFromDTC(calendarName) {
@@ -2065,8 +2071,9 @@ class DateTime {
     }
   }
   
-  set numDayOfTheWeek(dow) {Gametime.DTNow().setCalDow(dow)}
+  set numDayOfTheWeek(dow) {Gametime.DTNow().setCalDow(dow); _myCalendarSpec.first_day = Gametime.DTC.firstDay}
   get numDayOfTheWeek() {return Gametime.DTNow().dow()}
+
 
   get dateNum() { return this._datenum}
   set dateNum(dateNum) {this._datenum = dateNum};
@@ -2461,9 +2468,7 @@ $(document).ready(() => {
 
   Hooks.on('ready', () => {
     c.loadSettings();
-    // we are sending calendar updates so about-time does not need to
-    if (game.Gametime.sendCalendarUpdates) game.Gametime.sendCalendarUpdates(false);
-
+    Hooks.on("about-time.clockRunningStatus", c.updateDisplay)
 
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {

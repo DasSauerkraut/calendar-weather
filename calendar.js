@@ -2252,6 +2252,7 @@ checkEvents() {
   }
 }
 
+
 class WarningSystem {
   constructor() {}
 

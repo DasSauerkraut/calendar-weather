@@ -2279,7 +2279,7 @@ checkEvents() {
       if(dt.hours >= _myCalendarSpec.dawn && dt.hours < _myCalendarSpec.dusk - 1 && canvas.scene.data.darkness > 0){
         newDarkness = 0;
         canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
-        canvas.draw();
+        if(dt.hours == 7){canvas.draw(); console.log(canvas.scene.data.darkness)}
       }
       if(dt.hours == _myCalendarSpec.dusk - 1){
         newDarkness = (dt.minutes * 60 + dt.seconds)*0.0002778;
@@ -2288,7 +2288,7 @@ checkEvents() {
       if((dt.hours >= _myCalendarSpec.dusk || dt.hours < _myCalendarSpec.dawn - 1) && canvas.scene.data.darkness < 1){
         newDarkness = 1;
         canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
-        canvas.draw();
+        if(dt.hours == 0){canvas.draw();}
       }
     }
   }
@@ -2491,9 +2491,9 @@ $(document).ready(() => {
     let loadedData = canvas.scene.getFlag('calendar-weather', 'showFX');
     const fxHtml = `
     <div class="form-group">
-        <label>Calendar/Weather - Weather Effects</label>
+        <label>Calendar/Weather - Night Cycle and Weather Effects</label>
         <input type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''} onChange="canvas.scene.setFlag('calendar-weather', 'showFX', this.checked);">
-        <p class="notes">When checked, and the FXMaster module is enabled, generating new weather will change the scene's current effect.</p>
+        <p class="notes">When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day. If the FXMaster module is installed, it will also generate weather effects such as rain.</p>
     </div>
     `
 

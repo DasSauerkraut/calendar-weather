@@ -841,7 +841,7 @@ class Calendar extends Application {
   loadSettings() {
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
-    // templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
+    templateData.dt.is24 = game.settings.get('calendar-weather', 'is24')
     if (!data || !data.months) {
       if (data.default) {
         console.log("calendar-weather | rebuilding data", data.default);
@@ -1242,6 +1242,8 @@ class WeatherTracker {
   climateTemp = 0;
   climateHumidity = 0;
   precipitation = "";
+  dawn = 5;
+  dusk = 19;
   isVolcanic = false;
   outputToChat = true;
   showFX = false;
@@ -1954,22 +1956,20 @@ class WeatherTracker {
     let dt = Gametime.DTNow();
     let newDarkness = 0;
     if(this.showFX){
-      if(dt.hours == _myCalendarSpec.dawn - 1){
+      if(dt.hours == this.dawn ){
         newDarkness = 1 - (dt.minutes * 60 + dt.seconds)*0.0002778;
         canvas.scene.update({darkness: newDarkness})
       }
-      if(dt.hours >= _myCalendarSpec.dawn && dt.hours < _myCalendarSpec.dusk - 1 && canvas.scene.data.darkness > 0){
-        newDarkness = 0;
-        canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
+      if(dt.hours >= this.dawn + 1 && dt.hours < this.dusk && canvas.scene.data.darkness > 0){
+        canvas.scene.update({darkness: 0}, {animateDarkness: true})
         if(dt.hours == 7){canvas.draw();}
       }
-      if(dt.hours == _myCalendarSpec.dusk - 1){
+      if(dt.hours == this.dusk){
         newDarkness = (dt.minutes * 60 + dt.seconds)*0.0002778;
         canvas.scene.update({darkness: newDarkness})
       }
-      if((dt.hours >= _myCalendarSpec.dusk || dt.hours < _myCalendarSpec.dawn - 1) && canvas.scene.data.darkness < 1){
-        newDarkness = 1;
-        canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
+      if((dt.hours >= this.dusk + 1 || dt.hours < this.dawn) && canvas.scene.data.darkness < 1){
+        canvas.scene.update({darkness: 1}, {animateDarkness: true})
         if(dt.hours == 0){canvas.draw();}
       }
     }
@@ -1987,8 +1987,6 @@ _myCalendarSpec = {
   "has_year_0": true,
   "month_len": {},
   "weekdays": [],
-  "dawn": 6,
-  "dusk": 20,
 };
 
 class DateTimeStatics {
@@ -2005,6 +2003,7 @@ class DateTimeStatics {
 let dateTimeStatics = new DateTimeStatics(); 
 
 class DateTime {
+  is24 = false;
   static updateDTC() { // update the calendar spec so that about-time will know the new calendar
     Gametime.DTC.createFromData(_myCalendarSpec);
   }
@@ -2263,8 +2262,12 @@ checkEvents() {
     if (sec < 10) {
       sec = "0" + sec;
     }
-    hours = (hours % 12) || 12;
-    this.timeDisp = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
+    if(this.is24){
+      this.timeDisp = hours + ":" + minutes + ":" + sec
+    } else {
+      hours = (hours % 12) || 12;
+      this.timeDisp = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
+    }
   }
 
   genDateWordy() {
@@ -2361,6 +2364,14 @@ $(document).ready(() => {
       scope: 'world',
       config: true,
       default: true,
+      type: Boolean,
+    });
+    game.settings.register('calendar-weather', 'is24', {
+      name: "Display time as 24hr?",
+      hint: "If true, a 24 hour clock will be used for the time display.",
+      scope: 'world',
+      config: true,
+      default: false,
       type: Boolean,
     });
   });

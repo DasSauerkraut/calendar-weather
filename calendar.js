@@ -1981,7 +1981,6 @@ let dateTimeStatics = new DateTimeStatics();
 
 class DateTime {
   doLightCycle = false;
-  lightLevel = 0;
   static updateDTC() { // update the calendar spec so that about-time will know the new calendar
     Gametime.DTC.createFromData(_myCalendarSpec);
   }
@@ -2271,37 +2270,26 @@ checkEvents() {
 
   lightCycle() {
     let dt = Gametime.DTNow();
-    // let morningMacro = () => {
-    //   if(Gametime.DTNow().hours != _myCalendarSpec.dawn){
-        
-    //     game.Gametime.doIn({seconds: 20}, morningMacro)
-    //   } else {
-    //     console.log("The end of morning!")
-    //     this.lightCycleStarted = false;
-    //   }
-    // }
+    let newDarkness = 0;
     if(this.doLightCycle){
       if(dt.hours == _myCalendarSpec.dawn - 1){
-        this.lightLevel = (dt.minutes * 60 + dt.seconds)*0.0002778;
-        console.log(this.lightLevel)
-        canvas.scene.update({darkness: this.lightLevel})
-        console.log("Activating Dawn Protocols!")
-        // game.Gametime.doIn({seconds: 20}, morningMacro)
+        newDarkness = 1 - (dt.minutes * 60 + dt.seconds)*0.0002778;
+        canvas.scene.update({darkness: newDarkness})
       }
-      if(dt.hours == _myCalendarSpec.dawn && this.lightLevel < 1){
-        this.lightLevel = 1;
-        canvas.scene.update({darkness: this.lightLevel})
-        console.log("It's morning now!")
+      if(dt.hours >= _myCalendarSpec.dawn && dt.hours < _myCalendarSpec.dusk - 1 && canvas.scene.data.darkness > 0){
+        newDarkness = 0;
+        canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
+        canvas.draw();
       }
-      // if(dt.hours == _myCalendarSpec.dusk - 1 && !this.lightCycleStarted){
-      //   this.lightCycleStarted = true;
-      //   console.log("Activating Dusk Protocols!")
-      //   game.Gametime.doIn({seconds: 20}, nightMacro)
-      // }
-      // if(dt.hours == _myCalendarSpec.dusk && this.lightCycleStarted){
-      //   console.log("It's morning now!")
-      //   this.lightCycleStarted = false;
-      // }
+      if(dt.hours == _myCalendarSpec.dusk - 1){
+        newDarkness = (dt.minutes * 60 + dt.seconds)*0.0002778;
+        canvas.scene.update({darkness: newDarkness})
+      }
+      if((dt.hours >= _myCalendarSpec.dusk || dt.hours < _myCalendarSpec.dawn - 1) && canvas.scene.data.darkness < 1){
+        newDarkness = 1;
+        canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
+        canvas.draw();
+      }
     }
   }
 }
@@ -2518,6 +2506,7 @@ $(document).ready(() => {
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
     templateData.dt.doLightCycle = canvas.scene.getFlag('calendar-weather', 'showFX');
     templateData.dt.weather.loadFX();
+    // templateData.dt.lightCycle();
   });
 
   Hooks.on("closeSceneConfig", () => {

@@ -1958,7 +1958,6 @@ class DateTimeStatics {
   _months = [];;
   _daysOfTheWeek = [];
   _lastDays = 0;
-
 }
 
 let dateTimeStatics = new DateTimeStatics(); 
@@ -2015,11 +2014,11 @@ class DateTime {
   set dateWordy(dateWordy) {this._dateWordy = dateWordy;}
 
   set months(months) {
-    dateTimeStatics.month_len = {};
+    _myCalendarSpec._month_len = {};
     months.forEach(m => _myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.leapLength)], "intercalary": !m.isNumbered})
     dateTimeStatics._months = months;
   }
-  get months() { return DateTime._months}
+  get months() { return dateTimeStatics._months}
 
   set daysOfTheWeek(days) {
     _myCalendarSpec.weekdays = days;

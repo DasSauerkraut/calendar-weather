@@ -658,8 +658,8 @@ class CalendarForm extends FormApplication {
             callback: async () => {
               DateTime.updateFromDTC(defaultCalendar);
               DateTime.updateDTC();
-              this.data.months = DateTime._months;
-              this.data.daysOfTheWeek = DateTime._daysOfTheWeek;
+              this.data.months = DateTime.months;
+              this.data.daysOfTheWeek = DateTime.daysOfTheWeek;
               await this.render(true);
               try {
                 await this.checkBoxes();
@@ -1975,11 +1975,11 @@ class DateTime {
       _myCalendarSpec.leap_year_rule = game.Gametime.calendars[calendarName].leap_year_rule;
       // Remove this when leap years are supported in this module
       _myCalendarSpec.leap_year_rule = (year) => 0;
-      this._months = Object.keys(calSpec.month_len).map((k, i) => {
+      this.months = Object.keys(calSpec.month_len).map((k, i) => {
         let m = calSpec.month_len[k];
         return new Month(k, m.days[0],  m.days[1], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
       })
-      this._daysOfTheWeek = calSpec.weekdays;
+      this.daysOfTheWeek = calSpec.weekdays;
       game.Gametime.DTC.createFromData(_myCalendarSpec);
     }
   }
@@ -2015,18 +2015,17 @@ class DateTime {
   set dateWordy(dateWordy) {this._dateWordy = dateWordy;}
 
   set months(months) {
-    _myCalendarSpec.month_len = {};
+    dateTimeStatics.month_len = {};
     months.forEach(m => _myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.leapLength)], "intercalary": !m.isNumbered})
-    DateTime._months = months;
+    dateTimeStatics._months = months;
   }
   get months() { return DateTime._months}
 
   set daysOfTheWeek(days) {
     _myCalendarSpec.weekdays = days;
-    DateTime._daysOfTheWeek = days;
+    dateTimeStatics._daysOfTheWeek = days;
   }
-  get daysOfTheWeek() { 
-    return DateTime._daysOfTheWeek}
+  get daysOfTheWeek() {return dateTimeStatics._daysOfTheWeek}
 
 
 
@@ -2039,14 +2038,14 @@ class DateTime {
   }
   
   addMonth(month) {
-    DateTime._months.push(month);
+    DateTime.months.push(month);
     _myCalendarSpec.month_len[month.name]={days:[Number(month.length), Number(month.leapLength)]};
     // Gametime.DTC.createFromData(_myCalendarSpec);
   };
 
   addWeekday(day) {
     _myCalendarSpec.weekdays.push(day);
-    DateTime._daysOfTheWeek.push(day);
+    DateTime.daysOfTheWeek.push(day);
     // Gametime.DTC.createFromData(_myCalendarSpec);
   };
 
@@ -2078,9 +2077,9 @@ class DateTime {
   get dateNum() { return this._datenum}
   set dateNum(dateNum) {this._datenum = dateNum};
 
-  get weekday() { return this._daysOfTheWeek[this.numDayOfTheWeek]}
+  get weekday() { return this.daysOfTheWeek[this.numDayOfTheWeek]}
   set weekday(day) {
-    let newDow = this._daysOfTheWeek.indexOf(day);
+    let newDow = this.daysOfTheWeek.indexOf(day);
     if (newDow != -1) this.numDayOfTheWeek = newDow;
   }
 

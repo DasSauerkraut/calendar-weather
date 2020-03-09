@@ -1245,6 +1245,7 @@ class WeatherTracker {
   isVolcanic = false;
   outputToChat = true;
   showFX = false;
+  weatherFX = [];
   isC = false;
   cTemp = 21.11
 
@@ -1265,6 +1266,7 @@ class WeatherTracker {
     this.precipitation = newData.precipitation;
     this.isVolcanic = newData.isVolcanic;
     this.isC = newData.isC;
+    this.weatherFX = newData.weatherFX;
     return this;
   }
 
@@ -1837,6 +1839,7 @@ class WeatherTracker {
 
       }
     }
+    this.weatherFX = effects
     if(fxAvailable){
         canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
         if(effects){
@@ -1886,10 +1889,22 @@ class WeatherTracker {
       // console.log("Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
       this.lastTemp = this.temp;
     }
-    this.cTemp = ((this.temp - 32) * 5 / 9).toFixed(2);
+    this.cTemp = ((this.temp - 32) * 5 / 9).toFixed(1);
     this.precipitation = this.genPrecip(roll);
     if (this.outputToChat) {
       this.output();
+    }
+  }
+
+  loadFX(){
+  if (this.showFX && game.modules.find(module => module.id === 'fxmaster')) {
+    canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
+      if(this.weatherFX){
+        this.weatherFX.forEach((effect) => {
+          canvas.scene.setFlag("fxmaster", "effects", effect);
+        })
+      }
+    });
     }
   }
 
@@ -2461,6 +2476,7 @@ $(document).ready(() => {
 
   Hooks.on("canvasInit", async canvas => {
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+    templateData.dt.weather.loadFX();
   });
 
   Hooks.on("closeSceneConfig", () => {
@@ -2470,7 +2486,7 @@ $(document).ready(() => {
   Hooks.on('ready', () => {
     c.loadSettings();
     Hooks.on("about-time.clockRunningStatus", c.updateDisplay)
-
+    CONFIG.debug.hooks = true;
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, templateData).then(html => {

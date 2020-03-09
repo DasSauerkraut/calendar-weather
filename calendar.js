@@ -1981,7 +1981,6 @@ let dateTimeStatics = new DateTimeStatics();
 
 class DateTime {
   doLightCycle = false;
-  lightCycleStarted = false;
   lightLevel = 0;
   static updateDTC() { // update the calendar spec so that about-time will know the new calendar
     Gametime.DTC.createFromData(_myCalendarSpec);
@@ -2272,35 +2271,37 @@ checkEvents() {
 
   lightCycle() {
     let dt = Gametime.DTNow();
-    let morningMacro = () => {
-      if(Gametime.DTNow().hours != _myCalendarSpec.dawn){
-        this.lightLevel += 0.05;
-        canvas.lighting.animateDarkness(this.lightLevel)
-        game.Gametime.doIn({seconds: 20}, morningMacro)
-      } else {
-        console.log("The end of morning!")
-        this.lightCycleStarted = false;
-      }
-    }
+    // let morningMacro = () => {
+    //   if(Gametime.DTNow().hours != _myCalendarSpec.dawn){
+        
+    //     game.Gametime.doIn({seconds: 20}, morningMacro)
+    //   } else {
+    //     console.log("The end of morning!")
+    //     this.lightCycleStarted = false;
+    //   }
+    // }
     if(this.doLightCycle){
-      if(dt.hours == _myCalendarSpec.dawn - 1 && !this.lightCycleStarted){
-        this.lightCycleStarted = true;
+      if(dt.hours == _myCalendarSpec.dawn - 1){
+        this.lightLevel = (dt.minutes * 60 + dt.seconds)*0.0002778;
+        console.log(this.lightLevel)
+        canvas.scene.update({darkness: this.lightLevel})
         console.log("Activating Dawn Protocols!")
-        game.Gametime.doIn({seconds: 20}, morningMacro)
+        // game.Gametime.doIn({seconds: 20}, morningMacro)
       }
-      if(dt.hours == _myCalendarSpec.dawn && this.lightCycleStarted){
+      if(dt.hours == _myCalendarSpec.dawn && this.lightLevel < 1){
+        this.lightLevel = 1;
+        canvas.scene.update({darkness: this.lightLevel})
         console.log("It's morning now!")
-        this.lightCycleStarted = false;
       }
-      if(dt.hours == _myCalendarSpec.dusk - 1 && !this.lightCycleStarted){
-        this.lightCycleStarted = true;
-        console.log("Activating Dusk Protocols!")
-        game.Gametime.doIn({seconds: 20}, nightMacro)
-      }
-      if(dt.hours == _myCalendarSpec.dusk && this.lightCycleStarted){
-        console.log("It's morning now!")
-        this.lightCycleStarted = false;
-      }
+      // if(dt.hours == _myCalendarSpec.dusk - 1 && !this.lightCycleStarted){
+      //   this.lightCycleStarted = true;
+      //   console.log("Activating Dusk Protocols!")
+      //   game.Gametime.doIn({seconds: 20}, nightMacro)
+      // }
+      // if(dt.hours == _myCalendarSpec.dusk && this.lightCycleStarted){
+      //   console.log("It's morning now!")
+      //   this.lightCycleStarted = false;
+      // }
     }
   }
 }

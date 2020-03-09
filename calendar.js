@@ -1949,6 +1949,31 @@ class WeatherTracker {
     }
     this.seasonColor = season.color;
   }
+
+  lightCycle() {
+    let dt = Gametime.DTNow();
+    let newDarkness = 0;
+    if(this.showFX){
+      if(dt.hours == _myCalendarSpec.dawn - 1){
+        newDarkness = 1 - (dt.minutes * 60 + dt.seconds)*0.0002778;
+        canvas.scene.update({darkness: newDarkness})
+      }
+      if(dt.hours >= _myCalendarSpec.dawn && dt.hours < _myCalendarSpec.dusk - 1 && canvas.scene.data.darkness > 0){
+        newDarkness = 0;
+        canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
+        if(dt.hours == 7){canvas.draw();}
+      }
+      if(dt.hours == _myCalendarSpec.dusk - 1){
+        newDarkness = (dt.minutes * 60 + dt.seconds)*0.0002778;
+        canvas.scene.update({darkness: newDarkness})
+      }
+      if((dt.hours >= _myCalendarSpec.dusk || dt.hours < _myCalendarSpec.dawn - 1) && canvas.scene.data.darkness < 1){
+        newDarkness = 1;
+        canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
+        if(dt.hours == 0){canvas.draw();}
+      }
+    }
+  }
 }
 
 _myCalendarSpec = {
@@ -1980,7 +2005,6 @@ class DateTimeStatics {
 let dateTimeStatics = new DateTimeStatics(); 
 
 class DateTime {
-  doLightCycle = false;
   static updateDTC() { // update the calendar spec so that about-time will know the new calendar
     Gametime.DTC.createFromData(_myCalendarSpec);
   }
@@ -2267,31 +2291,6 @@ checkEvents() {
   advanceMonth() {
     Gametime.setAbsolute(Gametime.DTNow().add({months: 1}));
   }
-
-  lightCycle() {
-    let dt = Gametime.DTNow();
-    let newDarkness = 0;
-    if(this.doLightCycle){
-      if(dt.hours == _myCalendarSpec.dawn - 1){
-        newDarkness = 1 - (dt.minutes * 60 + dt.seconds)*0.0002778;
-        canvas.scene.update({darkness: newDarkness})
-      }
-      if(dt.hours >= _myCalendarSpec.dawn && dt.hours < _myCalendarSpec.dusk - 1 && canvas.scene.data.darkness > 0){
-        newDarkness = 0;
-        canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
-        if(dt.hours == 7){canvas.draw(); console.log(canvas.scene.data.darkness)}
-      }
-      if(dt.hours == _myCalendarSpec.dusk - 1){
-        newDarkness = (dt.minutes * 60 + dt.seconds)*0.0002778;
-        canvas.scene.update({darkness: newDarkness})
-      }
-      if((dt.hours >= _myCalendarSpec.dusk || dt.hours < _myCalendarSpec.dawn - 1) && canvas.scene.data.darkness < 1){
-        newDarkness = 1;
-        canvas.scene.update({darkness: newDarkness}, {animateDarkness: true})
-        if(dt.hours == 0){canvas.draw();}
-      }
-    }
-  }
 }
 
 
@@ -2416,7 +2415,7 @@ $(document).ready(() => {
 
     if (document.getElementById('calendar-time-container')) {
       c.updateDisplay();
-      templateData.dt.lightCycle();
+      templateData.dt.weather.lightCycle();
     }
   })
   Hooks.on("renderWeatherForm", () => {

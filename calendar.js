@@ -1871,7 +1871,6 @@ class WeatherTracker {
   }
 
   generate(force = false) {
-    console.warn("in gen weather");
     let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
     if (force) {
       let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
@@ -1962,7 +1961,9 @@ _myCalendarSpec = {
   "minutes_per_hour": 60,
   "has_year_0": true,
   "month_len": {},
-  "weekdays": []
+  "weekdays": [],
+  "dawn": 6,
+  "dusk": 20,
 };
 
 class DateTimeStatics {
@@ -1979,6 +1980,9 @@ class DateTimeStatics {
 let dateTimeStatics = new DateTimeStatics(); 
 
 class DateTime {
+  doLightCycle = false;
+  lightCycleStarted = false;
+  lightLevel = 0;
   static updateDTC() { // update the calendar spec so that about-time will know the new calendar
     Gametime.DTC.createFromData(_myCalendarSpec);
   }
@@ -2265,6 +2269,40 @@ checkEvents() {
   advanceMonth() {
     Gametime.setAbsolute(Gametime.DTNow().add({months: 1}));
   }
+
+  lightCycle() {
+    let dt = Gametime.DTNow();
+    let morningMacro = () => {
+      if(Gametime.DTNow().hours != _myCalendarSpec.dawn){
+        this.lightLevel += 0.05;
+        canvas.lighting.animateDarkness(this.lightLevel)
+        game.Gametime.doIn({seconds: 20}, morningMacro)
+      } else {
+        console.log("The end of morning!")
+        this.lightCycleStarted = false;
+      }
+    }
+    if(this.doLightCycle){
+      if(dt.hours == _myCalendarSpec.dawn - 1 && !this.lightCycleStarted){
+        this.lightCycleStarted = true;
+        console.log("Activating Dawn Protocols!")
+        game.Gametime.doIn({seconds: 20}, morningMacro)
+      }
+      if(dt.hours == _myCalendarSpec.dawn && this.lightCycleStarted){
+        console.log("It's morning now!")
+        this.lightCycleStarted = false;
+      }
+      if(dt.hours == _myCalendarSpec.dusk - 1 && !this.lightCycleStarted){
+        this.lightCycleStarted = true;
+        console.log("Activating Dusk Protocols!")
+        game.Gametime.doIn({seconds: 20}, nightMacro)
+      }
+      if(dt.hours == _myCalendarSpec.dusk && this.lightCycleStarted){
+        console.log("It's morning now!")
+        this.lightCycleStarted = false;
+      }
+    }
+  }
 }
 
 
@@ -2389,6 +2427,7 @@ $(document).ready(() => {
 
     if (document.getElementById('calendar-time-container')) {
       c.updateDisplay();
+      templateData.dt.lightCycle();
     }
   })
   Hooks.on("renderWeatherForm", () => {
@@ -2476,17 +2515,19 @@ $(document).ready(() => {
 
   Hooks.on("canvasInit", async canvas => {
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+    templateData.dt.doLightCycle = canvas.scene.getFlag('calendar-weather', 'showFX');
     templateData.dt.weather.loadFX();
   });
 
   Hooks.on("closeSceneConfig", () => {
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+    templateData.dt.doLightCycle = canvas.scene.getFlag('calendar-weather', 'showFX');
   });
 
   Hooks.on('ready', () => {
     c.loadSettings();
     Hooks.on("about-time.clockRunningStatus", c.updateDisplay)
-    CONFIG.debug.hooks = true;
+    // CONFIG.debug.hooks = true;
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, templateData).then(html => {

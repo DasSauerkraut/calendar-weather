@@ -964,6 +964,7 @@ class Calendar extends Application {
   setEvents(data) {
     data = JSON.parse(data);
     templateData.dt.seasons = data.seasons
+    console.log(templateData.dt.seasons)
     templateData.dt.reEvents = data.reEvents
     templateData.dt.events = data.events
     templateData.dt.checkEvents();
@@ -2032,16 +2033,16 @@ class DateTime {
    set lastDays(days) {dateTimeStatics._lastDays = days}
 
   get reEvents() {return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : []};
-  set reEvents(reEvents) {dateTimeStatics._reEvents = dateTimeStatics._reEvents || []};
+  set reEvents(reEvents) {dateTimeStatics._reEvents = reEvents || []};
 
   get events() {return dateTimeStatics._events ? dateTimeStatics._events : []};
-  set events(events) {dateTimeStatics._events = dateTimeStatics._events || []};
+  set events(events) {dateTimeStatics._events = events || []};
 
   get seasons() {return dateTimeStatics._seasons ? dateTimeStatics._seasons : []};
-  set seasons(seasons) {dateTimeStatics._seasons = dateTimeStatics._seasons || []};
+  set seasons(seasons) {dateTimeStatics._seasons = seasons || []};
 
   get weather() {return dateTimeStatics._weather ? dateTimeStatics._weather : new WeatherTracker()}
-  set weather(weather) {dateTimeStatics._weather = dateTimeStatics._weather || new WeatherTracker()}
+  set weather(weather) {dateTimeStatics._weather = weather || new WeatherTracker()}
 
   get year() {
     return Gametime.DTNow().years;
@@ -2389,7 +2390,6 @@ $(document).ready(() => {
     c.setEvents(newEvents);
     c.updateSettings();
     c.settingsOpen(false);
-
   });
 
   Hooks.on('calendarSettingsOpen', () => {

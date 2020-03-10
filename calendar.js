@@ -25,8 +25,13 @@ class CalendarEvents extends FormApplication {
     let seasonTemp = document.getElementsByClassName("calendar-season-temp");
     let seasonHumid = document.getElementsByClassName("calendar-season-humidity");
     let seasonColor = document.getElementsByClassName("calendar-season-color");
+    let seasonDawn = document.getElementsByClassName("calendar-dawn")
+    let seasonDusk = document.getElementsByClassName("calendar-dusk")
+    let dawnAmpm = document.getElementsByClassName("calendar-dawn-ampm")
+    let duskAmpm = document.getElementsByClassName("calendar-dusk-ampm")
     let event = {};
     let day = 0;
+    let hours = 0;
     for (var i = 0, max = seasonName.length; i < max; i++) {
       if (seasonName[i].value == "") {
         event['name'] = "Season " + i
@@ -46,9 +51,39 @@ class CalendarEvents extends FormApplication {
       event['humidity'] = seasonHumid[i].options[seasonHumid[i].selectedIndex].value;
       //color
       event['color'] = seasonColor[i].options[seasonColor[i].selectedIndex].value;
+      
+      if(parseInt(seasonDawn[i].value)){
+        hours = parseInt(seasonDawn[i].value)
+      }
+      if (hours > 24 || hours < 0 || hours == null) {
+        hours = 23;
+      }
+      if (dawnAmpm[i].value == "PM" && hours < 12) {
+        hours = hours + 12;
+      }
+      if (dawnAmpm[i].value == "AM" && hours == 12) {
+        hours = hours - 12;
+      }
+      event['dawn'] = hours;
+
+      if(parseInt(seasonDusk[i].value)){
+        hours = parseInt(seasonDusk[i].value)
+      }
+      if (hours > 24 || hours < 0 || hours == null) {
+        hours = 23;
+      }
+      if (duskAmpm[i].value == "PM" && hours < 12) {
+        hours = hours + 12;
+      }
+      if (duskAmpm[i].value == "AM" && hours == 12) {
+        hours = hours - 12;
+      }
+      event['dusk'] = hours
       savedData.seasons.push(event);
       event = {};
     }
+
+    console.log(savedData.seasons)
 
     let reEventName = document.getElementsByClassName("calendar-reEvent-name");
     let reEventMonth = document.getElementsByClassName("calendar-reEvent-month-value");
@@ -86,7 +121,6 @@ class CalendarEvents extends FormApplication {
     event = {};
     day = 0;
 
-    let hours = 0;
     let minutes = 0;
     let seconds = 0;
 
@@ -154,16 +188,16 @@ class CalendarEvents extends FormApplication {
   }
 
   async checkBoxes() {
-    //wait until form is loaded
-    // await this.formLoaded('calendar-reEvent-' + (this.data.reEvents.length - 1));
-    //get form data
-
     let names = document.getElementsByClassName("calendar-season-name");
     let days = document.getElementsByClassName("calendar-season-day");
     let months = document.getElementsByClassName("calendar-season-month-value");
     let temp = document.getElementsByClassName("calendar-season-temp");
     let humidity = document.getElementsByClassName("calendar-season-humidity");
     let color = document.getElementsByClassName("calendar-season-color");
+    let seasonDawn = document.getElementsByClassName("calendar-dawn")
+    let seasonDusk = document.getElementsByClassName("calendar-dusk")
+    let dawnAmpm = document.getElementsByClassName("calendar-dawn-ampm")
+    let duskAmpm = document.getElementsByClassName("calendar-dusk-ampm")
     //init vars
     let length = 0;
     let event = undefined
@@ -199,6 +233,19 @@ class CalendarEvents extends FormApplication {
               length = parseInt(months[i].getElementsByTagName('option')[k].attributes['name'].value);
             }
           }
+          if (event.dawn >= 12) {
+            dawnAmpm[i].getElementsByTagName('option')[1].selected = "true";
+          } else {
+            dawnAmpm[i].getElementsByTagName('option')[0].selected = "true";
+          }
+          seasonDawn[i].value = ((event.dawn + 11) % 12 + 1);
+
+          if (event.dusk >= 12) {
+            duskAmpm[i].getElementsByTagName('option')[0].selected = "true";
+          } else {
+            duskAmpm[i].getElementsByTagName('option')[1].selected = "true";
+          }
+          seasonDusk[i].value = ((event.dusk + 11) % 12 + 1);
           //create a whole bunch of options corresponding to each day in the selected month.
           let frag = document.createDocumentFragment();
           let element = days[i];
@@ -354,6 +401,8 @@ class CalendarEvents extends FormApplication {
       this.data.seasons.push({
         month: "1",
         day: 1,
+        dawn: 6,
+        dusk: 7
       });
       this.render(true);
     });
@@ -841,7 +890,7 @@ class Calendar extends Application {
   loadSettings() {
     let data = game.settings.get('calendar-weather', 'dateTime');
     this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
-    // templateData.dt.weather.showFX = game.settings.get('calendar-weather', 'fxDisplay')
+    templateData.dt.is24 = game.settings.get('calendar-weather', 'is24')
     if (!data || !data.months) {
       if (data.default) {
         console.log("calendar-weather | rebuilding data", data.default);
@@ -1011,7 +1060,6 @@ class Calendar extends Application {
     }
 
     game.Gametime._save(true);
-
   }
 
   toObject() {
@@ -1242,9 +1290,12 @@ class WeatherTracker {
   climateTemp = 0;
   climateHumidity = 0;
   precipitation = "";
+  dawn = 5;
+  dusk = 19;
   isVolcanic = false;
   outputToChat = true;
   showFX = false;
+  weatherFX = [];
   isC = false;
   cTemp = 21.11
 
@@ -1265,6 +1316,9 @@ class WeatherTracker {
     this.precipitation = newData.precipitation;
     this.isVolcanic = newData.isVolcanic;
     this.isC = newData.isC;
+    this.weatherFX = newData.weatherFX;
+    this.dawn = newData.dawn;
+    this.dusk = newData.dusk;
     return this;
   }
 
@@ -1837,6 +1891,7 @@ class WeatherTracker {
 
       }
     }
+    this.weatherFX = effects
     if(fxAvailable){
         canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
         if(effects){
@@ -1868,7 +1923,6 @@ class WeatherTracker {
   }
 
   generate(force = false) {
-    console.warn("in gen weather");
     let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
     if (force) {
       let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
@@ -1886,10 +1940,22 @@ class WeatherTracker {
       // console.log("Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
       this.lastTemp = this.temp;
     }
-    this.cTemp = ((this.temp - 32) * 5 / 9).toFixed(2);
+    this.cTemp = ((this.temp - 32) * 5 / 9).toFixed(1);
     this.precipitation = this.genPrecip(roll);
     if (this.outputToChat) {
       this.output();
+    }
+  }
+
+  loadFX(){
+  if (this.showFX && game.modules.find(module => module.id === 'fxmaster')) {
+    canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
+      if(this.weatherFX){
+        this.weatherFX.forEach((effect) => {
+          canvas.scene.setFlag("fxmaster", "effects", effect);
+        })
+      }
+    });
     }
   }
 
@@ -1909,6 +1975,8 @@ class WeatherTracker {
     } else {
       this.seasonHumidity = 0
     }
+    if(season.dawn){this.dawn = season.dawn}
+    if(season.dusk){this.dusk = season.dusk}
     let icon = document.getElementById('calendar-weather');
     switch (season.color) {
       case 'red':
@@ -1935,6 +2003,33 @@ class WeatherTracker {
     }
     this.seasonColor = season.color;
   }
+
+  lightCycle() {
+    let dt = Gametime.DTNow();
+    let newDarkness = 0;
+    if(this.showFX){
+      if(dt.hours == this.dawn ){
+        // console.log("calendar-weather | Starting dawn cycle.")
+        newDarkness = 1 - (dt.minutes * 60 + dt.seconds)*0.0002778;
+        canvas.scene.update({darkness: newDarkness})
+      }
+      if(dt.hours >= this.dawn + 1 && dt.hours < this.dusk && canvas.scene.data.darkness > 0){
+        console.log("calendar-weather | It is now day.")
+        canvas.scene.update({darkness: 0}, {animateDarkness: true})
+        if(dt.hours == 7){canvas.draw();}
+      }
+      if(dt.hours == this.dusk){
+        // console.log("calendar-weather | Starting dusk cycle.")
+        newDarkness = (dt.minutes * 60 + dt.seconds)*0.0002778;
+        canvas.scene.update({darkness: newDarkness})
+      }
+      if((dt.hours >= this.dusk + 1 || dt.hours < this.dawn) && canvas.scene.data.darkness < 1){
+        console.log("calendar-weather | It is now night.")
+        canvas.scene.update({darkness: 1}, {animateDarkness: true})
+        if(dt.hours == 0){canvas.draw();}
+      }
+    }
+  }
 }
 
 _myCalendarSpec = {
@@ -1947,7 +2042,7 @@ _myCalendarSpec = {
   "minutes_per_hour": 60,
   "has_year_0": true,
   "month_len": {},
-  "weekdays": []
+  "weekdays": [],
 };
 
 class DateTimeStatics {
@@ -1963,6 +2058,7 @@ class DateTimeStatics {
 let dateTimeStatics = new DateTimeStatics(); 
 
 class DateTime {
+  is24 = false;
   static updateDTC() { // update the calendar spec so that about-time will know the new calendar
     Gametime.DTC.createFromData(_myCalendarSpec);
   }
@@ -1992,16 +2088,16 @@ class DateTime {
    set lastDays(days) {dateTimeStatics._lastDays = days}
 
   get reEvents() {return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : []};
-  set reEvents(reEvents) {dateTimeStatics._reEvents = dateTimeStatics._reEvents || []};
+  set reEvents(reEvents) {dateTimeStatics._reEvents = reEvents || []};
 
   get events() {return dateTimeStatics._events ? dateTimeStatics._events : []};
-  set events(events) {dateTimeStatics._events = dateTimeStatics._events || []};
+  set events(events) {dateTimeStatics._events = events || []};
 
   get seasons() {return dateTimeStatics._seasons ? dateTimeStatics._seasons : []};
-  set seasons(seasons) {dateTimeStatics._seasons = dateTimeStatics._seasons || []};
+  set seasons(seasons) {dateTimeStatics._seasons = seasons || []};
 
   get weather() {return dateTimeStatics._weather ? dateTimeStatics._weather : new WeatherTracker()}
-  set weather(weather) {dateTimeStatics._weather = dateTimeStatics._weather || new WeatherTracker()}
+  set weather(weather) {dateTimeStatics._weather = weather || new WeatherTracker()}
 
   get year() {
     return Gametime.DTNow().years;
@@ -2220,8 +2316,12 @@ checkEvents() {
     if (sec < 10) {
       sec = "0" + sec;
     }
-    hours = (hours % 12) || 12;
-    this.timeDisp = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
+    if(this.is24){
+      this.timeDisp = hours + ":" + minutes + ":" + sec
+    } else {
+      hours = (hours % 12) || 12;
+      this.timeDisp = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
+    }
   }
 
   genDateWordy() {
@@ -2320,6 +2420,14 @@ $(document).ready(() => {
       default: true,
       type: Boolean,
     });
+    game.settings.register('calendar-weather', 'is24', {
+      name: "Display time as 24hr?",
+      hint: "If true, a 24 hour clock will be used for the time display.",
+      scope: 'world',
+      config: true,
+      default: false,
+      type: Boolean,
+    });
   });
 
   Hooks.on('renderCalendarEvents', () => {
@@ -2337,7 +2445,6 @@ $(document).ready(() => {
     c.setEvents(newEvents);
     c.updateSettings();
     c.settingsOpen(false);
-
   });
 
   Hooks.on('calendarSettingsOpen', () => {
@@ -2348,6 +2455,7 @@ $(document).ready(() => {
   Hooks.on('calendarSettingsClose', (updatedData) => {
     console.log("calendar-settings | Closing Calendar form.");
     c.rebuild(JSON.parse(updatedData));
+    templateData.dt.genDateWordy();
     c.updateDisplay();
     c.updateSettings();
     c.settingsOpen(false);
@@ -2372,6 +2480,7 @@ $(document).ready(() => {
 
     if (document.getElementById('calendar-time-container')) {
       c.updateDisplay();
+      templateData.dt.weather.lightCycle();
     }
   })
   Hooks.on("renderWeatherForm", () => {
@@ -2446,9 +2555,9 @@ $(document).ready(() => {
     let loadedData = canvas.scene.getFlag('calendar-weather', 'showFX');
     const fxHtml = `
     <div class="form-group">
-        <label>Calendar/Weather - Weather Effects</label>
+        <label>Calendar/Weather - Night Cycle and Weather Effects</label>
         <input type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''} onChange="canvas.scene.setFlag('calendar-weather', 'showFX', this.checked);">
-        <p class="notes">When checked, and the FXMaster module is enabled, generating new weather will change the scene's current effect.</p>
+        <p class="notes">When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day. If the FXMaster module is installed, it will also generate weather effects such as rain.</p>
     </div>
     `
 
@@ -2459,16 +2568,20 @@ $(document).ready(() => {
 
   Hooks.on("canvasInit", async canvas => {
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+    templateData.dt.doLightCycle = canvas.scene.getFlag('calendar-weather', 'showFX');
+    templateData.dt.weather.loadFX();
+    // templateData.dt.lightCycle();
   });
 
   Hooks.on("closeSceneConfig", () => {
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+    templateData.dt.doLightCycle = canvas.scene.getFlag('calendar-weather', 'showFX');
   });
 
   Hooks.on('ready', () => {
     c.loadSettings();
     Hooks.on("about-time.clockRunningStatus", c.updateDisplay)
-
+    // CONFIG.debug.hooks = true;
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, templateData).then(html => {

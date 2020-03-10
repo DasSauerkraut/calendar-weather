@@ -1012,7 +1012,6 @@ class Calendar extends Application {
     }
 
     game.Gametime._save(true);
-
   }
 
   toObject() {
@@ -2400,6 +2399,7 @@ $(document).ready(() => {
   Hooks.on('calendarSettingsClose', (updatedData) => {
     console.log("calendar-settings | Closing Calendar form.");
     c.rebuild(JSON.parse(updatedData));
+    templateData.dt.genDateWordy();
     c.updateDisplay();
     c.updateSettings();
     c.settingsOpen(false);

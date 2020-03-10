@@ -1948,7 +1948,7 @@ class WeatherTracker {
   }
 
   loadFX(){
-  if (this.showFX && game.modules.find(module => module.id === 'fxmaster')) {
+  if (this.showFX && game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
     canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
       if(this.weatherFX){
         this.weatherFX.forEach((effect) => {
@@ -2007,7 +2007,7 @@ class WeatherTracker {
   lightCycle() {
     let dt = Gametime.DTNow();
     let newDarkness = 0;
-    if(this.showFX){
+    if(this.showFX && Gametime.isMaster()){
       if(dt.hours == this.dawn ){
         // console.log("calendar-weather | Starting dawn cycle.")
         newDarkness = 1 - (dt.minutes * 60 + dt.seconds)*0.0002778;
@@ -2581,14 +2581,14 @@ $(document).ready(() => {
 
   Hooks.on("canvasInit", async canvas => {
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
-    templateData.dt.doLightCycle = canvas.scene.getFlag('calendar-weather', 'showFX');
-    templateData.dt.weather.loadFX();
+    if(Gametime.isMaster()){
+      templateData.dt.weather.loadFX();
+    }
     // templateData.dt.lightCycle();
   });
 
   Hooks.on("closeSceneConfig", () => {
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
-    templateData.dt.doLightCycle = canvas.scene.getFlag('calendar-weather', 'showFX');
   });
 
   Hooks.on('ready', () => {

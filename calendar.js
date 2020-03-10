@@ -642,7 +642,7 @@ class CalendarForm extends FormApplication {
       dayLength: game.Gametime.DTC.hpd,
       timeDisp: savedData.timeDisp,
       dateNum: savedData.dateNum,
-      events: DateTime._events
+      events: DateTime.events
     }
 
     console.log("calendar-weather | Building new calendar with the following object:", returnData)
@@ -2084,20 +2084,48 @@ class DateTime {
   _era = "";
   timeDisp = "";
   _dateNum = "";
-   get lastDays() {return dateTimeStatics._lastDays};
-   set lastDays(days) {dateTimeStatics._lastDays = days}
 
-  get reEvents() {return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : []};
-  set reEvents(reEvents) {dateTimeStatics._reEvents = reEvents || []};
+   static get lastDays() {return dateTimeStatics._lastDays};
+   static set lastDays(days) {dateTimeStatics._lastDays = days}
+   get lastDays() {return DateTime.lastDays};
+   set lastDays(days) {DateTime.lastDays = days}
 
-  get events() {return dateTimeStatics._events ? dateTimeStatics._events : []};
-  set events(events) {dateTimeStatics._events = events || []};
+   static get reEvents() {return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : []};
+   static set reEvents(reEvents) {dateTimeStatics._reEvents = reEvents || []};
+   get reEvents() {return DateTime.reEvents};
+   set reEvents(reEvents) {DateTime.reEvents = reEvents};
+  
+  static get events() {return dateTimeStatics._events ? dateTimeStatics._events : []};
+  static set events(events) {dateTimeStatics._events = events || []};
+  get events() {return DateTime.events};
+  set events(events) {DateTime.events = events};
 
-  get seasons() {return dateTimeStatics._seasons ? dateTimeStatics._seasons : []};
-  set seasons(seasons) {dateTimeStatics._seasons = seasons || []};
+  static get seasons() {return dateTimeStatics._seasons ? dateTimeStatics._seasons : []};
+  static set seasons(seasons) {dateTimeStatics._seasons = seasons || []};
+  get seasons() {return DateTime.seasons};
+  set seasons(seasons) {DateTime.seasons = seasons};
 
-  get weather() {return dateTimeStatics._weather ? dateTimeStatics._weather : new WeatherTracker()}
-  set weather(weather) {dateTimeStatics._weather = weather || new WeatherTracker()}
+  static get weather() {return dateTimeStatics._weather ? dateTimeStatics._weather : new WeatherTracker()}
+  static set weather(weather) {dateTimeStatics._weather = weather || new WeatherTracker()}
+  get weather() {return DateTime.weather}
+  set weather(weather) {DateTime.weather = weather}
+
+  static get months() {return dateTimeStatics._months}
+  static set months(months) { 
+    _myCalendarSpec._month_len = {};
+    months.forEach(m => _myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.leapLength)], "intercalary": !m.isNumbered})
+    dateTimeStatics._months = months;
+  }
+  get months() {return DateTime.months}
+  set months(months) { DateTime.months = months}
+
+  static set daysOfTheWeek(days) {
+    _myCalendarSpec.weekdays = days;
+    dateTimeStatics._daysOfTheWeek = days;
+  }
+  static get daysOfTheWeek() {return dateTimeStatics._daysOfTheWeek}
+  set daysOfTheWeek(days) {DateTime.daysOfTheWeek = days}
+  get daysOfTheWeek() { return DateTime.daysOfTheWeek}
 
   get year() {
     return Gametime.DTNow().years;
@@ -2108,21 +2136,6 @@ class DateTime {
 
   get dateWordy() {return this._dateWordy;}
   set dateWordy(dateWordy) {this._dateWordy = dateWordy;}
-
-  set months(months) {
-    _myCalendarSpec._month_len = {};
-    months.forEach(m => _myCalendarSpec.month_len[m.name] = {"days": [Number(m.length), Number(m.leapLength)], "intercalary": !m.isNumbered})
-    dateTimeStatics._months = months;
-  }
-  get months() { return dateTimeStatics._months}
-
-  set daysOfTheWeek(days) {
-    _myCalendarSpec.weekdays = days;
-    dateTimeStatics._daysOfTheWeek = days;
-  }
-  get daysOfTheWeek() {return dateTimeStatics._daysOfTheWeek}
-
-
 
   set year(y) {
     this.setYear(y)

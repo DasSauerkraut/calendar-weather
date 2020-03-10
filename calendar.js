@@ -25,8 +25,13 @@ class CalendarEvents extends FormApplication {
     let seasonTemp = document.getElementsByClassName("calendar-season-temp");
     let seasonHumid = document.getElementsByClassName("calendar-season-humidity");
     let seasonColor = document.getElementsByClassName("calendar-season-color");
+    let seasonDawn = document.getElementsByClassName("calendar-dawn")
+    let seasonDusk = document.getElementsByClassName("calendar-dusk")
+    let dawnAmpm = document.getElementsByClassName("calendar-dawn-ampm")
+    let duskAmpm = document.getElementsByClassName("calendar-dusk-ampm")
     let event = {};
     let day = 0;
+    let hours = 0;
     for (var i = 0, max = seasonName.length; i < max; i++) {
       if (seasonName[i].value == "") {
         event['name'] = "Season " + i
@@ -46,9 +51,39 @@ class CalendarEvents extends FormApplication {
       event['humidity'] = seasonHumid[i].options[seasonHumid[i].selectedIndex].value;
       //color
       event['color'] = seasonColor[i].options[seasonColor[i].selectedIndex].value;
+      
+      if(parseInt(seasonDawn[i].value)){
+        hours = parseInt(seasonDawn[i].value)
+      }
+      if (hours > 24 || hours < 0 || hours == null) {
+        hours = 23;
+      }
+      if (dawnAmpm[i].value == "PM" && hours < 12) {
+        hours = hours + 12;
+      }
+      if (dawnAmpm[i].value == "AM" && hours == 12) {
+        hours = hours - 12;
+      }
+      event['dawn'] = hours;
+
+      if(parseInt(seasonDusk[i].value)){
+        hours = parseInt(seasonDusk[i].value)
+      }
+      if (hours > 24 || hours < 0 || hours == null) {
+        hours = 23;
+      }
+      if (duskAmpm[i].value == "PM" && hours < 12) {
+        hours = hours + 12;
+      }
+      if (duskAmpm[i].value == "AM" && hours == 12) {
+        hours = hours - 12;
+      }
+      event['dusk'] = hours
       savedData.seasons.push(event);
       event = {};
     }
+
+    console.log(savedData.seasons)
 
     let reEventName = document.getElementsByClassName("calendar-reEvent-name");
     let reEventMonth = document.getElementsByClassName("calendar-reEvent-month-value");
@@ -86,7 +121,6 @@ class CalendarEvents extends FormApplication {
     event = {};
     day = 0;
 
-    let hours = 0;
     let minutes = 0;
     let seconds = 0;
 
@@ -154,16 +188,16 @@ class CalendarEvents extends FormApplication {
   }
 
   async checkBoxes() {
-    //wait until form is loaded
-    // await this.formLoaded('calendar-reEvent-' + (this.data.reEvents.length - 1));
-    //get form data
-
     let names = document.getElementsByClassName("calendar-season-name");
     let days = document.getElementsByClassName("calendar-season-day");
     let months = document.getElementsByClassName("calendar-season-month-value");
     let temp = document.getElementsByClassName("calendar-season-temp");
     let humidity = document.getElementsByClassName("calendar-season-humidity");
     let color = document.getElementsByClassName("calendar-season-color");
+    let seasonDawn = document.getElementsByClassName("calendar-dawn")
+    let seasonDusk = document.getElementsByClassName("calendar-dusk")
+    let dawnAmpm = document.getElementsByClassName("calendar-dawn-ampm")
+    let duskAmpm = document.getElementsByClassName("calendar-dusk-ampm")
     //init vars
     let length = 0;
     let event = undefined
@@ -199,6 +233,19 @@ class CalendarEvents extends FormApplication {
               length = parseInt(months[i].getElementsByTagName('option')[k].attributes['name'].value);
             }
           }
+          if (event.dawn >= 12) {
+            dawnAmpm[i].getElementsByTagName('option')[1].selected = "true";
+          } else {
+            dawnAmpm[i].getElementsByTagName('option')[0].selected = "true";
+          }
+          seasonDawn[i].value = ((event.dawn + 11) % 12 + 1);
+
+          if (event.dusk >= 12) {
+            duskAmpm[i].getElementsByTagName('option')[0].selected = "true";
+          } else {
+            duskAmpm[i].getElementsByTagName('option')[1].selected = "true";
+          }
+          seasonDusk[i].value = ((event.dusk + 11) % 12 + 1);
           //create a whole bunch of options corresponding to each day in the selected month.
           let frag = document.createDocumentFragment();
           let element = days[i];
@@ -354,6 +401,8 @@ class CalendarEvents extends FormApplication {
       this.data.seasons.push({
         month: "1",
         day: 1,
+        dawn: 6,
+        dusk: 7
       });
       this.render(true);
     });
@@ -964,7 +1013,6 @@ class Calendar extends Application {
   setEvents(data) {
     data = JSON.parse(data);
     templateData.dt.seasons = data.seasons
-    console.log(templateData.dt.seasons)
     templateData.dt.reEvents = data.reEvents
     templateData.dt.events = data.events
     templateData.dt.checkEvents();
@@ -1269,6 +1317,8 @@ class WeatherTracker {
     this.isVolcanic = newData.isVolcanic;
     this.isC = newData.isC;
     this.weatherFX = newData.weatherFX;
+    this.dawn = newData.dawn;
+    this.dusk = newData.dusk;
     return this;
   }
 
@@ -1925,6 +1975,8 @@ class WeatherTracker {
     } else {
       this.seasonHumidity = 0
     }
+    if(season.dawn){this.dawn = season.dawn}
+    if(season.dusk){this.dusk = season.dusk}
     let icon = document.getElementById('calendar-weather');
     switch (season.color) {
       case 'red':
@@ -1957,18 +2009,22 @@ class WeatherTracker {
     let newDarkness = 0;
     if(this.showFX){
       if(dt.hours == this.dawn ){
+        // console.log("calendar-weather | Starting dawn cycle.")
         newDarkness = 1 - (dt.minutes * 60 + dt.seconds)*0.0002778;
         canvas.scene.update({darkness: newDarkness})
       }
       if(dt.hours >= this.dawn + 1 && dt.hours < this.dusk && canvas.scene.data.darkness > 0){
+        console.log("calendar-weather | It is now day.")
         canvas.scene.update({darkness: 0}, {animateDarkness: true})
         if(dt.hours == 7){canvas.draw();}
       }
       if(dt.hours == this.dusk){
+        // console.log("calendar-weather | Starting dusk cycle.")
         newDarkness = (dt.minutes * 60 + dt.seconds)*0.0002778;
         canvas.scene.update({darkness: newDarkness})
       }
       if((dt.hours >= this.dusk + 1 || dt.hours < this.dawn) && canvas.scene.data.darkness < 1){
+        console.log("calendar-weather | It is now night.")
         canvas.scene.update({darkness: 1}, {animateDarkness: true})
         if(dt.hours == 0){canvas.draw();}
       }

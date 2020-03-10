@@ -1,49 +1,42 @@
 <style style="visibility: hidden;">
   .calendar-season-container {
-    display: grid;
-    justify-items: center;
+    display: inline-flex;
+    width: 100%;
   }
 
   .calendar-season-name {
-    grid-row: 1;
-    grid-column: 1;
-    width: 20%;
+    display: block;
+    max-width: 20%;
   }
 
   .calendar-season-temp {
-    grid-row: 1;
-    grid-column: 2;
+    padding: 1px;
   }
 
   .calendar-season-humidity {
-    grid-row: 1;
-    grid-column: 3;
-  }
-
-  .calendar-season-color {
-    grid-row: 1;
-    grid-column: 4;
+    padding: 1px;
   }
 
   .calendar-season-light-container {
-    display: flex;
+    display: inline-flex;
+    width: 100%;
   }
 
   .calendar-dusk{
-    width: 50px;
+    text-align: center;
+    max-width: 25px;
   }
   .calendar-dawn{
-    width: 50px;
+    text-align: center;
+    max-width: 25px;
   }
 
   .calendar-season-month {
-    grid-row: 1;
-    grid-column: 6;
+    padding: 1px;
   }
 
   .calendar-season-del {
-    grid-row: 1;
-    grid-column: 7;
+    margin-left: auto;
     width: 40px;
   }
 
@@ -155,6 +148,18 @@
     width: 40px;
   }
 
+  .calendar-season-text{
+    padding-left: 7px;
+    margin-top: 4px;
+  }
+
+  .calendar-season-listitem{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    outline-offset: 5px;
+    border-bottom: 1px solid rgb(116, 0, 0);
+  }
+
   .calendar-events-container {
     background: url(../ui/parchment.jpg) repeat;
     overflow-y: auto;
@@ -167,50 +172,27 @@
   <div>
     <p>Enter the start date and weather modifiers for each season. The Color dropdown changes the color of the weather
       icon for a visual indication of the season</p>
-    <div class="calendar-season-container">
-      <span class="calendar-season-label-name">
-        Name
-      </span>
-      <span class="calendar-season-label-temp">
-        Temperature Humidity
-      </span>
-      <span class="calendar-season-label-color">
-        Color
-      </span>
-      <span class="calendar-season-label-date">
-        Start Date
-      </span>
-      <span class="calendar-season-label-del">
-        Delete
-      </span>
-    </div>
     <ol>
       {{#each seasons as |season|}}
-      <li >
+      <li class="calendar-season-listitem">
         <div class="calendar-season-container">
           <input class="calendar-season-name" value="{{season.name}}" type="text" placeholder="ex. Autumn"
             title="Enter the season's name" id="calendar-season-{{@index}}">
+          <span class="calendar-season-text">Temperature:</span>
           <select class="calendar-season-temp" title="Is the season hotter or colder than average?"
             id="calendar-season-temp-{{@index}}">
             <option value=" "> </option>
             <option value="+">+</option>
             <option value="-">-</option>
           </select>
+          <span class="calendar-season-text">Humidity:</span>
           <select class="calendar-season-humidity" title="Is the season drier or wetter than average?"
             id="calendar-season-humidity-{{@index}}">
             <option value=" "> </option>
             <option value="+">+</option>
             <option value="-">-</option>
           </select>
-          <select class="calendar-season-color" title="What color do you want to display with the season?"
-            id="calendar-season-color-{{@index}}">
-            <option value="red" style="background-color: red;">Red</option>
-            <option value="orange" style="background-color: orange;">Orange</option>
-            <option value="yellow" style="background-color: yellow;">Yellow</option>
-            <option value="green" style="background-color: green;">Green</option>
-            <option value="blue" style="color:white; background-color: blue;">Blue</option>
-            <option value="white" style="background-color: white;">White</option>
-          </select>
+          <span class="calendar-season-text">Date:</span>
           <div class="calendar-season-month">
             <select class="calendar-season-month-value" title="What month does the season start?"
               id="calendar-season-month-{{@index}}" onchange="
@@ -235,26 +217,35 @@
             </select>
             <select class="calendar-season-day" id="calendar-season-day-{{@index}}"></select>
           </div>
-
           <button class="calendar-season-del" id="calendar-season-del-{{@index}}" name="del-season-{{@index}}"
             title="Delete Season">
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
         <div class="calendar-season-light-container">
-          Dawn:
+          <span class="calendar-season-text">Dawn:</span>
           <input class="calendar-dawn" value="{{season.dawn}}" type="text" placeholder="6"
             title="Enter the hour it gets bright" id="calendar-dawn-{{@index}}">
-          <select id="calendar-dawn-ampm-{{@index}}" class="calendar-event-ampm">
+          <select id="calendar-dawn-ampm-{{@index}}" class="calendar-dawn-ampm">
             <option value="AM">AM</option>
             <option value="PM">PM</option>
           </select>
-          Dusk:
+          <span class="calendar-season-text">Dusk:</span>
           <input class="calendar-dusk" value="{{season.dusk}}" type="text" placeholder="6"
             title="Enter the hour it gets dark" id="calendar-dusk-{{@index}}">
-          <select id="calendar-dusk-ampm-{{@index}}" class="calendar-event-ampm">
+          <select id="calendar-dusk-ampm-{{@index}}" class="calendar-dusk-ampm">
             <option value="PM">PM</option>
             <option value="AM">AM</option>
+          </select>
+          <span class="calendar-season-text">Color:</span>
+          <select class="calendar-season-color" title="What color do you want to display with the season?"
+            id="calendar-season-color-{{@index}}">
+            <option value="red" style="background-color: red;">Red</option>
+            <option value="orange" style="background-color: orange;">Orange</option>
+            <option value="yellow" style="background-color: yellow;">Yellow</option>
+            <option value="green" style="background-color: green;">Green</option>
+            <option value="blue" style="color:white; background-color: blue;">Blue</option>
+            <option value="white" style="background-color: white;">White</option>
           </select>
         </div>
       </li>

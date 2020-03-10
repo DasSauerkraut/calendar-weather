@@ -1975,8 +1975,8 @@ class WeatherTracker {
     } else {
       this.seasonHumidity = 0
     }
-    if(season.dawn){this.dawn = season.dawn}
-    if(season.dusk){this.dusk = season.dusk}
+    this.dawn = season.dawn
+    this.dusk = season.dusk
     let icon = document.getElementById('calendar-weather');
     switch (season.color) {
       case 'red':
@@ -2363,7 +2363,6 @@ checkEvents() {
   }
 }
 
-
 class WarningSystem {
   constructor() {}
 
@@ -2458,6 +2457,7 @@ $(document).ready(() => {
     c.setEvents(newEvents);
     c.updateSettings();
     c.settingsOpen(false);
+    templateData.dt.weather.setSeason(templateData.dt.findSeason(Gametime.DTNow()))
   });
 
   Hooks.on('calendarSettingsOpen', () => {

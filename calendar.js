@@ -1412,6 +1412,10 @@ class WeatherTracker {
 
   setClimate(climate) {
     this.isVolcanic = false;
+    if(this.climate = "tropical"){
+      this.seasonTemp = this.seasonTemp * 2;
+      this.seasonHumidity = this.seasonHumidity * 0.5;
+    }
     switch (climate) {
       case "temperate":
         this.climateHumidity = 0;
@@ -1434,7 +1438,7 @@ class WeatherTracker {
         this.generate(true)
         break;
       case "desert":
-        this.climateHumidity = -2;
+        this.climateHumidity = -4;
         this.climateTemp = 20;
         this.climate = "desert";
         this.tempRange = {
@@ -1457,6 +1461,8 @@ class WeatherTracker {
         this.climateHumidity = 1;
         this.climateTemp = 20;
         this.climate = "tropical";
+        this.seasonTemp = this.seasonTemp * 0.5;
+        this.seasonHumidity = this.seasonHumidity * 2;
         this.tempRange = {
           max: 100,
           min: 60
@@ -1495,7 +1501,7 @@ class WeatherTracker {
       fxAvailable = true;
     }
     if (roll < 0) {
-      roll = this.rand(1, 6);
+      roll = this.rand(1, 20) == 20 ? 6 : 1;
     }
     if (roll <= 3) {
       if (this.isVolcanic) {
@@ -1641,6 +1647,9 @@ class WeatherTracker {
       }
     } else if (roll == 8) {
       this.humidity -= 1;
+      if(this.climate = "desert"){
+        this.humidity -= 1;
+      }
       if (this.isVolcanic) {
         effects.push({
           "lightsnowID": {
@@ -1733,6 +1742,9 @@ class WeatherTracker {
 
     } else if (roll == 9) {
       this.humidity -= 2;
+      if(this.climate = "desert"){
+        this.humidity -= 2;
+      }
       if (this.isVolcanic) {
         effects.push({
           "lightsnowID": {
@@ -1825,6 +1837,9 @@ class WeatherTracker {
 
     } else if (roll >= 10) {
       this.humidity -= 2;
+      if(this.climate = "desert"){
+        this.humidity = 0;
+      }
       if (this.rand(1, 20) == 20) {
         weather = this.extremeWeather();
       } else {
@@ -2004,7 +2019,10 @@ class WeatherTracker {
   }
 
   generate(force = false) {
-    let roll = this.rand(1, 6) + this.humidity + this.climateHumidity;
+    let roll = this.rand(1, 6)
+    let tempRoll = roll //+ this.humidity + this.climateHumidity + this.seasonHumidity;
+    roll = roll + this.humidity + this.climateHumidity + this.seasonHumidity
+    console.log("Roll: " + tempRoll + " Humidity: " + this.humidity + " Climate Humidity: " + this.climateHumidity + " Season Humidity: " + this.seasonHumidity + " Final Roll: " + roll)
     if (force) {
       let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
       this.temp = temp + this.seasonTemp + this.climateTemp;
@@ -2020,8 +2038,9 @@ class WeatherTracker {
     }
     this.temp = Math.clamped(this.temp, this.tempRange.min, this.tempRange.max);
     this.lastTemp = this.temp;
+    this.cTemp = ((this.temp - 32) * 5/9).toFixed(1);
     //Change to (1,200) when finished testing
-    if (this.rand(1, 2) == 1 && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
+    if (this.rand(1, 400) == 1 && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
       this.precipitation = "Morrslieb is full..."
     } else {
       this.precipitation = this.genPrecip(roll);
@@ -2031,7 +2050,7 @@ class WeatherTracker {
   }
 }
 
-async loadFX() {
+loadFX() {
   if (this.showFX && game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
     canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
       if (this.weatherFX) {
@@ -2053,11 +2072,15 @@ setSeason(season) {
     this.seasonTemp = 0
   }
   if (season.humidity == "-") {
-    this.seasonHumidity = -10
+    this.seasonHumidity = -1
   } else if (season.humidity = "+") {
-    this.seasonHumidity = 10
+    this.seasonHumidity = 1
   } else {
     this.seasonHumidity = 0
+  }
+  if(this.climate = "tropical"){
+    this.seasonTemp = this.seasonTemp * 0.5;
+    this.seasonHumidity = this.seasonHumidity * 2;
   }
   this.dawn = season.dawn
   this.dusk = season.dusk
@@ -2500,12 +2523,19 @@ class DateTime {
       humidity: this.weather.humidity,
       lastTemp: this.weather.lastTemp,
       season: this.weather.season,
+      seasonColor: this.weather.seasonColor,
       seasonTemp: this.weather.seasonTemp,
       seasonHumidity: this.weather.seasonHumidity,
       climate: this.weather.climate,
       climateTemp: this.weather.climateTemp,
       climateHumidity: this.weather.climateHumidity,
-      precipitation: this.weather.precipitation
+      precipitation: this.weather.precipitation,
+      isVolcanic: this.weather.isVolcanic,
+      isC: this.weather.isC,
+      weatherFX: this.weather.weatherFX,
+      dawn: this.weather.dawn,
+      dusk: this.weather.dusk,
+      tempRange: this.weather.tempRange
     }
   }
 
@@ -2704,6 +2734,8 @@ $(document).ready(() => {
     let offset = document.getElementById("calendar").offsetWidth + 225
     document.getElementById("calendar-weather-container").style.left = offset + 'px'
     document.getElementById('calendar-weather-climate').value = templateData.dt.weather.climate;
+      if (templateData.dt.weather.isC)
+        document.getElementById("calendar-weather-temp").innerHTML = templateData.dt.getWeatherObj().cTemp;
   })
 
   Hooks.on("calendarWeatherUpdateUnits", (newUnits) => {

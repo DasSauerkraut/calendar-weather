@@ -237,7 +237,7 @@ background: rgba(0, 0, 0, 0.5);
 	cursor: pointer;
 	display: inline-flex;
 }
-#calendar-time{
+.calendar-time-disp{
 	position: relative;
 	bottom: 6px;
 }

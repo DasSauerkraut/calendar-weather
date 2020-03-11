@@ -1940,24 +1940,50 @@ class WeatherTracker {
       // console.log("Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
       this.lastTemp = this.temp;
     }
-    this.cTemp = ((this.temp - 32) * 5 / 9).toFixed(1);
-    this.precipitation = this.genPrecip(roll);
-    if (this.outputToChat) {
-      this.output();
-    }
-  }
+ //Change to (1,200) when finished testing
+ let lastPrecip = this.precipitation;
+ if(this.rand(1,2) == 1 && game.data.system.data.name == "wfrp4e"){
+   this.precipitation = "Morrslieb is full..."
+   canvas.scene.setFlag("core", "darknessColor", colorStringToHex("#006633"))
+   if(canvas.scene.data.darkness > 0) {
+     let darkness = canvas.scene.data.darkness
+     canvas.scene.update({darkness: 0})
+     canvas.scene.update({darkness: darkness})
+     canvas.draw();
+   }
+ } else {
+   if(lastPrecip == "Morrslieb is full..."){
+     canvas.scene.setFlag("core", "darknessColor", 1114163)
+     if(canvas.scene.data.darkness > 0) {
+       let darkness = canvas.scene.data.darkness
+       canvas.scene.update({darkness: 0})
+       canvas.scene.update({darkness: darkness})
+       canvas.draw();
+     }
+   }
+   this.precipitation = this.genPrecip(roll);
+ }
+ if (this.outputToChat) {
+   this.output();
+ }
+}
 
-  loadFX(){
-  if (this.showFX && game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
-    canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
-      if(this.weatherFX){
-        this.weatherFX.forEach((effect) => {
-          canvas.scene.setFlag("fxmaster", "effects", effect);
-        })
-      }
-    });
-    }
-  }
+loadFX(){
+if (this.showFX && game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
+ canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
+   if(this.weatherFX){
+     this.weatherFX.forEach((effect) => {
+       canvas.scene.setFlag("fxmaster", "effects", effect);
+     })
+   }
+ });
+ }
+ if(this.precipitation == "Morrslieb is full..."){
+   canvas.scene.setFlag("core", "darknessColor", colorStringToHex("#006633"))
+ } else {
+   canvas.scene.setFlag("core", "darknessColor", 1114163)
+ }
+}
 
   setSeason(season) {
     this.season = season.name;

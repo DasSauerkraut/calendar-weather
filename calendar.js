@@ -1941,29 +1941,7 @@ class WeatherTracker {
       this.lastTemp = this.temp;
     }
     this.cTemp = ((this.temp - 32) * 5 / 9).toFixed(1);
-    //Change to (1,200) when finished testing
-    let lastPrecip = this.precipitation;
-    if(this.rand(1,2) == 1 && game.data.system.data.name == "wfrp4e"){
-      this.precipitation = "Morrslieb is full..."
-      canvas.scene.setFlag("core", "darknessColor", colorStringToHex("#006633"))
-      if(canvas.scene.data.darkness > 0) {
-        let darkness = canvas.scene.data.darkness
-        canvas.scene.update({darkness: 0})
-        canvas.scene.update({darkness: darkness})
-        canvas.draw();
-      }
-    } else {
-      if(lastPrecip == "Morrslieb is full..."){
-        canvas.scene.setFlag("core", "darknessColor", 1114163)
-        if(canvas.scene.data.darkness > 0) {
-          let darkness = canvas.scene.data.darkness
-          canvas.scene.update({darkness: 0})
-          canvas.scene.update({darkness: darkness})
-          canvas.draw();
-        }
-      }
-      this.precipitation = this.genPrecip(roll);
-    }
+    this.precipitation = this.genPrecip(roll);
     if (this.outputToChat) {
       this.output();
     }
@@ -1978,11 +1956,6 @@ class WeatherTracker {
         })
       }
     });
-    }
-    if(this.precipitation == "Morrslieb is full..."){
-      canvas.scene.setFlag("core", "darknessColor", colorStringToHex("#006633"))
-    } else {
-      canvas.scene.setFlag("core", "darknessColor", 1114163)
     }
   }
 

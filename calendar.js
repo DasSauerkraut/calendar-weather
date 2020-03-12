@@ -83,8 +83,6 @@ class CalendarEvents extends FormApplication {
       event = {};
     }
 
-    console.log(savedData.seasons)
-
     let reEventName = document.getElementsByClassName("calendar-reEvent-name");
     let reEventMonth = document.getElementsByClassName("calendar-reEvent-month-value");
     let reEventDay = document.getElementsByClassName("calendar-reEvent-day");
@@ -1042,8 +1040,8 @@ class Calendar extends Application {
 
   }
 
-  setEvents(data) {
-    data = JSON.parse(data);
+  setEvents(newData) {
+    let data = JSON.parse(newData);
     templateData.dt.seasons = data.seasons
     templateData.dt.reEvents = data.reEvents
     templateData.dt.events = data.events
@@ -1412,10 +1410,6 @@ class WeatherTracker {
 
   setClimate(climate) {
     this.isVolcanic = false;
-    if(this.climate = "tropical"){
-      this.seasonTemp = this.seasonTemp * 2;
-      this.seasonHumidity = this.seasonHumidity * 0.5;
-    }
     switch (climate) {
       case "temperate":
         this.climateHumidity = 0;
@@ -1461,8 +1455,6 @@ class WeatherTracker {
         this.climateHumidity = 1;
         this.climateTemp = 20;
         this.climate = "tropical";
-        this.seasonTemp = this.seasonTemp * 0.5;
-        this.seasonHumidity = this.seasonHumidity * 2;
         this.tempRange = {
           max: 100,
           min: 60
@@ -2020,26 +2012,32 @@ class WeatherTracker {
 
   generate(force = false) {
     let roll = this.rand(1, 6)
-    let tempRoll = roll //+ this.humidity + this.climateHumidity + this.seasonHumidity;
-    roll = roll + this.humidity + this.climateHumidity + this.seasonHumidity
-    console.log("Roll: " + tempRoll + " Humidity: " + this.humidity + " Climate Humidity: " + this.climateHumidity + " Season Humidity: " + this.seasonHumidity + " Final Roll: " + roll)
+    roll = roll + this.humidity + this.climateHumidity + Math.floor(this.seasonHumidity)
+    let season = this.seasonTemp;
+    let climate = this.climateTemp;
+    if(this.climate = "tropical"){
+      season = this.seasonTemp * 0.5;
+    }
+    console.log("OG " + this.seasonTemp + " Modified: " + season)
+
     if (force) {
       let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
-      this.temp = temp + this.seasonTemp + this.climateTemp;
+      this.temp = temp + season + climate;
       // console.log("Forced Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
     } else if (this.rand(1, 5) >= 5) {
       let temp = this.rand(20, 60)
       // console.log("Fresh Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
-      this.temp = temp + this.seasonTemp + this.climateTemp;
+      this.temp = temp + season + climate;
     } else {
       let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
-      this.temp = temp;
-      // console.log("Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
+      console.log("Climate Mod: " + climate / 20 + " Season Mod: " + season / 20)
+      console.log("Total Modifier: " + Math.floor(climate / 20 + season / 20))
+      this.temp = temp + Math.floor(climate / 20 + season / 20);
     }
     this.temp = Math.clamped(this.temp, this.tempRange.min, this.tempRange.max);
     this.lastTemp = this.temp;
     this.cTemp = ((this.temp - 32) * 5/9).toFixed(1);
-    //Change to (1,200) when finished testing
+    //Morrslieb weather events
     if ((this.rand(1, 400) == 1 || templateData.dt.months[Gametime.DTNow().months].name == "Hexenstag" || templateData.dt.months[Gametime.DTNow().months].name == "Geheimnistag") && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
       this.precipitation = "Morrslieb is full..."
     } else {
@@ -2066,21 +2064,17 @@ setSeason(season) {
   this.season = season.name;
   if (season.temp == "-") {
     this.seasonTemp = -10
-  } else if (season.temp = "+") {
+  } else if (season.temp == "+") {
     this.seasonTemp = 10
   } else {
     this.seasonTemp = 0
   }
   if (season.humidity == "-") {
     this.seasonHumidity = -1
-  } else if (season.humidity = "+") {
+  } else if (season.humidity == "+") {
     this.seasonHumidity = 1
   } else {
     this.seasonHumidity = 0
-  }
-  if(this.climate = "tropical"){
-    this.seasonTemp = this.seasonTemp * 0.5;
-    this.seasonHumidity = this.seasonHumidity * 2;
   }
   this.dawn = season.dawn
   this.dusk = season.dusk
@@ -2445,17 +2439,33 @@ class DateTime {
 
     // seasons
     let newSeason = this.findSeason(Gametime.DTNow());
-    if (newSeason && this.weather.season !== newSeason.name) {
+    let newTemp = 0
+    let newHumidity = 0
+    if (newSeason.temp == "-") {
+      newTemp = -10
+    } else if (newSeason.temp == "+") {
+      newTemp = 10
+    } 
+    if (newSeason.humidity == "-") {
+      newHumidity = -1
+    } else if (newSeason.humidity == "+") {
+      newHumidity = 1
+    }
+    let updateFlag = this.weather.season !== newSeason.name || this.weather.dawn !== newSeason.dawn || this.weather.dusk !== newSeason.dusk || this.weather.seasonColor !== newSeason.color || this.weather.seasonTemp !== newTemp || this.weather.seasonHumidity !== newHumidity
+    if (newSeason && updateFlag) {
       // season change
       this.weather.setSeason(newSeason)
-      let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
-      ChatMessage.create({
-        speaker: {
-          alias: "Season Change:",
-        },
-        whisper: ChatMessage.getWhisperIDs("GM"),
-        content: chatOut,
-      });
+      if(this.weather.season !== newSeason.name){
+        let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
+        ChatMessage.create({
+          speaker: {
+            alias: "Season Change:",
+          },
+          whisper: ChatMessage.getWhisperIDs("GM"),
+          content: chatOut,
+        });
+      }
+      
     }
 
     //Find reoccuring events
@@ -2691,7 +2701,6 @@ $(document).ready(() => {
     c.setEvents(newEvents);
     c.updateSettings();
     c.settingsOpen(false);
-    templateData.dt.weather.setSeason(templateData.dt.findSeason(Gametime.DTNow()))
   });
 
   Hooks.on('calendarSettingsOpen', () => {

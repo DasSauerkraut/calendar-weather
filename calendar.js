@@ -2465,7 +2465,7 @@ class DateTime {
           content: chatOut,
         });
       }
-      
+
     }
 
     //Find reoccuring events

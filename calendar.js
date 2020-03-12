@@ -1064,7 +1064,7 @@ class Calendar extends Application {
 
   updateDisplay() {
     let now = game.Gametime.DTNow();
-    if (templateData.dt.dateWordy == "") {
+    if (Gametime.DTNow().toDays().days*24*60*60 + Gametime.DTNow().seconds == 0) {
       document.getElementById("calendar-date").innerHTML = "Calendar Loading...";
     } else {
       document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
@@ -2040,7 +2040,7 @@ class WeatherTracker {
     this.lastTemp = this.temp;
     this.cTemp = ((this.temp - 32) * 5/9).toFixed(1);
     //Change to (1,200) when finished testing
-    if (this.rand(1, 400) == 1 && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
+    if ((this.rand(1, 400) == 1 || templateData.dt.months[Gametime.DTNow().months].name == "Hexenstag" || templateData.dt.months[Gametime.DTNow().months].name == "Geheimnistag") && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
       this.precipitation = "Morrslieb is full..."
     } else {
       this.precipitation = this.genPrecip(roll);
@@ -2734,8 +2734,8 @@ $(document).ready(() => {
     let offset = document.getElementById("calendar").offsetWidth + 225
     document.getElementById("calendar-weather-container").style.left = offset + 'px'
     document.getElementById('calendar-weather-climate').value = templateData.dt.weather.climate;
-      if (templateData.dt.weather.isC)
-        document.getElementById("calendar-weather-temp").innerHTML = templateData.dt.getWeatherObj().cTemp;
+    if (templateData.dt.weather.isC)
+      document.getElementById("calendar-weather-temp").innerHTML = templateData.dt.getWeatherObj().cTemp;
   })
 
   Hooks.on("calendarWeatherUpdateUnits", (newUnits) => {

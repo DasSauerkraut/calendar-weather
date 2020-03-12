@@ -1482,6 +1482,16 @@ class WeatherTracker {
         }
         this.generate(true)
         break;
+      case "polar":
+        this.climateHumidity = 0;
+        this.climateTemp = -50;
+        this.climate = "polar";
+        this.tempRange = {
+          max: 10,
+          min: -170
+        }
+        this.generate(true)
+        break;
     }
   }
 
@@ -2015,10 +2025,9 @@ class WeatherTracker {
     roll = roll + this.humidity + this.climateHumidity + Math.floor(this.seasonHumidity)
     let season = this.seasonTemp;
     let climate = this.climateTemp;
-    if(this.climate = "tropical"){
+    if(this.climate == "tropical"){
       season = this.seasonTemp * 0.5;
     }
-    console.log("OG " + this.seasonTemp + " Modified: " + season)
 
     if (force) {
       let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
@@ -2030,8 +2039,6 @@ class WeatherTracker {
       this.temp = temp + season + climate;
     } else {
       let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
-      console.log("Climate Mod: " + climate / 20 + " Season Mod: " + season / 20)
-      console.log("Total Modifier: " + Math.floor(climate / 20 + season / 20))
       this.temp = temp + Math.floor(climate / 20 + season / 20);
     }
     this.temp = Math.clamped(this.temp, this.tempRange.min, this.tempRange.max);
@@ -2116,14 +2123,26 @@ lightCycle() {
       console.log("calendar-weather | Deactivating Morrslieb")
       WFRP_Utility.toggleMorrslieb()
     }
-    if (dt.hours == this.dawn) {
+
+    let dawn = this.dawn;
+    let dusk = this.dusk;
+    if(this.climate = "polar"){
+      if(this.seasonTemp > 0){
+        dawn = 1
+        dusk = 23
+      } else if(this.seasonTemp < 0){
+        dawn = 11
+        dusk = 13
+      }
+    }
+    if (dt.hours == dawn) {
       // console.log("calendar-weather | Starting dawn cycle.")
       newDarkness = 1 - (dt.minutes * 60 + dt.seconds) * 0.0002778;
       canvas.scene.update({
         darkness: newDarkness
       })
     }
-    if (dt.hours >= this.dawn + 1 && dt.hours < this.dusk && canvas.scene.data.darkness > 0) {
+    if (dt.hours >= dawn + 1 && dt.hours < dusk && canvas.scene.data.darkness > 0) {
       console.log("calendar-weather | It is now day.")
       canvas.scene.update({
         darkness: 0
@@ -2134,14 +2153,14 @@ lightCycle() {
         canvas.draw();
       }
     }
-    if (dt.hours == this.dusk) {
+    if (dt.hours == dusk) {
       // console.log("calendar-weather | Starting dusk cycle.")
       newDarkness = (dt.minutes * 60 + dt.seconds) * 0.0002778;
       canvas.scene.update({
         darkness: newDarkness
       })
     }
-    if ((dt.hours >= this.dusk + 1 || dt.hours < this.dawn) && canvas.scene.data.darkness < 1) {
+    if ((dt.hours >= dusk + 1 || dt.hours < dawn) && canvas.scene.data.darkness < 1) {
       console.log("calendar-weather | It is now night.")
       canvas.scene.update({
         darkness: 1

@@ -2046,7 +2046,8 @@ class WeatherTracker {
     this.lastTemp = this.temp;
     this.cTemp = ((this.temp - 32) * 5/9).toFixed(1);
     //Morrslieb weather events
-    if ((this.rand(1, 400) == 1 || templateData.dt.months[Gametime.DTNow().months].name == "Hexenstag" || templateData.dt.months[Gametime.DTNow().months].name == "Geheimnistag") && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
+    let morrTrigger = (this.rand(1, 400) == 1 || templateData.dt.months[Gametime.DTNow().months].name == "Hexenstag" || templateData.dt.months[Gametime.DTNow().months].name == "Geheimnistag")
+    if ( morrTrigger && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
       this.precipitation = "Morrslieb is full..."
     } else {
       this.precipitation = this.genPrecip(roll);
@@ -2117,10 +2118,10 @@ lightCycle() {
   let dt = Gametime.DTNow();
   let newDarkness = 0;
   if (this.showFX && Gametime.isMaster()) {
-    if(this.precipitation == "Morrslieb is full..." && canvas.scene.getFlag("core", "darknessColor") == CONFIG.Canvas.darknessColor){
+    if(this.precipitation == "Morrslieb is full..." && canvas.scene.getFlag("core", "darknessColor") == CONFIG.Canvas.darknessColor && game.data.system.data.name == "wfrp4e" && Gametime.isMaster() ){
       console.log("calendar-weather | Activating Morrslieb")
       WFRP_Utility.toggleMorrslieb()
-    } else if(this.precipitation != "Morrslieb is full..." && canvas.scene.getFlag("core", "darknessColor") != CONFIG.Canvas.darknessColor){
+    } else if(this.precipitation != "Morrslieb is full..." && canvas.scene.getFlag("core", "darknessColor") != CONFIG.Canvas.darknessColor && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()){
       console.log("calendar-weather | Deactivating Morrslieb")
       WFRP_Utility.toggleMorrslieb()
     }

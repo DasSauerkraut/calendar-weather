@@ -2128,7 +2128,7 @@ lightCycle() {
 
     let dawn = this.dawn;
     let dusk = this.dusk;
-    if(this.climate = "polar"){
+    if(this.climate == "polar"){
       if(this.seasonTemp > 0){
         dawn = 1
         dusk = 23

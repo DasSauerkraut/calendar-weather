@@ -1072,7 +1072,7 @@ class Calendar extends Application {
     templateData.dt.setTimeDisp();
     document.getElementById("calendar-time").innerHTML = templateData.dt.timeDisp;
     let temp = document.getElementById("calendar-weather-temp")
-    if (temp) {
+    if (temp && this) {
       if (templateData.dt.weather.isC) {
         temp.innerHTML = templateData.dt.getWeatherObj().cTemp;
       } else {
@@ -1081,6 +1081,7 @@ class Calendar extends Application {
       document.getElementById("calendar-weather-precip").innerHTML = templateData.dt.getWeatherObj().precipitation
       let offset = document.getElementById("calendar").offsetWidth + 225
       document.getElementById("calendar-weather-container").style.left = offset + 'px'
+      console.log(this)
       this.weatherForm.updateData(templateData.dt.getWeatherObj())
     }
     if (Gametime.isRunning()) {
@@ -2829,15 +2830,18 @@ $(document).ready(() => {
   })
 
   Hooks.on("renderSceneConfig", (app, html, data) => {
-    let loadedData = canvas.scene.getFlag('calendar-weather', 'showFX');
+    let loadedData = undefined;
+    if(!app.object.data.flags["calendar-weather"])
+      app.object.setFlag('calendar-weather', 'showFX', false);
+    
+    loadedData = app.object.data.flags["calendar-weather"].showFX;
     const fxHtml = `
     <div class="form-group">
         <label>Calendar/Weather - Night Cycle and Weather Effects</label>
-        <input type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''} onChange="canvas.scene.setFlag('calendar-weather', 'showFX', this.checked);">
+        <input type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''} onChange="${app.object.data.flags["calendar-weather"].showFX = !app.object.data.flags["calendar-weather"].showFX}">
         <p class="notes">When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day. If the FXMaster module is installed, it will also generate weather effects such as rain.</p>
     </div>
     `
-
     const fxFind = html.find("select[name ='weather']");
     const formGroup = fxFind.closest(".form-group");
     formGroup.after(fxHtml);
@@ -2848,7 +2852,6 @@ $(document).ready(() => {
     if (Gametime.isMaster()) {
       templateData.dt.weather.loadFX();
     }
-    // templateData.dt.lightCycle();
   });
 
   Hooks.on("closeSceneConfig", () => {

@@ -2058,9 +2058,9 @@ class WeatherTracker {
 }
 
 loadFX() {
-  if (this.showFX && game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
+  if (game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
     canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
-      if (this.weatherFX) {
+      if (this.weatherFX && this.showFX) {
         this.weatherFX.forEach((effect) => {
           canvas.scene.setFlag("fxmaster", "effects", effect);
         })
@@ -2118,12 +2118,16 @@ lightCycle() {
   let dt = Gametime.DTNow();
   let newDarkness = 0;
   if (this.showFX && Gametime.isMaster()) {
-    if(this.precipitation == "Morrslieb is full..." && canvas.scene.getFlag("core", "darknessColor") == CONFIG.Canvas.darknessColor && game.data.system.data.name == "wfrp4e" && Gametime.isMaster() ){
-      console.log("calendar-weather | Activating Morrslieb")
-      WFRP_Utility.toggleMorrslieb()
-    } else if(this.precipitation != "Morrslieb is full..." && canvas.scene.getFlag("core", "darknessColor") != CONFIG.Canvas.darknessColor && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()){
-      console.log("calendar-weather | Deactivating Morrslieb")
-      WFRP_Utility.toggleMorrslieb()
+    if(this.precipitation == "Morrslieb is full..." && game.data.system.data.name == "wfrp4e" && Gametime.isMaster() ){
+      if(!canvas.scene.getFlag("wfrp4e", "morrslieb")){
+        console.log("calendar-weather | Activating Morrslieb")
+        WFRP_Utility.toggleMorrslieb()
+      }
+    } else if(this.precipitation != "Morrslieb is full..." && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()){
+      if(canvas.scene.getFlag("wfrp4e", "morrslieb")){
+        console.log("calendar-weather | Deactivating Morrslieb")
+        WFRP_Utility.toggleMorrslieb()
+      }
     }
 
     let dawn = this.dawn;

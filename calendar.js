@@ -2748,24 +2748,6 @@ $(document).ready(() => {
     c.settingsOpen(false);
   });
 
-
-  Hooks.on("pseudoclockSet", () => {
-    let newDays = Gametime.DTNow().toDays().days;
-    if (templateData.dt.lastDays !== newDays) {
-      templateData.dt.genDateWordy();
-      if (Gametime.isMaster() && templateData.dt.lastDays) {
-        templateData.dt.checkEvents();
-        templateData.dt.weather.generate();
-      }
-    }
-    templateData.dt.lastDays = newDays;
-
-    if (document.getElementById('calendar-time-container')) {
-      c.updateDisplay();
-      templateData.dt.weather.lightCycle();
-    }
-  })
-  
   Hooks.on("renderWeatherForm", () => {
     let offset = document.getElementById("calendar").offsetWidth + 225
     document.getElementById("calendar-weather-container").style.left = offset + 'px'
@@ -2867,6 +2849,22 @@ $(document).ready(() => {
 
   Hooks.on('ready', () => {
     c.loadSettings();
+    Hooks.on("pseudoclockSet", () => {
+      let newDays = Gametime.DTNow().toDays().days;
+      if (templateData.dt.lastDays !== newDays) {
+        templateData.dt.genDateWordy();
+        if (Gametime.isMaster() && templateData.dt.lastDays) {
+          templateData.dt.checkEvents();
+          templateData.dt.weather.generate();
+        }
+      }
+      templateData.dt.lastDays = newDays;
+  
+      if (document.getElementById('calendar-time-container')) {
+        c.updateDisplay();
+        templateData.dt.weather.lightCycle();
+      }
+    })
     Hooks.on("about-time.clockRunningStatus", c.updateDisplay)
     // CONFIG.debug.hooks = true;
     WarningSystem.validateAboutTime();

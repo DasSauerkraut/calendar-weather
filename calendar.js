@@ -1062,7 +1062,7 @@ class Calendar extends Application {
 
   updateDisplay() {
     let now = game.Gametime.DTNow();
-    if (Gametime.DTNow().toDays().days*24*60*60 + Gametime.DTNow().seconds == 0) {
+    if (Gametime.DTNow().toDays().days * 24 * 60 * 60 + Gametime.DTNow().seconds == 0) {
       document.getElementById("calendar-date").innerHTML = "Calendar Loading...";
     } else {
       document.getElementById("calendar-date").innerHTML = templateData.dt.dateWordy;
@@ -1650,7 +1650,7 @@ class WeatherTracker {
       }
     } else if (roll == 8) {
       this.humidity -= 1;
-      if(this.climate = "desert"){
+      if (this.climate = "desert") {
         this.humidity -= 1;
       }
       if (this.isVolcanic) {
@@ -1745,7 +1745,7 @@ class WeatherTracker {
 
     } else if (roll == 9) {
       this.humidity -= 2;
-      if(this.climate = "desert"){
+      if (this.climate = "desert") {
         this.humidity -= 2;
       }
       if (this.isVolcanic) {
@@ -1840,7 +1840,7 @@ class WeatherTracker {
 
     } else if (roll >= 10) {
       this.humidity -= 2;
-      if(this.climate = "desert"){
+      if (this.climate = "desert") {
         this.humidity = 0;
       }
       if (this.rand(1, 20) == 20) {
@@ -2026,7 +2026,7 @@ class WeatherTracker {
     roll = roll + this.humidity + this.climateHumidity + Math.floor(this.seasonHumidity)
     let season = this.seasonTemp;
     let climate = this.climateTemp;
-    if(this.climate == "tropical"){
+    if (this.climate == "tropical") {
       season = this.seasonTemp * 0.5;
     }
 
@@ -2044,141 +2044,141 @@ class WeatherTracker {
     }
     this.temp = Math.clamped(this.temp, this.tempRange.min, this.tempRange.max);
     this.lastTemp = this.temp;
-    this.cTemp = ((this.temp - 32) * 5/9).toFixed(1);
+    this.cTemp = ((this.temp - 32) * 5 / 9).toFixed(1);
     //Morrslieb weather events
     let morrTrigger = (this.rand(1, 400) == 1 || templateData.dt.months[Gametime.DTNow().months].name == "Hexenstag" || templateData.dt.months[Gametime.DTNow().months].name == "Geheimnistag")
-    if ( morrTrigger && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
+    if (morrTrigger && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
       this.precipitation = "Morrslieb is full..."
     } else {
       this.precipitation = this.genPrecip(roll);
     }
-  if (this.outputToChat) {
-    this.output();
+    if (this.outputToChat) {
+      this.output();
+    }
   }
-}
 
-loadFX() {
-  if (game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
-    canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
-      if (this.weatherFX && this.showFX) {
-        this.weatherFX.forEach((effect) => {
-          canvas.scene.setFlag("fxmaster", "effects", effect);
+  loadFX() {
+    if (game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
+      canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
+        if (this.weatherFX && this.showFX) {
+          this.weatherFX.forEach((effect) => {
+            canvas.scene.setFlag("fxmaster", "effects", effect);
+          })
+        }
+      });
+    }
+  }
+
+  setSeason(season) {
+    this.season = season.name;
+    if (season.temp == "-") {
+      this.seasonTemp = -10
+    } else if (season.temp == "+") {
+      this.seasonTemp = 10
+    } else {
+      this.seasonTemp = 0
+    }
+    if (season.humidity == "-") {
+      this.seasonHumidity = -1
+    } else if (season.humidity == "+") {
+      this.seasonHumidity = 1
+    } else {
+      this.seasonHumidity = 0
+    }
+    this.dawn = season.dawn
+    this.dusk = season.dusk
+    let icon = document.getElementById('calendar-weather');
+    switch (season.color) {
+      case 'red':
+        icon.style.color = "#B12E2E"
+        break;
+      case 'orange':
+        icon.style.color = "#B1692E"
+        break;
+      case 'yellow':
+        icon.style.color = "#B99946"
+        break;
+      case 'green':
+        icon.style.color = "#258E25"
+        break;
+      case 'blue':
+        icon.style.color = "#5b80a5"
+        break;
+      case 'white':
+        icon.style.color = "#CCC"
+        break;
+      default:
+        icon.style.color = "#000"
+        break
+    }
+    this.seasonColor = season.color;
+  }
+
+  lightCycle() {
+    let dt = Gametime.DTNow();
+    let newDarkness = 0;
+    if (this.showFX && Gametime.isMaster()) {
+      if (this.precipitation == "Morrslieb is full..." && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
+        if (!canvas.scene.getFlag("wfrp4e", "morrslieb")) {
+          console.log("calendar-weather | Activating Morrslieb")
+          WFRP_Utility.toggleMorrslieb()
+        }
+      } else if (this.precipitation != "Morrslieb is full..." && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
+        if (canvas.scene.getFlag("wfrp4e", "morrslieb")) {
+          console.log("calendar-weather | Deactivating Morrslieb")
+          WFRP_Utility.toggleMorrslieb()
+        }
+      }
+
+      let dawn = this.dawn;
+      let dusk = this.dusk;
+      if (this.climate == "polar") {
+        if (this.seasonTemp > 0) {
+          dawn = 1
+          dusk = 23
+        } else if (this.seasonTemp < 0) {
+          dawn = 11
+          dusk = 13
+        }
+      }
+      if (dt.hours == dawn) {
+        // console.log("calendar-weather | Starting dawn cycle.")
+        newDarkness = 1 - (dt.minutes * 60 + dt.seconds) * 0.0002778;
+        canvas.scene.update({
+          darkness: newDarkness
         })
       }
-    });
-  }
-}
-
-setSeason(season) {
-  this.season = season.name;
-  if (season.temp == "-") {
-    this.seasonTemp = -10
-  } else if (season.temp == "+") {
-    this.seasonTemp = 10
-  } else {
-    this.seasonTemp = 0
-  }
-  if (season.humidity == "-") {
-    this.seasonHumidity = -1
-  } else if (season.humidity == "+") {
-    this.seasonHumidity = 1
-  } else {
-    this.seasonHumidity = 0
-  }
-  this.dawn = season.dawn
-  this.dusk = season.dusk
-  let icon = document.getElementById('calendar-weather');
-  switch (season.color) {
-    case 'red':
-      icon.style.color = "#B12E2E"
-      break;
-    case 'orange':
-      icon.style.color = "#B1692E"
-      break;
-    case 'yellow':
-      icon.style.color = "#B99946"
-      break;
-    case 'green':
-      icon.style.color = "#258E25"
-      break;
-    case 'blue':
-      icon.style.color = "#5b80a5"
-      break;
-    case 'white':
-      icon.style.color = "#CCC"
-      break;
-    default:
-      icon.style.color = "#000"
-      break
-  }
-  this.seasonColor = season.color;
-}
-
-lightCycle() {
-  let dt = Gametime.DTNow();
-  let newDarkness = 0;
-  if (this.showFX && Gametime.isMaster()) {
-    if(this.precipitation == "Morrslieb is full..." && game.data.system.data.name == "wfrp4e" && Gametime.isMaster() ){
-      if(!canvas.scene.getFlag("wfrp4e", "morrslieb")){
-        console.log("calendar-weather | Activating Morrslieb")
-        WFRP_Utility.toggleMorrslieb()
+      if (dt.hours >= dawn + 1 && dt.hours < dusk && canvas.scene.data.darkness > 0) {
+        console.log("calendar-weather | It is now day.")
+        canvas.scene.update({
+          darkness: 0
+        }, {
+          animateDarkness: true
+        })
+        if (dt.hours == 7) {
+          canvas.draw();
+        }
       }
-    } else if(this.precipitation != "Morrslieb is full..." && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()){
-      if(canvas.scene.getFlag("wfrp4e", "morrslieb")){
-        console.log("calendar-weather | Deactivating Morrslieb")
-        WFRP_Utility.toggleMorrslieb()
+      if (dt.hours == dusk) {
+        // console.log("calendar-weather | Starting dusk cycle.")
+        newDarkness = (dt.minutes * 60 + dt.seconds) * 0.0002778;
+        canvas.scene.update({
+          darkness: newDarkness
+        })
       }
-    }
-
-    let dawn = this.dawn;
-    let dusk = this.dusk;
-    if(this.climate == "polar"){
-      if(this.seasonTemp > 0){
-        dawn = 1
-        dusk = 23
-      } else if(this.seasonTemp < 0){
-        dawn = 11
-        dusk = 13
-      }
-    }
-    if (dt.hours == dawn) {
-      // console.log("calendar-weather | Starting dawn cycle.")
-      newDarkness = 1 - (dt.minutes * 60 + dt.seconds) * 0.0002778;
-      canvas.scene.update({
-        darkness: newDarkness
-      })
-    }
-    if (dt.hours >= dawn + 1 && dt.hours < dusk && canvas.scene.data.darkness > 0) {
-      console.log("calendar-weather | It is now day.")
-      canvas.scene.update({
-        darkness: 0
-      }, {
-        animateDarkness: true
-      })
-      if (dt.hours == 7) {
-        canvas.draw();
-      }
-    }
-    if (dt.hours == dusk) {
-      // console.log("calendar-weather | Starting dusk cycle.")
-      newDarkness = (dt.minutes * 60 + dt.seconds) * 0.0002778;
-      canvas.scene.update({
-        darkness: newDarkness
-      })
-    }
-    if ((dt.hours >= dusk + 1 || dt.hours < dawn) && canvas.scene.data.darkness < 1) {
-      console.log("calendar-weather | It is now night.")
-      canvas.scene.update({
-        darkness: 1
-      }, {
-        animateDarkness: true
-      })
-      if (dt.hours == 0) {
-        canvas.draw();
+      if ((dt.hours >= dusk + 1 || dt.hours < dawn) && canvas.scene.data.darkness < 1) {
+        console.log("calendar-weather | It is now night.")
+        canvas.scene.update({
+          darkness: 1
+        }, {
+          animateDarkness: true
+        })
+        if (dt.hours == 0) {
+          canvas.draw();
+        }
       }
     }
   }
-}
 }
 
 _myCalendarSpec = {
@@ -2466,31 +2466,32 @@ class DateTime {
     let newSeason = this.findSeason(Gametime.DTNow());
     let newTemp = 0
     let newHumidity = 0
-    if (newSeason.temp == "-") {
-      newTemp = -10
-    } else if (newSeason.temp == "+") {
-      newTemp = 10
-    } 
-    if (newSeason.humidity == "-") {
-      newHumidity = -1
-    } else if (newSeason.humidity == "+") {
-      newHumidity = 1
-    }
-    let updateFlag = this.weather.season !== newSeason.name || this.weather.dawn !== newSeason.dawn || this.weather.dusk !== newSeason.dusk || this.weather.seasonColor !== newSeason.color || this.weather.seasonTemp !== newTemp || this.weather.seasonHumidity !== newHumidity
-    if (newSeason && updateFlag) {
-      // season change
-      this.weather.setSeason(newSeason)
-      if(this.weather.season !== newSeason.name){
-        let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
-        ChatMessage.create({
-          speaker: {
-            alias: "Season Change:",
-          },
-          whisper: ChatMessage.getWhisperIDs("GM"),
-          content: chatOut,
-        });
+    if (newSeason) {
+      if (newSeason.temp == "-") {
+        newTemp = -10
+      } else if (newSeason.temp == "+") {
+        newTemp = 10
       }
-
+      if (newSeason.humidity == "-") {
+        newHumidity = -1
+      } else if (newSeason.humidity == "+") {
+        newHumidity = 1
+      }
+      let updateFlag = this.weather.season !== newSeason.name || this.weather.dawn !== newSeason.dawn || this.weather.dusk !== newSeason.dusk || this.weather.seasonColor !== newSeason.color || this.weather.seasonTemp !== newTemp || this.weather.seasonHumidity !== newHumidity
+      if (newSeason && updateFlag) {
+        // season change
+        this.weather.setSeason(newSeason)
+        if (this.weather.season !== newSeason.name) {
+          let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
+          ChatMessage.create({
+            speaker: {
+              alias: "Season Change:",
+            },
+            whisper: ChatMessage.getWhisperIDs("GM"),
+            content: chatOut,
+          });
+        }
+      }
     }
 
     //Find reoccuring events
@@ -2764,6 +2765,7 @@ $(document).ready(() => {
       templateData.dt.weather.lightCycle();
     }
   })
+  
   Hooks.on("renderWeatherForm", () => {
     let offset = document.getElementById("calendar").offsetWidth + 225
     document.getElementById("calendar-weather-container").style.left = offset + 'px'
@@ -2836,9 +2838,9 @@ $(document).ready(() => {
 
   Hooks.on("renderSceneConfig", (app, html, data) => {
     let loadedData = undefined;
-    if(!app.object.data.flags["calendar-weather"])
+    if (!app.object.data.flags["calendar-weather"])
       app.object.setFlag('calendar-weather', 'showFX', false);
-    
+
     loadedData = app.object.data.flags["calendar-weather"].showFX;
     const fxHtml = `
     <div class="form-group">

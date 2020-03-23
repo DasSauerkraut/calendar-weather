@@ -2820,14 +2820,20 @@ $(document).ready(() => {
 
   Hooks.on("renderSceneConfig", (app, html, data) => {
     let loadedData = undefined;
-    if (!app.object.data.flags["calendar-weather"])
+    if (!app.object.data.flags["calendar-weather"]){
       app.object.setFlag('calendar-weather', 'showFX', false);
+      loadedData = false;
+      console.log("Setting New Flag")
+    } else {
+      loadedData = app.object.getFlag('calendar-weather', 'showFX');
+    }
 
-    loadedData = app.object.data.flags["calendar-weather"].showFX;
+    console.log("Flag Value: " + loadedData);
+    
     const fxHtml = `
     <div class="form-group">
         <label>Calendar/Weather - Night Cycle and Weather Effects</label>
-        <input type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''} onChange="${app.object.data.flags["calendar-weather"].showFX = !app.object.data.flags["calendar-weather"].showFX}">
+        <input id="calendar-weather-showFX" type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''}>
         <p class="notes">When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day. If the FXMaster module is installed, it will also generate weather effects such as rain.</p>
     </div>
     `
@@ -2843,8 +2849,11 @@ $(document).ready(() => {
     }
   });
 
-  Hooks.on("closeSceneConfig", () => {
+  Hooks.on("closeSceneConfig", (app, html, data) => {
+    app.object.setFlag('calendar-weather', 'showFX', html.find("input[name ='calendarFX']").is(":checked"))
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+    // canvas.scene.setFlag('calendar-weather', 'showFX', templateData.dt.weather.showFX);
+    console.log("ShowFX: "+ templateData.dt.weather.showFX)
   });
 
   Hooks.on('ready', () => {

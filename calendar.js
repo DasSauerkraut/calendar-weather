@@ -1500,7 +1500,7 @@ class WeatherTracker {
     let fxAvailable = false;
     let weather = "";
     let effects = [];
-    if (this.showFX && game.modules.find(module => module.id === 'fxmaster')) {
+    if (this.showFX && game.modules.get("fxmaster").active) {
       fxAvailable = true;
     }
     if (roll < 0) {
@@ -2026,6 +2026,12 @@ class WeatherTracker {
     roll = roll + this.humidity + this.climateHumidity + Math.floor(this.seasonHumidity)
     let season = this.seasonTemp;
     let climate = this.climateTemp;
+    if(this.tempRange == undefined){
+      this.tempRange = {
+        max: 90,
+        min: -20
+      }
+    }
     if (this.climate == "tropical") {
       season = this.seasonTemp * 0.5;
     }
@@ -2058,7 +2064,7 @@ class WeatherTracker {
   }
 
   loadFX() {
-    if (game.modules.find(module => module.id === 'fxmaster') && Gametime.isMaster()) {
+    if (game.modules.get("fxmaster").active && Gametime.isMaster()) {
       canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
         if (this.weatherFX && this.showFX) {
           this.weatherFX.forEach((effect) => {
@@ -2856,7 +2862,6 @@ $(document).ready(() => {
   Hooks.on("closeSceneConfig", (app, html, data) => {
     app.object.setFlag('calendar-weather', 'showFX', html.find("input[name ='calendarFX']").is(":checked"))
     templateData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
-    // canvas.scene.setFlag('calendar-weather', 'showFX', templateData.dt.weather.showFX);
     console.log("ShowFX: "+ templateData.dt.weather.showFX)
   });
 

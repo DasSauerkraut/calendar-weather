@@ -1382,31 +1382,31 @@ class WeatherTracker {
     let roll = this.rand(1, 5);
     let event = "";
     if (this.isVolcanic) {
-      return "Volcano Erupts!";
+      return game.i18n.localize("VolcanoE");
     }
     switch (roll) {
       case 1:
-        event = "Tornado";
+        event = game.i18n.localize("Tornado");
         break;
       case 2:
-        event = "Hurricane or large amounts of flooding";
+        event = game.i18n.localize("Hurricane");
         break;
       case 3:
-        event = "Drought";
+        event = game.i18n.localize("Drought");
         this.humidity = -5;
         break;
       case 4:
-        event = "Baseball-sized hail";
+        event = game.i18n.localize("Baseball");
         break;
       case 5:
         if (this.temp <= 32) {
-          event = "Extreme blizzard"
+          event = game.i18n.localize("Blizzard");
         } else {
-          event = "Monsoon-like rainfall"
+          event = game.i18n.localize("Monsoon");
         }
         break;
     }
-    return "<b>Extreme Weather!</b> <hr>" + event;
+    return game.i18n.localize("Xtrem") + event;
   }
 
   setClimate(climate) {
@@ -1508,9 +1508,9 @@ class WeatherTracker {
     }
     if (roll <= 3) {
       if (this.isVolcanic) {
-        weather = "Ashen skies today";
+        weather = game.i18n.localize("AshenW");
       } else {
-        weather = "Clear sky today.";
+        weather = game.i18n.localize("ClearW");
       }
     } else if (roll <= 6) {
       this.humidity += 1;
@@ -1528,7 +1528,7 @@ class WeatherTracker {
             }
           }
         })
-        weather = "Dark, smokey skies today";
+        weather = game.i18n.localize("DarkW");
       } else {
         effects.push({
           "lightcloudsID": {
@@ -1543,11 +1543,11 @@ class WeatherTracker {
             }
           }
         })
-        weather = "Scattered clouds, but mostly clear today."
+        weather = game.i18n.localize("ScatteredW");
       }
     } else if (roll == 7) {
       if (this.isVolcanic) {
-        weather = "The sun is completely obscured by ash, possible ashfall today";
+        weather = game.i18n.localize("SunAshW");
       } else {
         if (this.temp < 25) {
           effects.push({
@@ -1576,7 +1576,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Completely overcast with some snow flurries possible.";
+          weather = game.i18n.localize("OvercastW");
         } else if (this.temp < 32) {
           effects.push({
             "lightcloudsID": {
@@ -1617,7 +1617,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Completely overcast with light freezing rain possible.";
+          weather = game.i18n.localize("OvercastLightW");
         } else {
           effects.push({
             "lightcloudsID": {
@@ -1645,7 +1645,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Completely overcast; light drizzles possible.";
+          weather = game.i18n.localize("OvercastDrizzleW");
         }
       }
     } else if (roll == 8) {
@@ -1680,7 +1680,7 @@ class WeatherTracker {
             }
           }
         })
-        weather = "Large ashfall today.";
+        weather = game.i18n.localize("AshfallW");
       } else {
         if (this.temp < 25) {
           effects.push({
@@ -1696,7 +1696,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "A light to moderate amount of snow today.";
+          weather = game.i18n.localize("LightSnowW");
         } else if (this.temp < 32) {
           effects.push({
             "lightsnowID": {
@@ -1724,7 +1724,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Light to moderate freezing rain today.";
+          weather = game.i18n.localize("LightRainW");
         } else {
           effects.push({
             "lightRainID": {
@@ -1739,7 +1739,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Light to moderate rain today.";
+          weather = game.i18n.localize("ModerateRainW");
         }
       }
 
@@ -1775,7 +1775,7 @@ class WeatherTracker {
             }
           }
         })
-        weather = "Firey rain today, take cover.";
+        weather = game.i18n.localize("FireyRainW");
       } else {
         if (this.temp < 25) {
           effects.push({
@@ -1791,7 +1791,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Large amount of snowfall today.";
+          weather = game.i18n.localize("LargeSnowW");
         } else if (this.temp < 32) {
           effects.push({
             "lightsnowID": {
@@ -1819,7 +1819,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Large amount of freezing rain today.";
+          weather = game.i18n.localize("LargeFreezingRainW");
         } else {
           effects.push({
             "lightsnowID": {
@@ -1834,7 +1834,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Heavy Rain today.";
+          weather = game.i18n.localize("HeavyRainW");
         }
       }
 
@@ -1899,7 +1899,7 @@ class WeatherTracker {
               }
             }
           })
-          weather = "Earthquake, firey rain, and toxic gases today.";
+          weather = game.i18n.localize("EarthquakeW");
         } else {
           if (this.temp < 25) {
             effects.push({
@@ -1928,7 +1928,7 @@ class WeatherTracker {
                 }
               }
             })
-            weather = "Blizzard today.";
+            weather = game.i18n.localize("BlizzardW");
           } else if (this.temp < 32) {
             effects.push({
               "lightsnowID": {
@@ -1956,7 +1956,7 @@ class WeatherTracker {
                 }
               }
             })
-            weather = "Icestorm today.";
+            weather = game.i18n.localize("IcestormW");
           } else {
             effects.push({
               "lightsnowID": {
@@ -1984,7 +1984,7 @@ class WeatherTracker {
                 }
               }
             })
-            weather = "Torrential rains today.";
+            weather = game.i18n.localize("TorrentialRainW");
           }
         }
 
@@ -2014,7 +2014,7 @@ class WeatherTracker {
     let chatOut = "<b>" + tempOut + "</b> - " + this.precipitation;
     ChatMessage.create({
       speaker: {
-        alias: "Today's Weather:",
+        alias: game.i18n.localize("TodayW"),
       },
       whisper: messageLvl,
       content: chatOut,
@@ -2054,7 +2054,7 @@ class WeatherTracker {
     //Morrslieb weather events
     let morrTrigger = (this.rand(1, 400) == 1 || templateData.dt.months[Gametime.DTNow().months].name == "Hexenstag" || templateData.dt.months[Gametime.DTNow().months].name == "Geheimnistag")
     if (morrTrigger && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
-      this.precipitation = "Morrslieb is full..."
+      this.precipitation = game.i18n.localize("MorrsliebFull");
     } else {
       this.precipitation = this.genPrecip(roll);
     }
@@ -2124,12 +2124,12 @@ class WeatherTracker {
     let dt = Gametime.DTNow();
     let newDarkness = 0;
     if (this.showFX && Gametime.isMaster()) {
-      if (this.precipitation == "Morrslieb is full..." && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
+      if (this.precipitation == game.i18n.localize("MorrsliebFull") && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
         if (!canvas.scene.getFlag("wfrp4e", "morrslieb")) {
           console.log("calendar-weather | Activating Morrslieb")
           WFRP_Utility.toggleMorrslieb()
         }
-      } else if (this.precipitation != "Morrslieb is full..." && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
+      } else if (this.precipitation != game.i18n.localize("MorrsliebFull") && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
         if (canvas.scene.getFlag("wfrp4e", "morrslieb")) {
           console.log("calendar-weather | Deactivating Morrslieb")
           WFRP_Utility.toggleMorrslieb()
@@ -2655,17 +2655,17 @@ class WarningSystem {
 
   static generateDialog() {
     new Dialog({
-      title: "About Time is not found",
-      content: "The Calendar/Weather mod requires AboutTime by Tim Posney in order to run properly.",
+      title: game.i18n.localize("AboutTimeMissing"),
+      content: game.i18n.localize("AboutTimeMissingHelp"),
       buttons: {
         one: {
           icon: '<i class="fas fa-check"></i>',
-          label: "Open the Gitlab page now",
+          label: game.i18n.localize("AboutTimeGitlab"),
           callback: () => window.open('https://gitlab.com/tposney/about-time/-/tree/master/src', '_blank', "fullscreen=no")
         },
         two: {
           icon: '<i class="fas fa-times"></i>',
-          label: "Disregard this message",
+          label:  game.i18n.localize("Disregard"),
           callback: () => {}
         }
       },
@@ -2697,24 +2697,24 @@ $(document).ready(() => {
       onChange: c.loadSettings.bind(c)
     });
     game.settings.register('calendar-weather', 'calendarDisplay', {
-      name: "Calendar Display for Non-GM",
-      hint: "If false, clients without GM-level permissions will not see the calendar displayed",
+      name: game.i18n.localize("CalDispNonGm"),
+      hint: game.i18n.localize("CalDispNonGmHelp"),
       scope: 'world',
       config: true,
       default: true,
       type: Boolean,
     });
     game.settings.register('calendar-weather', 'weatherDisplay', {
-      name: "Output weather to chat?",
-      hint: "If true, the weather will be output to chat, displayed only to GM level users.",
+      name: game.i18n.localize("Weather2Chat"),
+      hint: game.i18n.localize("Weather2ChatHelp"),
       scope: 'world',
       config: true,
       default: true,
       type: Boolean,
     });
     game.settings.register('calendar-weather', 'is24', {
-      name: "Display time as 24hr?",
-      hint: "If true, a 24 hour clock will be used for the time display.",
+      name: game.i18n.localize("Display24H"),
+      hint: game.i18n.localize("Display24HHelp"),
       scope: 'world',
       config: true,
       default: false,
@@ -2842,9 +2842,9 @@ $(document).ready(() => {
     
     const fxHtml = `
     <div class="form-group">
-        <label>Calendar/Weather - Night Cycle and Weather Effects</label>
+        <label>{{localize 'NightCycleLabel'}}</label>
         <input id="calendar-weather-showFX" type="checkbox" name="calendarFX" data-dtype="Boolean" ${loadedData ? 'checked' : ''}>
-        <p class="notes">When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day. If the FXMaster module is installed, it will also generate weather effects such as rain.</p>
+        <p class="notes">{{localize 'NightCycleLabelHelp'}}</p>
     </div>
     `
     const fxFind = html.find("select[name ='weather']");

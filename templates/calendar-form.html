@@ -167,9 +167,9 @@
     
 </style>
 <form autocomplete="off" onsubmit="event.preventDefault();" class="calendar-form-container">
-    <h1>Calendar Settings</h1>
+    <h1>{{localize 'CalendarSettings'}}</h1>
     <div id="calendar-form-year">
-        <label>Current Day: </label><input value="{{day}}" type="number" min="1" placeholder="14" id="calendar-form-cDay-input">
+        <label>{{localize 'CurrentDay'}}</label><input value="{{day}}" type="number" min="1" placeholder="14" id="calendar-form-cDay-input">
         <label class="calendar-form-label">Year: </label><input type="number" min="1" value="{{year}}" placeholder="2020" id="calendar-form-year-input">
         <label class="calendar-form-label">Era: </label><input value="{{era}}" type="text" placeholder="AD" id="calendar-form-era-input" maxlength="3">
         <label class="calendar-form-label">Time: </label>
@@ -177,8 +177,8 @@
         <input value="{{minutes}}" type="text" placeholder="15" id="calendar-form-minute-input" max="60">:
         <input value="{{seconds}}" type="text" placeholder="00" id="calendar-form-second-input" max="60">
         <select id="calendar-form-ampm">
-            <option value="AM">AM</option>
-            <option value="PM">PM</option>
+            <option value="AM">{{localize 'AM'}}</option>
+            <option value="PM">{{localize 'PM'}}</option>
         </select>
     </div>
     <h2>Weekdays</h2>
@@ -197,16 +197,16 @@
         {{#each daysOfTheWeek as |item|}}
         <li>
             <div class="calendar-form-weekday-container">
-                <input class="calendar-form-weekday-input" value="{{item}}" name="input-weekday-{{@index}}" type="text" placeholder="ex. Tuesday" id="calendar-form-weekday-{{@index}}">
+                <input class="calendar-form-weekday-input" value="{{item}}" name="input-weekday-{{@index}}" type="text" placeholder="{{localize 'exTuesday'}}" id="calendar-form-weekday-{{@index}}">
                 <input class="calendar-form-weekday-radio" type="radio" name="current-weekday" value="{{@index}}" checked>
-                <button class="calendar-form-weekday-del" id="calendar-form-del-weekday-{{@index}}" name="del-weekday-{{@index}}" title="Delete a Weekday">
+                <button class="calendar-form-weekday-del" id="calendar-form-del-weekday-{{@index}}" name="del-weekday-{{@index}}" title="{{localize 'DeleteWeekDay'}}">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
         </li>
         {{/each}}
     </ol>
-    <button id="calendar-form-add-weekday" name="add-weekday" title="Add a new day of the week">
+    <button id="calendar-form-add-weekday" name="add-weekday" title="{{localize 'AddNewDay'}}">
         <i class="fas fa-plus"></i> Add Weekday
     </button>
     <h2>Months</h2>
@@ -234,10 +234,10 @@
         {{#each months as |month|}}
         <li>
             <div class="calendar-form-month-container">
-                <input class="calendar-form-month-input" value="{{month.name}}" name="input-month-{{@index}}" type="text" placeholder="ex. October" id="calendar-form-month-{{@index}}">
+                <input class="calendar-form-month-input" value="{{month.name}}" name="input-month-{{@index}}" type="text" placeholder="{{localize 'exOctober'}}" id="calendar-form-month-{{@index}}">
                 <input class="calendar-form-month-length-input" value="{{month.length}}" name="input-month-length-{{@index}}" type="number" id="calendar-form-month-length-{{@index}}">
-                <input class="calendar-form-month-abbrev" title="What is displayed instead of the month number if the month is intercalary."value="{{month.abbrev}}" id="calendar-form-month-abbrev-{{@index}}" maxlength="3" disabled>
-                <input class="calendar-form-month-isnum" title="Removes the month from the normal month numbering scheme" type="checkbox" name="is-numbered" value="{{@index}}" onclick="
+                <input class="calendar-form-month-abbrev" title="{{localize 'MonthAbbrevHelp'}}" value="{{month.abbrev}}" id="calendar-form-month-abbrev-{{@index}}" maxlength="3" disabled>
+                <input class="calendar-form-month-isnum" title="{{localize 'MonthDelHelp'}}" type="checkbox" name="is-numbered" value="{{@index}}" onclick="
                 var input = document.getElementById('calendar-form-month-abbrev-{{@index}}');
                 var length = document.getElementById('calendar-form-month-length-{{@index}}');
                 if(this.checked){
@@ -254,22 +254,22 @@
                     length.style.cursor = 'auto';
                 }">
                 <input class="calendar-form-month-radio" type="radio" name="current-month" value="{{@index}}">
-                <button class="calendar-form-month-del" id="calendar-form-del-month-{{@index}}" name="del-month-{{@index}}" title="Delete a month">
+                <button class="calendar-form-month-del" id="calendar-form-del-month-{{@index}}" name="del-month-{{@index}}" title="{{localize 'DeleteMonth'}}">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
         </li>
         {{/each}}
     </ol>
-    <button id="calendar-form-add-month" name="add-month" title="Add a new month">
-        <i class="fas fa-plus"></i> Add Month
+    <button id="calendar-form-add-month" name="add-month" title="{{localize 'AddMonth'}}">
+        <i class="fas fa-plus"></i> {{localize 'AddMonth'}}
     </button>
   <footer>
-    <button id="calendar-form-submit" type="submit" name="submit" title="Save Calendar Settings">
-        <i class="far fa-save"></i> Save Calendar
+    <button id="calendar-form-submit" type="submit" name="submit" title="{{localize 'SaveCalendar'}}">
+        <i class="far fa-save"></i> {{localize 'SaveCalendar'}}
     </button>
-    <button id="calendar-form-load-default" name="default" title="load default calendar">
-        <i class="fal fa-load"></i> Load Default Calendar
+    <button id="calendar-form-load-default" name="default" title="{{localize 'LoadDefaultCalendar'}}">
+        <i class="fal fa-load"></i> {{localize 'LoadDefaultCalendar'}}
     </button>
   </footer>
 </form>

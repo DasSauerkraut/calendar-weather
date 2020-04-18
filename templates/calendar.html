@@ -1,7 +1,7 @@
 <div id="calendar-time-container">
 	<div id="calendar">
 		<h3 id="calendar-hdr">
-			<i id=calendar-events class="far fa-calendar-alt" title="Events"></i>
+			<i id=calendar-events class="far fa-calendar-alt" title="{{localize 'Events'}}"></i>
 			<span id="calendar-date" title="{{localize 'EditCalendar'}}">Date</span><span title="{{localize 'EditCalendar'}}" id="calendar-date-num">DateNum</span>
 			<i id=calendar-weather class="fas fa-cloud-sun" title="{{localize 'Weather'}}"></i>
 		</h3>
@@ -14,13 +14,13 @@
 			</div>
 			<div class="calendar-weekday-time">
 				<p id="calendar-weekday">Day of the Week</p>
-				<span class="calendar-time"><p class="calendar-time-disp" id="calendar-time" title="Stop/start psuedo real time clock.">Time</p><span id='calender-time-running'>•</span></span>
+				<span class="calendar-time"><p class="calendar-time-disp" id="calendar-time" title="{{localize 'StartStopPseudo'}}">Time</p><span id='calender-time-running'>•</span></span>
 			</div>
 			<div class="calendar-btn-container-right">
-				<i id="calendar-btn-quick" class="fas fa-forward" title="Advance 15 minutes" ></i>
-				<i id="calendar-btn-long" class="fas fa-fast-forward" title="Advance 1 hour" ></i>
-				<i id="calendar-btn-day" class="fas fa-sun" title="Advance to 7am the next day"></i>
-				<i id="calendar-btn-night" class="fas fa-moon" title="Advance to midnight"></i>
+				<i id="calendar-btn-quick" class="fas fa-forward" title="{{localize 'Advance15minutes'}}" ></i>
+				<i id="calendar-btn-long" class="fas fa-fast-forward" title="{{localize 'Advance1hour'}}" ></i>
+				<i id="calendar-btn-day" class="fas fa-sun" title="{{localize 'Advance7amNextDay'}}"></i>
+				<i id="calendar-btn-night" class="fas fa-moon" title="{{localize 'AdvanceToMidnight'}}"></i>
 			</div>
 		</div>
 	</div>

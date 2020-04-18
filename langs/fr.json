@@ -111,6 +111,9 @@
   "Display24H": "Afficher les heures au format 24hr?",
   "Display24HHelp": "Si activé, l'horloge utilisera un cycle de 25 heures.",
   "NightCycleLabel": "Calendar/Weather - Cycle jour/nuit",
-  "NightCycleLabelHelp": "Quand activé, la scène basculera entre les cycles de jour et de nut. Si FXMaster est installé, les effets de météo seront aussi générés."
+  "NightCycleLabelHelp": "Quand activé, la scène basculera entre les cycles de jour et de nut. Si FXMaster est installé, les effets de météo seront aussi générés.",
+  "Monday": "Lundi",
+  "Tuesday": "Mardi", 
+  "Wenesday": "Mercredi"
   
 }

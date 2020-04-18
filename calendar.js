@@ -978,12 +978,12 @@ class Calendar extends Application {
 
   populateData() {
     templateData.dt = new DateTime();
-    let newMonth1 = new Month("Month 1", 30, 30, true, "1");
+    let newMonth1 = new Month(game.i18n.localize("DefMonth"), 30, 30, true, "1");
     templateData.dt.addMonth(newMonth1);
-    templateData.dt.addWeekday("Monday");
-    templateData.dt.addWeekday("Tuesday");
-    templateData.dt.addWeekday("Wednesday");
-    templateData.dt.addWeekday("Thursday");
+    templateData.dt.addWeekday(game.i18n.localize("Monday"));
+    templateData.dt.addWeekday(game.i18n.localize("Tuesday"));
+    templateData.dt.addWeekday(game.i18n.localize("Wednesday"));
+    templateData.dt.addWeekday(game.i18n.localize("Thursday"));
     templateData.dt.setDayLength(24);
     templateData.dt.settings = [];
     templateData.dt.events = [];
@@ -1417,8 +1417,8 @@ class WeatherTracker {
         this.climateTemp = 0;
         this.climate = "temperate";
         this.tempRange = {
-          max: 90,
-          min: -20
+          max: 100,
+          min: -5
         }
         this.generate(true)
         break;

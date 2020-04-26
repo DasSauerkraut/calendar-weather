@@ -2687,7 +2687,8 @@ $(document).ready(() => {
   // Init settings so they can be wrote to later
   Hooks.on('init', () => {
     // c.populateData();
-
+    CONFIG.supportedLanguages['en'] = 'English';
+    CONFIG.supportedLanguages['fr'] = 'French';
     game.settings.register('calendar-weather', 'dateTime', {
       name: "Date/Time Data",
       scope: 'world',

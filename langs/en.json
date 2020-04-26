@@ -112,6 +112,5 @@
   "Display24HHelp": "If true, a 24 hour clock will be used for the time display.",
   "NightCycleLabel": "Calendar/Weather - Night Cycle and Weather Effects",
   "NightCycleLabelHelp": "When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day. If the FXMaster module is installed, it will also generate weather effects such as rain.",
-  "DefMonth": "Month 1",
-  
+  "DefMonth": "Month 1"
 }

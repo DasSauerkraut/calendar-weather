@@ -233,7 +233,6 @@ export class Calendar extends Application {
         }
         document.getElementById("calendar-weather-precip").innerHTML = cwdtData.dt.getWeatherObj().precipitation
         let offset = document.getElementById("calendar-time-container")
-        console.log(parseInt(offset.style.left.slice(0, -2)) + offset.offsetWidth)
         document.getElementById("calendar-weather-container").style.left = (parseInt(offset.style.left.slice(0, -2)) + offset.offsetWidth) + 'px'
         this.weatherForm.updateData(cwdtData.dt.getWeatherObj())
       }

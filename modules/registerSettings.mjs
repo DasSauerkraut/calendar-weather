@@ -1,11 +1,17 @@
 export const registerSettings = function(calendar) {
-    game.settings.register('calendar-weather', 'dateTime', {
+  game.settings.register('calendar-weather', 'dateTime', {
     name: "Date/Time Data",
     scope: 'world',
     config: false,
     // default: {},
     type: Object,
     onChange: calendar.loadSettings.bind(calendar)
+  });
+  game.settings.register('calendar-weather', 'calendarPos', {
+    name: "Calendar Position",
+    scope: 'world',
+    config: false,
+    type: Object,
   });
   game.settings.register('calendar-weather', 'calendarDisplay', {
     name: game.i18n.localize("CalDispNonGm"),

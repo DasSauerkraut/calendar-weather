@@ -28,9 +28,29 @@ export class Calendar extends Application {
     getPlayerDisp() {
       return this.showToPlayers
     }
+
+    setPos(pos) {
+      return new Promise(resolve => {
+        function check() {
+          let elmnt = document.getElementById("calendar-time-container")
+          if (elmnt) {
+            elmnt.style.top = (pos.top) + "px";
+            elmnt.style.left = (pos.left) + "px";
+            resolve();
+          } else {
+            setTimeout(check, 30);
+          }
+        }
+        check();
+      })
+    }
   
     loadSettings() {
       let data = game.settings.get('calendar-weather', 'dateTime');
+      let pos = game.settings.get('calendar-weather', 'calendarPos')
+      if(pos){
+        this.setPos(pos)
+      }
       this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
       cwdtData.dt.is24 = game.settings.get('calendar-weather', 'is24')
       if (!data || !data.months) {
@@ -212,9 +232,9 @@ export class Calendar extends Application {
           temp.innerHTML = cwdtData.dt.getWeatherObj().temp;
         }
         document.getElementById("calendar-weather-precip").innerHTML = cwdtData.dt.getWeatherObj().precipitation
-        let offset = document.getElementById("calendar").offsetWidth + 225
-        document.getElementById("calendar-weather-container").style.left = offset + 'px'
-        console.log(this)
+        let offset = document.getElementById("calendar-time-container")
+        console.log(parseInt(offset.style.left.slice(0, -2)) + offset.offsetWidth)
+        document.getElementById("calendar-weather-container").style.left = (parseInt(offset.style.left.slice(0, -2)) + offset.offsetWidth) + 'px'
         this.weatherForm.updateData(cwdtData.dt.getWeatherObj())
       }
       if (Gametime.isRunning()) {
@@ -419,27 +439,16 @@ export class Calendar extends Application {
         if (game.user.isGM && !isRightMB) {
           form.renderForm(JSON.stringify(this.toObject()));
         } else {
-
           dragElement(document.getElementById("calendar-time-container"))
-
+          let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
           function dragElement(elmnt) {
-            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            if (document.getElementById(elmnt.id + "header")) {
-              // if present, the header is where you move the DIV from:
-              document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-            } else {
-              // otherwise, move the DIV from anywhere inside the DIV:
-              elmnt.onmousedown = dragMouseDown;
-            }
-          
+            elmnt.onmousedown = dragMouseDown;
             function dragMouseDown(e) {
               e = e || window.event;
               e.preventDefault();
-              // get the mouse cursor position at startup:
               pos3 = e.clientX;
               pos4 = e.clientY;
               document.onmouseup = closeDragElement;
-              // call a function whenever the cursor moves:
               document.onmousemove = elementDrag;
             }
           
@@ -460,6 +469,7 @@ export class Calendar extends Application {
               // stop moving when mouse button is released:
               document.onmouseup = null;
               document.onmousemove = null;
+              game.settings.set("calendar-weather", "calendarPos", {top: elmnt.offsetTop - pos2, left: elmnt.offsetLeft - pos1});
             }
           }
         }

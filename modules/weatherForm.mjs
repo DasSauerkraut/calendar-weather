@@ -46,6 +46,27 @@ export class WeatherForm extends Application {
         }
       });
     }
+
+    setPos() {
+      return new Promise(resolve => {
+        function check() {
+          let elmnt = document.getElementById("calendar-weather-container")
+          if (elmnt) {
+            let offset = document.getElementById("calendar-time-container")
+            let pos = {
+              left: offset.style.left.slice(0, -2),
+              top: offset.style.top.slice(0, -2)
+            }
+            elmnt.style.left = (parseInt(pos.left) + offset.offsetWidth) + 'px';
+            elmnt.style.top = (parseInt(pos.top) + 2) + 'px';
+            resolve();
+          } else {
+            setTimeout(check, 30);
+          }
+        }
+        check();
+      })
+    }
   
     toggleForm(newData) {
       let templatePath = "modules/calendar-weather/templates/calendar-weather.html";
@@ -58,6 +79,7 @@ export class WeatherForm extends Application {
         renderTemplate(templatePath, this.data).then(html => {
           this.render(true);
         });
+        this.setPos();
       }
     }
   }

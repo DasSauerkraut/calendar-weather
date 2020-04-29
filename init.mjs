@@ -19,6 +19,14 @@ $(document).ready(() => {
     registerSettings(c)
   });
 
+  Hooks.on('setup', () => {
+    let operations = {
+      resetPos: Calendar.resetPos,
+    }
+    game.CWCalendar = operations;
+    window.CWCalendar = operations;
+  })
+
   Hooks.on('renderCalendarEvents', () => {
     c.checkEventBoxes();
     c.settingsOpen(true);
@@ -159,7 +167,6 @@ $(document).ready(() => {
   Hooks.on("closeSceneConfig", (app, html, data) => {
     app.object.setFlag('calendar-weather', 'showFX', html.find("input[name ='calendarFX']").is(":checked"))
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
-    console.log("ShowFX: "+ cwdtData.dt.weather.showFX)
   });
 
   Hooks.on('ready', () => {

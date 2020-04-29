@@ -34,6 +34,7 @@ export class Calendar extends Application {
         function check() {
           let elmnt = document.getElementById("calendar-time-container")
           if (elmnt) {
+            elmnt.style.bottom = null;
             elmnt.style.top = (pos.top) + "px";
             elmnt.style.left = (pos.left) + "px";
             resolve();
@@ -212,6 +213,26 @@ export class Calendar extends Application {
         if (Gametime.isMaster()) Gametime._save(true);
       }
     }
+
+    static resetPos(){
+      let pos = {bottom: 75, left: 223}
+      return new Promise(resolve => {
+        function check() {
+          let elmnt = document.getElementById("calendar-time-container")
+          if (elmnt) {
+            console.log('calendar-weather | Resetting Calendar Position')
+            elmnt.style.top = null;
+            elmnt.style.bottom = (pos.bottom) + "px";
+            elmnt.style.left = (pos.left) + "px";
+            game.settings.set("calendar-weather", "calendarPos", {top: elmnt.offsetTop, left: elmnt.offsetLeft});
+            resolve();
+          } else {
+            setTimeout(check, 30);
+          }
+        }
+        check();
+      })
+    }
   
     updateDisplay() {
       let now = game.Gametime.DTNow();
@@ -372,9 +393,16 @@ export class Calendar extends Application {
         }
       });
       //toggles real time clock on off, disabling granular controls
-      html.find(toggleClock).click(ev => {
+      html.find(toggleClock).mousedown(ev => {
         ev.preventDefault();
-        if (!this.isOpen && game.Gametime.isMaster()) {
+        ev = ev || window.event;
+        let isRightMB = false;
+        if ("which" in ev)  // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+          isRightMB = ev.which == 3
+        else if ("button" in ev)  // IE, Opera 
+          isRightMB = ev.button == 2;
+
+        if (!this.isOpen && game.Gametime.isMaster() && !isRightMB) {
           if (Gametime.isRunning()) {
             console.log("calendar-weather | Stopping about-time pseudo clock.");
             game.Gametime.stopRunning();
@@ -398,6 +426,8 @@ export class Calendar extends Application {
   
           }
           this.updateSettings();
+        } else if(isRightMB){
+          Calendar.resetPos()
         }
       });
       //handles hover events because can't access css hover property
@@ -468,6 +498,7 @@ export class Calendar extends Application {
               // stop moving when mouse button is released:
               document.onmouseup = null;
               document.onmousemove = null;
+              console.log('calendar-weather | Setting calendar position to x: ' + (elmnt.offsetTop - pos2) + ' y: ' + (elmnt.offsetLeft - pos1))
               game.settings.set("calendar-weather", "calendarPos", {top: elmnt.offsetTop - pos2, left: elmnt.offsetLeft - pos1});
             }
           }

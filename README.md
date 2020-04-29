@@ -15,5 +15,5 @@ If you want to have weather effects, you must have [FXMaster](https://gitlab.com
 * Day/Night Cycle: If the 'Calendar/Weather - Night Cycle and Weather Effects' setting is enabled, it will begin to grow dark at the specified dusk time for the season, and grow bright at the season's dawn time.
 * FXMaster Weather Integration: If you have U~man's FXmaster module installed, each time weather is generated, a corresponding effect will be applied to the current scene. This is enabled on a scene by scene basis by the 'Calendar/Weather - Night Cycle and Weather Effects' setting located in the scene config form.
 ### Controls:
-![control menu](https://i.imgur.com/ablmsjV.png)
+![control menu](https://i.imgur.com/1aCVPXG.png)
 ![weather menu](https://i.imgur.com/ZSRuAub.png)

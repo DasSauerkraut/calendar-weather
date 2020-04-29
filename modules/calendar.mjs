@@ -48,8 +48,8 @@ export class Calendar extends Application {
   
     loadSettings() {
       let data = game.settings.get('calendar-weather', 'dateTime');
-      let pos = game.settings.get('calendar-weather', 'calendarPos')
-      if(pos){
+      if(game.settings.get('calendar-weather', 'calendarPos')){
+        let pos = game.settings.get('calendar-weather', 'calendarPos');
         this.setPos(pos)
       }
       this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');

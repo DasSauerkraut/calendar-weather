@@ -137,16 +137,24 @@ $(document).ready(() => {
     let loadedWeatherData = undefined;
     let loadedNightData = undefined;
 
-    if (app.object.data.flags["calendar-weather"].showFX){
-      loadedWeatherData = app.object.getFlag('calendar-weather', 'showFX');
+    if(app.object.data.flags["calendar-weather"]){
+      if (app.object.data.flags["calendar-weather"].showFX){
+        loadedWeatherData = app.object.getFlag('calendar-weather', 'showFX');
+      } else {
+        app.object.setFlag('calendar-weather', 'showFX', false);
+        loadedWeatherData = false;
+      }
+  
+      if (app.object.data.flags["calendar-weather"].doNightCycle){
+        loadedNightData = app.object.getFlag('calendar-weather', 'doNightCycle');
+      } else {
+        app.object.setFlag('calendar-weather', 'doNightCycle', false);
+        loadedNightData = false;
+      }  
     } else {
       app.object.setFlag('calendar-weather', 'showFX', false);
       loadedWeatherData = false;
-    }
-
-    if (app.object.data.flags["calendar-weather"].doNightCycle){
-      loadedWeatherData = app.object.getFlag('calendar-weather', 'doNightCycle');
-    } else {
+      
       app.object.setFlag('calendar-weather', 'doNightCycle', false);
       loadedNightData = false;
     }

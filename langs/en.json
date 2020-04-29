@@ -110,7 +110,10 @@
   "Weather2ChatHelp": "If true, the weather will be output to chat, displayed only to GM level users.",  
   "Display24H": "Display time as 24hr?",
   "Display24HHelp": "If true, a 24 hour clock will be used for the time display.",
-  "NightCycleLabel": "Calendar/Weather - Night Cycle and Weather Effects",
-  "NightCycleLabelHelp": "When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day. If the FXMaster module is installed, it will also generate weather effects such as rain.",
+  "WeatherLabel": "Calendar/Weather - Scene Weather Effects",
+  "WeatherLabelHelp": "When checked, ff the FXMaster module is installed, it will generate weather effects such as rain and clouds.",
+  "NightCycleLabel": "Calendar/Weather - Scene Night Cycle",
+  "NightCycleLabelHelp": "When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day.",
+
   "DefMonth": "Month 1"
 }

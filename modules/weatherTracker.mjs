@@ -16,6 +16,7 @@ export class WeatherTracker {
     isVolcanic = false;
     outputToChat = true;
     showFX = false;
+    doNightCycle = false;
     weatherFX = [];
     isC = false;
     cTemp = 21.11
@@ -797,7 +798,7 @@ export class WeatherTracker {
     lightCycle() {
       let dt = Gametime.DTNow();
       let newDarkness = 0;
-      if (this.showFX && Gametime.isMaster()) {
+      if (this.doNightCycle && Gametime.isMaster()) {
         if (this.precipitation == game.i18n.localize("MorrsliebFull") && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {
           if (!canvas.scene.getFlag("wfrp4e", "morrslieb")) {
             console.log("calendar-weather | Activating Morrslieb")

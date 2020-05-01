@@ -64,8 +64,8 @@ $(document).ready(() => {
   });
 
   Hooks.on("renderWeatherForm", () => {
-    let offset = document.getElementById("calendar").offsetWidth + 225
-    document.getElementById("calendar-weather-container").style.left = offset + 'px'
+    // let offset = document.getElementById("calendar").offsetWidth + 225
+    // document.getElementById("calendar-weather-container").style.left = offset + 'px'
     document.getElementById('calendar-weather-climate').value = cwdtData.dt.weather.climate;
     if (cwdtData.dt.weather.isC)
       document.getElementById("calendar-weather-temp").innerHTML = cwdtData.dt.getWeatherObj().cTemp;
@@ -177,8 +177,11 @@ $(document).ready(() => {
   });
 
   Hooks.on("canvasInit", async canvas => {
+    console.log('ShowFX: ' + canvas.scene.getFlag('calendar-weather', 'showFX'));
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+    console.log('Set ShowFX: ' + cwdtData.dt.weather.showFX)
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'doNightCycle');
+
     if (Gametime.isMaster()) {
       cwdtData.dt.weather.loadFX();
     }
@@ -188,7 +191,10 @@ $(document).ready(() => {
     app.object.setFlag('calendar-weather', 'showFX', html.find("input[name ='calendarFXWeather']").is(":checked"))
     app.object.setFlag('calendar-weather', 'doNightCycle', html.find("input[name ='calendarFXNight']").is(":checked"))
 
+    console.log('ShowFX: ' + canvas.scene.getFlag('calendar-weather', 'showFX'));
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
+    console.log('Set ShowFX: ' + cwdtData.dt.weather.showFX)
+
     cwdtData.dt.weather.doNightCycle = canvas.scene.getFlag('calendar-weather', 'doNightCycle');
 
   });

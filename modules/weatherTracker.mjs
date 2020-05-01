@@ -175,8 +175,12 @@ export class WeatherTracker {
       let fxAvailable = false;
       let weather = "";
       let effects = [];
-      if (this.showFX && game.modules.get("fxmaster").active) {
-        fxAvailable = true;
+      console.log('ShowFX: ' + this.showFX + ' FXMaster: ' + game.modules.get("fxmaster").active + ' Scene Flag: ' + canvas.scene.getFlag('calendar-weather', 'showFX'))
+      if (game.modules.get("fxmaster").active) {
+        if(this.showFX || canvas.scene.getFlag('calendar-weather', 'showFX')){
+          fxAvailable = true;
+          this.showFX = true;
+        }
       }
       if (roll < 0) {
         roll = this.rand(1, 20) == 20 ? 6 : 1;
@@ -191,32 +195,28 @@ export class WeatherTracker {
         this.humidity += 1;
         if (this.isVolcanic) {
           effects.push({
-            "darkcloudsID": {
               type: 'clouds',
-              config: {
-                density: "4",
+              options: {
+                density: "13",
                 speed: "29",
-                scale: "20",
+                scale: "34",
                 tint: "#4a4a4a",
                 direction: "50",
                 apply_tint: true
               }
-            }
           })
           weather = game.i18n.localize("DarkW");
         } else {
           effects.push({
-            "lightcloudsID": {
               type: 'clouds',
-              config: {
-                density: "4",
+              options: {
+                density: "13",
                 speed: "29",
-                scale: "20",
+                scale: "34",
                 tint: "#bcbcbc",
                 direction: "50",
                 apply_tint: true
               }
-            }
           })
           weather = game.i18n.localize("ScatteredW");
         }
@@ -226,78 +226,63 @@ export class WeatherTracker {
         } else {
           if (this.temp < 25) {
             effects.push({
-              "lightcloudsID": {
                 type: 'clouds',
-                config: {
-                  density: "4",
+                options: {
+                  density: "41",
                   speed: "29",
-                  scale: "20",
+                  scale: "34",
                   tint: "#bcbcbc",
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             effects.push({
-              "snowID": {
                 type: 'snow',
-                config: {
-                  density: "8",
-                  speed: "50",
-                  scale: "30",
-                  tint: "#ffffff",
+                options: {
+                  density: "30",
+                  speed: "31",
+                  scale: "17",
+                  tint: "#000000",
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("OvercastW");
           } else if (this.temp < 32) {
             effects.push({
-              "lightcloudsID": {
                 type: 'clouds',
-                config: {
-                  density: "40",
+                options: {
+                  density: "41",
                   speed: "29",
-                  scale: "20",
+                  scale: "34",
                   tint: "#bcbcbc",
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             effects.push({
-              "lightrainID": {
                 type: 'rain',
-                config: {
-                  density: "8",
+                options: {
+                  density: "19",
                   speed: "50",
-                  scale: "15",
-                  tint: "#acd2cd",
+                  scale: "31",
                   direction: "50",
-                  apply_tint: true
                 }
-              }
             })
             effects.push({
-              "lightsnowID": {
                 type: 'snow',
-                config: {
-                  density: "8",
-                  speed: "50",
-                  scale: "15",
-                  tint: "#ffffff",
+                options: {
+                  density: "30",
+                  speed: "31",
+                  scale: "17",
                   direction: "50",
-                  apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("OvercastLightW");
           } else {
             effects.push({
-              "lightcloudsID": {
                 type: 'clouds',
-                config: {
+                options: {
                   density: "40",
                   speed: "29",
                   scale: "20",
@@ -305,12 +290,10 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             effects.push({
-              "lightrainID": {
                 type: 'rain',
-                config: {
+                options: {
                   density: "40",
                   speed: "50",
                   scale: "30",
@@ -318,7 +301,6 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("OvercastDrizzleW");
           }
@@ -330,9 +312,8 @@ export class WeatherTracker {
         }
         if (this.isVolcanic) {
           effects.push({
-            "lightsnowID": {
               type: 'snow',
-              config: {
+              options: {
                 density: "50",
                 speed: "50",
                 scale: "50",
@@ -340,12 +321,10 @@ export class WeatherTracker {
                 direction: "50",
                 apply_tint: true
               }
-            }
           })
           effects.push({
-            "embersID": {
               type: 'embers',
-              config: {
+              options: {
                 density: "50",
                 speed: "50",
                 scale: "50",
@@ -353,15 +332,13 @@ export class WeatherTracker {
                 direction: "50",
                 apply_tint: true
               }
-            }
           })
           weather = game.i18n.localize("AshfallW");
         } else {
           if (this.temp < 25) {
             effects.push({
-              "lightsnowID": {
                 type: 'snow',
-                config: {
+                options: {
                   density: "50",
                   speed: "50",
                   scale: "50",
@@ -369,14 +346,12 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("LightSnowW");
           } else if (this.temp < 32) {
             effects.push({
-              "lightsnowID": {
                 type: 'snow',
-                config: {
+                options: {
                   density: "25",
                   speed: "50",
                   scale: "25",
@@ -384,12 +359,10 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             effects.push({
-              "lightRainID": {
                 type: 'rain',
-                config: {
+                options: {
                   density: "25",
                   speed: "50",
                   scale: "50",
@@ -397,14 +370,12 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("LightRainW");
           } else {
             effects.push({
-              "lightRainID": {
                 type: 'rain',
-                config: {
+                options: {
                   density: "50",
                   speed: "50",
                   scale: "50",
@@ -412,7 +383,6 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("ModerateRainW");
           }
@@ -425,9 +395,8 @@ export class WeatherTracker {
         }
         if (this.isVolcanic) {
           effects.push({
-            "lightsnowID": {
               type: 'rain',
-              config: {
+              options: {
                 density: "72",
                 speed: "50",
                 scale: "67",
@@ -435,12 +404,10 @@ export class WeatherTracker {
                 direction: "50",
                 apply_tint: true
               }
-            }
           })
           effects.push({
-            "embers": {
               type: 'embers',
-              config: {
+              options: {
                 density: "50",
                 speed: "50",
                 scale: "50",
@@ -448,30 +415,21 @@ export class WeatherTracker {
                 direction: "50",
                 apply_tint: true
               }
-            }
           })
           weather = game.i18n.localize("FireyRainW");
         } else {
           if (this.temp < 25) {
             effects.push({
-              "lightsnowID": {
                 type: 'snow',
-                config: {
+                options: {
                   density: "72",
-                  speed: "50",
-                  scale: "67",
-                  tint: "#ffffff",
-                  direction: "50",
-                  apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("LargeSnowW");
           } else if (this.temp < 32) {
             effects.push({
-              "lightsnowID": {
                 type: 'snow',
-                config: {
+                options: {
                   density: "50",
                   speed: "50",
                   scale: "50",
@@ -479,12 +437,10 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             effects.push({
-              "lightRainID": {
                 type: 'rain',
-                config: {
+                options: {
                   density: "50",
                   speed: "50",
                   scale: "50",
@@ -492,14 +448,12 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("LargeFreezingRainW");
           } else {
             effects.push({
-              "lightsnowID": {
                 type: 'rain',
-                config: {
+                options: {
                   density: "72",
                   speed: "50",
                   scale: "67",
@@ -507,7 +461,6 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("HeavyRainW");
           }
@@ -523,9 +476,8 @@ export class WeatherTracker {
         } else {
           if (this.isVolcanic) {
             effects.push({
-              "lightsnowID": {
                 type: 'rain',
-                config: {
+                options: {
                   density: "100",
                   speed: "75",
                   scale: "100",
@@ -533,12 +485,10 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             effects.push({
-              "embers": {
                 type: 'embers',
-                config: {
+                options: {
                   density: "100",
                   speed: "50",
                   scale: "100",
@@ -546,12 +496,10 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             effects.push({
-              "lightsnowID": {
                 type: 'snow',
-                config: {
+                options: {
                   density: "50",
                   speed: "50",
                   scale: "50",
@@ -559,12 +507,10 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             effects.push({
-              "clouds": {
                 type: 'clouds',
-                config: {
+                options: {
                   density: "50",
                   speed: "8",
                   scale: "50",
@@ -572,15 +518,13 @@ export class WeatherTracker {
                   direction: "50",
                   apply_tint: true
                 }
-              }
             })
             weather = game.i18n.localize("EarthquakeW");
           } else {
             if (this.temp < 25) {
               effects.push({
-                "lightsnowID": {
                   type: 'snow',
-                  config: {
+                  options: {
                     density: "100",
                     speed: "75",
                     scale: "100",
@@ -588,27 +532,21 @@ export class WeatherTracker {
                     direction: "50",
                     apply_tint: true
                   }
-                }
               })
               effects.push({
-                "snow2": {
-                  type: 'snow',
-                  config: {
-                    density: "100",
-                    speed: "75",
-                    scale: "100",
-                    tint: "#ffffff",
-                    direction: "50",
-                    apply_tint: true
-                  }
+                type: 'clouds',
+                options: {
+                  density: "50",
+                  speed: "50",
+                  scale: "50",
+                  direction: "50",
                 }
               })
               weather = game.i18n.localize("BlizzardW");
             } else if (this.temp < 32) {
               effects.push({
-                "lightsnowID": {
                   type: 'snow',
-                  config: {
+                  options: {
                     density: "50",
                     speed: "50",
                     scale: "50",
@@ -616,12 +554,10 @@ export class WeatherTracker {
                     direction: "50",
                     apply_tint: true
                   }
-                }
               })
               effects.push({
-                "rain": {
                   type: 'rain',
-                  config: {
+                  options: {
                     density: "83",
                     speed: "17",
                     scale: "100",
@@ -629,14 +565,21 @@ export class WeatherTracker {
                     direction: "50",
                     apply_tint: true
                   }
+              })
+              effects.push({
+                type: 'clouds',
+                options: {
+                  density: "50",
+                  speed: "50",
+                  scale: "50",
+                  direction: "50",
                 }
               })
               weather = game.i18n.localize("IcestormW");
             } else {
               effects.push({
-                "lightsnowID": {
                   type: 'rain',
-                  config: {
+                  options: {
                     density: "100",
                     speed: "75",
                     scale: "100",
@@ -644,12 +587,10 @@ export class WeatherTracker {
                     direction: "50",
                     apply_tint: true
                   }
-                }
               })
               effects.push({
-                "rain": {
                   type: 'rain',
-                  config: {
+                  options: {
                     density: "100",
                     speed: "75",
                     scale: "100",
@@ -657,6 +598,14 @@ export class WeatherTracker {
                     direction: "50",
                     apply_tint: true
                   }
+              })
+              effects.push({
+                type: 'clouds',
+                options: {
+                  density: "50",
+                  speed: "50",
+                  scale: "50",
+                  direction: "50",
                 }
               })
               weather = game.i18n.localize("TorrentialRainW");
@@ -666,14 +615,9 @@ export class WeatherTracker {
         }
       }
       this.weatherFX = effects
+      console.log(fxAvailable);
       if (fxAvailable) {
-        canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
-          if (effects) {
-            effects.forEach((effect) => {
-              canvas.scene.setFlag("fxmaster", "effects", effect);
-            })
-          }
-        });
+        Hooks.call("updateWeather", effects);
       }
       return weather;
     }

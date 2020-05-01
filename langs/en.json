@@ -42,7 +42,6 @@
   "OneTimeEvents": "One Time Events",
   "OneTimeDescr": "Enter the date and description of one time events, for example an assassination.The event will be deleted after it is triggered.",
   "AllDayEvent": "All day event",
-  "DeleteREvent": "Delete reoccuring event.",
   "AddOneTimeEvent": "Add a new one time event",
   "SaveEvent": "Save Event Settings",
   "SwitchFC": "Switch between °F and °C",

@@ -42,7 +42,6 @@
   "OneTimeEvents": "일회성 이벤트",
   "OneTimeDescr": "암살과 같은 일회성 이벤트에 대한 날짜 및 설명을 입력한다. 이벤트는 트리거 된 뒤 삭제된다.",
   "AllDayEvent": "하루 종일 진행",
-  "DeleteREvent": "재발생 이벤트 삭제.",
   "AddOneTimeEvent": "일회성 이벤트 추가",
   "SaveEvent": "이벤트 설정 저장",
   "SwitchFC": "°F 와 °C 전환",

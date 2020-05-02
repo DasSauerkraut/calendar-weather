@@ -42,7 +42,6 @@
   "OneTimeEvents": "Evènements uniques",
   "OneTimeDescr": "Entrez la date et la description des évènements uniques, par exemple un assassinat. L'évènement sera supprimé après son déclenchement.",
   "AllDayEvent": "Evènement sur toute la journée",
-  "DeleteREvent": "Supprimer un évènement récurrent",
   "AddOneTimeEvent": "Ajouter un évènement unique",
   "SaveEvent": "Sauvegarder les évènements",
   "SwitchFC": "Basculer entre °F et °C",

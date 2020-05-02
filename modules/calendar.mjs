@@ -464,12 +464,13 @@ export class Calendar extends Application {
           isRightMB = ev.which == 3
         else if ("button" in ev)  // IE, Opera 
           isRightMB = ev.button == 2;
-
+        console.log("RB?: " + isRightMB)
         if (game.user.isGM && !isRightMB) {
           form.renderForm(JSON.stringify(this.toObject()));
-        } else {
+        } else if(isRightMB){
           dragElement(document.getElementById("calendar-time-container"))
           let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
           function dragElement(elmnt) {
             elmnt.onmousedown = dragMouseDown;
             function dragMouseDown(e) {
@@ -496,6 +497,7 @@ export class Calendar extends Application {
           
             function closeDragElement() {
               // stop moving when mouse button is released:
+              elmnt.onmousedown = null;
               document.onmouseup = null;
               document.onmousemove = null;
               console.log('calendar-weather | Setting calendar position to x: ' + (elmnt.offsetTop - pos2) + ' y: ' + (elmnt.offsetLeft - pos1))

@@ -297,7 +297,13 @@ export var _myCalendarSpec = {
         } else if (newSeason.humidity == "+") {
           newHumidity = 1
         }
-        let updateFlag = this.weather.season !== newSeason.name || this.weather.dawn !== newSeason.dawn || this.weather.dusk !== newSeason.dusk || this.weather.seasonColor !== newSeason.color || this.weather.seasonTemp !== newTemp || this.weather.seasonHumidity !== newHumidity
+        let updateFlag = this.weather.season !== newSeason.name || 
+        this.weather.dawn !== newSeason.dawn || 
+        this.weather.dusk !== newSeason.dusk || 
+        this.weather.seasonColor !== newSeason.color || 
+        this.weather.seasonTemp !== newTemp || 
+        this.weather.seasonHumidity !== newHumidity ||
+        this.weather.seasonRolltable !== newSeason.rolltable
         if (newSeason && updateFlag) {
           // season change
           this.weather.setSeason(newSeason)

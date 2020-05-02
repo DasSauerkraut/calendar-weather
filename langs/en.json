@@ -11,7 +11,7 @@
   "Advance1hour": "Advance 1 hour",
   "Advance7amNextDay": "Advance to 7am the next day",
   "AdvanceToMidnight": "Advance to midnight",
-  "SeasonIntro": "Enter the start date and weather modifiers for each season. The Color dropdown changes the color of the weather icon for a visual indication of the season",
+  "SeasonIntro": "Enter the start date and weather modifiers for each season. The Color dropdown changes the color of the weather icon for a visual indication of the season. Entering an @RollTable[] into the 'Table' will disable advanced weather generation and instead, weather will be generated via the table. Note this will disable FXMaster integration.",
   "SeasonName": "Enter the season's name:", 
   "HotterOrColder": "Is the season hotter or colder than average?",
   "DrierOrWetter": "Is the season drier or wetter than average?",
@@ -20,6 +20,7 @@
   "SeasonHourBright": "Enter the hour it gets bright",
   "SeasonHourDark": "Enter the hour it gets dark",
   "SeasonColor": "What color do you want to display with the season?",
+  "SeasonRolltable" : "OPTIONAL: Entering a @RollTable[] will disable advanced weather generation and instead, weather will be generated via the table.",
   "ColorRed": "Red",
   "ColorOrange": "Orange",
   "ColorYellow": "Yellow",
@@ -42,7 +43,6 @@
   "OneTimeEvents": "One Time Events",
   "OneTimeDescr": "Enter the date and description of one time events, for example an assassination.The event will be deleted after it is triggered.",
   "AllDayEvent": "All day event",
-  "DeleteREvent": "Delete reoccuring event.",
   "AddOneTimeEvent": "Add a new one time event",
   "SaveEvent": "Save Event Settings",
   "SwitchFC": "Switch between °F and °C",
@@ -110,7 +110,10 @@
   "Weather2ChatHelp": "If true, the weather will be output to chat, displayed only to GM level users.",  
   "Display24H": "Display time as 24hr?",
   "Display24HHelp": "If true, a 24 hour clock will be used for the time display.",
-  "NightCycleLabel": "Calendar/Weather - Night Cycle and Weather Effects",
-  "NightCycleLabelHelp": "When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day. If the FXMaster module is installed, it will also generate weather effects such as rain.",
+  "WeatherLabel": "Calendar/Weather - Scene Weather Effects",
+  "WeatherLabelHelp": "When checked, if the FXMaster module is installed, it will generate weather effects such as rain and clouds.",
+  "NightCycleLabel": "Calendar/Weather - Scene Night Cycle",
+  "NightCycleLabelHelp": "When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day.",
+
   "DefMonth": "Month 1"
 }

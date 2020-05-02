@@ -27,6 +27,7 @@ export class CalendarEvents extends FormApplication {
       let seasonColor = document.getElementsByClassName("calendar-season-color");
       let seasonDawn = document.getElementsByClassName("calendar-dawn")
       let seasonDusk = document.getElementsByClassName("calendar-dusk")
+      let seasonRolltable = document.getElementsByClassName("calendar-season-rolltable")
       let dawnAmpm = document.getElementsByClassName("calendar-dawn-ampm")
       let duskAmpm = document.getElementsByClassName("calendar-dusk-ampm")
       let event = {};
@@ -38,6 +39,8 @@ export class CalendarEvents extends FormApplication {
         } else {
           event['name'] = seasonName[i].value;
         }
+
+        event['rolltable'] = seasonRolltable[i].value;
   
         day = parseInt(seasonDay[i].selectedIndex) + 1
         event['date'] = {
@@ -466,12 +469,32 @@ export class CalendarEvents extends FormApplication {
       for (let i = 0; i < reText.length; i++) reText[i].ondrop = this.onDrop.bind(null, reText[i]);
       let evText = html.find(".calendar-event-content");
       for (let i = 0; i < evText.length; i++) evText[i].ondrop = this.onDrop.bind(null, evText[i]);
+      let rollText = html.find(".calendar-season-rolltable");
+      let rollTarget = html.find(".calendar-season-listitem");
+      for(let i = 0; i < rollText.length; i++) rollText[i].ondrop = this.onRollDrop.bind(null, rollText[i])
     }
   
     onDrop = (html, event) => {
-      const collections = {
+      let collections = {
         JournalEntry: JournalEntry,
-        Macro: Macro
+        Macro: Macro,
+      };
+      try {
+        let data = JSON.parse(event.dataTransfer.getData("text"));
+        if (collections[data.type]) {
+          event.preventDefault();
+          let name = collections[data.type].collection.get(data.id).data.name;
+          html.value = `@${data.type}[${data.id}]{${name}}`;
+        }
+      } catch (err) {
+        console.log(event.dataTransfer.getData("text"));
+        console.warn(err);
+      }
+    }
+
+    onRollDrop = (html, event) => {
+      let collections = {
+        RollTable: RollTable,
       };
       try {
         let data = JSON.parse(event.dataTransfer.getData("text"));

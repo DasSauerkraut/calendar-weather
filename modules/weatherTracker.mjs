@@ -7,6 +7,7 @@ export class WeatherTracker {
     seasonColor = "";
     seasonTemp = 0;
     seasonHumidity = 0;
+    seasonRolltable = "";
     climate = "temperate";
     climateTemp = 0;
     climateHumidity = 0;
@@ -175,7 +176,22 @@ export class WeatherTracker {
       let fxAvailable = false;
       let weather = "";
       let effects = [];
-      console.log('ShowFX: ' + this.showFX + ' FXMaster: ' + game.modules.get("fxmaster").active + ' Scene Flag: ' + canvas.scene.getFlag('calendar-weather', 'showFX'))
+
+      if(this.seasonRolltable !== undefined &&this.seasonRolltable !== ""){
+          if (this.seasonRolltable && this.seasonRolltable.startsWith("@")) {
+            let macroMatch = this.seasonRolltable.match(/\@RollTable\[(.*)\].*/);
+            if (macroMatch && macroMatch.length === 2) {
+              // match by id
+              let entity = game.tables.get(macroMatch[1])
+              // if no match search by name
+              if (!entity) entity = game.tables.entities.find(m => m.name === macroMatch[1]);
+              let tableRoll = entity.roll()
+              return `Roll: ${tableRoll[0]._result} <br> ${tableRoll[1].text}`
+            }
+        }
+        return "Error: RollTable not found!";
+      }
+
       if (game.modules.get("fxmaster").active) {
         if(this.showFX || canvas.scene.getFlag('calendar-weather', 'showFX')){
           fxAvailable = true;
@@ -710,6 +726,7 @@ export class WeatherTracker {
       } else {
         this.seasonHumidity = 0
       }
+      this.seasonRolltable = season.rolltable
       this.dawn = season.dawn
       this.dusk = season.dusk
       let icon = document.getElementById('calendar-weather');

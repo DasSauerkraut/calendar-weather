@@ -246,6 +246,8 @@
             <option value="blue" style="color:white; background-color: blue;">{{localize 'ColorBlue'}}</option>
             <option value="white" style="background-color: white;">{{localize 'ColorWhite'}}</option>
           </select>
+          <input class="calendar-season-rolltable" value="{{season.rolltable}}" type="text" placeholder="ex. @Rolltable[Weather]"
+            title="{{localize 'SeasonRolltable'}}" id="calendar-season-rolltable-{{@index}}">
         </div>
       </li>
       {{/each}}

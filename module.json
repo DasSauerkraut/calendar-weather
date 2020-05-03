@@ -38,6 +38,11 @@
       "lang": "kr",
       "name": "Korean",
       "path": "langs/kr.json"
-    }  
+    },
+    {
+      "lang": "de",
+      "name": "Deutsch",
+      "path": "langs/de.json"
+    }
   ]
 }

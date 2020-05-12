@@ -1,7 +1,7 @@
 # calendar-weather
 A customizable module that accurately tracks and displays dates and time.
 ## Links:
-* Manifest: https://raw.githubusercontent.com/DasSauerkraut/calendar-weather/master/package/module.json
+* Manifest: https://raw.githubusercontent.com/DasSauerkraut/calendar-weather/master/module.json
 * Direct Link: https://github.com/DasSauerkraut/calendar-weather/raw/master/package/calendar-weather-v2.5.2.zip
 
 This module **REQUIRES** [about-time](https://gitlab.com/tposney/about-time) v0.1.18 or greater installed and loaded to function correctly.

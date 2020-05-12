@@ -9,6 +9,7 @@ import { cwdtData } from "../init.mjs";
 
 export class Calendar extends Application {
     isOpen = false;
+    toggled = true;
     showToPlayers = true;
     eventsForm = new CalendarEvents();
     weatherForm = new WeatherForm();
@@ -37,6 +38,8 @@ export class Calendar extends Application {
             elmnt.style.bottom = null;
             elmnt.style.top = (pos.top) + "px";
             elmnt.style.left = (pos.left) + "px";
+            elmnt.style.position = 'fixed';
+            elmnt.style.zIndex = 100;
             resolve();
           } else {
             setTimeout(check, 30);
@@ -215,15 +218,15 @@ export class Calendar extends Application {
     }
 
     static resetPos(){
-      let pos = {bottom: 75, left: 223}
+      let pos = {bottom: 8, left: 15}
       return new Promise(resolve => {
         function check() {
           let elmnt = document.getElementById("calendar-time-container")
           if (elmnt) {
             console.log('calendar-weather | Resetting Calendar Position')
             elmnt.style.top = null;
-            elmnt.style.bottom = (pos.bottom) + "px";
-            elmnt.style.left = (pos.left) + "px";
+            elmnt.style.bottom = (pos.bottom) + "%";
+            elmnt.style.left = (pos.left) + "%";
             game.settings.set("calendar-weather", "calendarPos", {top: elmnt.offsetTop, left: elmnt.offsetLeft});
             resolve();
           } else {
@@ -232,6 +235,22 @@ export class Calendar extends Application {
         }
         check();
       })
+    }
+
+    static toggleCalendar(calendar){
+      console.log('calendar-weather | Toggling calendar display.')
+      let templatePath = "modules/calendar-weather/templates/calendar.html";
+      if (calendar.toggled) {
+        calendar.toggled = false;
+        calendar.close();
+      } else {
+        calendar.toggled = true;
+        renderTemplate(templatePath, cwdtData).then(html => {
+          calendar.render(true);
+        }).then(
+          calendar.setPos(game.settings.get('calendar-weather', 'calendarPos'))
+        );
+      }
     }
   
     updateDisplay() {
@@ -464,7 +483,6 @@ export class Calendar extends Application {
           isRightMB = ev.which == 3
         else if ("button" in ev)  // IE, Opera 
           isRightMB = ev.button == 2;
-        console.log("RB?: " + isRightMB)
         if (game.user.isGM && !isRightMB) {
           form.renderForm(JSON.stringify(this.toObject()));
         } else if(isRightMB){
@@ -478,6 +496,7 @@ export class Calendar extends Application {
               e.preventDefault();
               pos3 = e.clientX;
               pos4 = e.clientY;
+              
               document.onmouseup = closeDragElement;
               document.onmousemove = elementDrag;
             }
@@ -493,6 +512,8 @@ export class Calendar extends Application {
               // set the element's new position:
               elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
               elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+              elmnt.style.position = 'fixed';
+              elmnt.style.zIndex = 100;
             }
           
             function closeDragElement() {
@@ -500,8 +521,16 @@ export class Calendar extends Application {
               elmnt.onmousedown = null;
               document.onmouseup = null;
               document.onmousemove = null;
-              console.log('calendar-weather | Setting calendar position to x: ' + (elmnt.offsetTop - pos2) + ' y: ' + (elmnt.offsetLeft - pos1))
-              game.settings.set("calendar-weather", "calendarPos", {top: elmnt.offsetTop - pos2, left: elmnt.offsetLeft - pos1});
+              let xPos = (elmnt.offsetLeft - pos1) > window.innerWidth ? window.innerWidth : (elmnt.offsetLeft - pos1);
+              let yPos = (elmnt.offsetTop - pos2) > window.innerHeight-20 ? window.innerHeight-100 : (elmnt.offsetTop - pos2)
+              xPos = xPos < 0 ? 0 : xPos
+              yPos = yPos < 0 ? 0 : yPos
+              if(xPos != (elmnt.offsetLeft - pos1) || yPos != (elmnt.offsetTop - pos2)){
+                elmnt.style.top = (yPos) + "px";
+                elmnt.style.left = (xPos) + "px";
+              }
+              console.log(`calendar-weather | Setting calendar position to x: ${xPos}px, y: ${yPos}px`)
+              game.settings.set("calendar-weather", "calendarPos", {top: yPos, left: xPos});
             }
           }
         }

@@ -631,7 +631,6 @@ export class WeatherTracker {
         }
       }
       this.weatherFX = effects
-      console.log(fxAvailable);
       if (fxAvailable) {
         Hooks.call("updateWeather", effects);
       }

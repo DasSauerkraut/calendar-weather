@@ -22,6 +22,7 @@ $(document).ready(() => {
   Hooks.on('setup', () => {
     let operations = {
       resetPos: Calendar.resetPos,
+      toggleCalendar: Calendar.toggleCalendar,
     }
     game.CWCalendar = operations;
     window.CWCalendar = operations;
@@ -45,12 +46,12 @@ $(document).ready(() => {
   });
 
   Hooks.on('calendarSettingsOpen', () => {
-    console.log("calendar-settings | Opening Calendar form.")
+    console.log("calendar-weather | Opening Calendar form.")
     c.settingsOpen(true);
   });
 
   Hooks.on('calendarSettingsClose', (updatedData) => {
-    console.log("calendar-settings | Closing Calendar form.");
+    console.log("calendar-weather | Closing Calendar form.");
     c.rebuild(JSON.parse(updatedData));
     cwdtData.dt.genDateWordy();
     c.updateDisplay();
@@ -59,7 +60,7 @@ $(document).ready(() => {
   });
 
   Hooks.on('closeCalendarForm', () => {
-    console.log("calendar-settings | Closing Calendar form");
+    console.log("calendar-weather | Closing Calendar form");
     c.settingsOpen(false);
   });
 
@@ -177,9 +178,7 @@ $(document).ready(() => {
   });
 
   Hooks.on("canvasInit", async canvas => {
-    console.log('ShowFX: ' + canvas.scene.getFlag('calendar-weather', 'showFX'));
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
-    console.log('Set ShowFX: ' + cwdtData.dt.weather.showFX)
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'doNightCycle');
 
     if (Gametime.isMaster()) {
@@ -191,13 +190,27 @@ $(document).ready(() => {
     app.object.setFlag('calendar-weather', 'showFX', html.find("input[name ='calendarFXWeather']").is(":checked"))
     app.object.setFlag('calendar-weather', 'doNightCycle', html.find("input[name ='calendarFXNight']").is(":checked"))
 
-    console.log('ShowFX: ' + canvas.scene.getFlag('calendar-weather', 'showFX'));
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
-    console.log('Set ShowFX: ' + cwdtData.dt.weather.showFX)
 
     cwdtData.dt.weather.doNightCycle = canvas.scene.getFlag('calendar-weather', 'doNightCycle');
-
   });
+
+  Hooks.on("getSceneControlButtons", (controls) => {
+    console.log("\n\n\n\n")
+    console.log(controls)
+    if(game.user.isGM){
+      let notes = controls.find(control => control.name == 'notes')
+      notes.tools.splice( notes.tools.length-1, 0, {
+          name: "toggleCalendar",
+          title: "ToggleControl",
+          icon: "far fa-calendar-alt",
+          onClick: () => {
+            CWCalendar.toggleCalendar(c);
+          },
+          button: true,
+        });
+    }
+  })
 
   Hooks.on('ready', () => {
     c.loadSettings();
@@ -218,7 +231,7 @@ $(document).ready(() => {
       }
     })
     Hooks.on("about-time.clockRunningStatus", c.updateDisplay)
-    // CONFIG.debug.hooks = true;
+    CONFIG.debug.hooks = true;
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, cwdtData).then(html => {

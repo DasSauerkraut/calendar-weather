@@ -3,6 +3,7 @@
 	bottom: 75px;
 	left: 223px;
 	display: block;
+	height: fit-content;
 }
 #calendar{
 min-width: 150px;

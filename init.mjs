@@ -231,7 +231,7 @@ $(document).ready(() => {
       }
     })
     Hooks.on("about-time.clockRunningStatus", c.updateDisplay)
-    CONFIG.debug.hooks = true;
+    // CONFIG.debug.hooks = true;
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, cwdtData).then(html => {

@@ -179,7 +179,7 @@ $(document).ready(() => {
 
   Hooks.on("canvasInit", async canvas => {
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
-    cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'doNightCycle');
+    cwdtData.dt.weather.doNightCycle = canvas.scene.getFlag('calendar-weather', 'doNightCycle');
 
     if (Gametime.isMaster()) {
       cwdtData.dt.weather.loadFX();
@@ -196,8 +196,6 @@ $(document).ready(() => {
   });
 
   Hooks.on("getSceneControlButtons", (controls) => {
-    console.log("\n\n\n\n")
-    console.log(controls)
     if(game.user.isGM){
       let notes = controls.find(control => control.name == 'notes')
       notes.tools.splice( notes.tools.length-1, 0, {

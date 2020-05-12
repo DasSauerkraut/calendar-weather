@@ -698,15 +698,8 @@ export class WeatherTracker {
     }
   
     loadFX() {
-      if (game.modules.get("fxmaster").active && Gametime.isMaster()) {
-        canvas.scene.setFlag("fxmaster", "effects", null).then(_ => {
-          if (this.weatherFX && this.showFX) {
-            this.weatherFX.forEach((effect) => {
-              canvas.scene.setFlag("fxmaster", "effects", effect);
-            })
-          }
-        });
-      }
+      if (game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX && this.weatherFX)
+        Hooks.call("updateWeather", this.weatherFX);
     }
   
     setSeason(season) {

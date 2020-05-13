@@ -19,7 +19,8 @@ export var _myCalendarSpec = {
     _seasons = [];
     _reEvents = [];
     _events = [];
-    _months = [];;
+    _moons = [];
+    _months = [];
     _daysOfTheWeek = [];
     _lastDays = 0;
   }
@@ -66,6 +67,19 @@ export var _myCalendarSpec = {
     set lastDays(days) {
       DateTime.lastDays = days
     }
+
+    static get moons() {
+      return dateTimeStatics._moons ? dateTimeStatics._moons : []
+    };
+    static set moons(moons) {
+      dateTimeStatics._moons = moons || []
+    };
+    get moons() {
+      return DateTime.moons
+    };
+    set moons(moons) {
+      DateTime.moons = moons
+    };
   
     static get reEvents() {
       return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : []
@@ -274,6 +288,80 @@ export var _myCalendarSpec = {
       let index = season ? ((this.seasons.indexOf(season) - 1 + this.seasons.length) % this.seasons.length) : this.seasons.length - 1;
   
       return this.seasons[index];
+    }
+
+    checkMoons(moonSet = false){
+      if (!Gametime.isMaster()) return;
+
+      this.moons.forEach(moon => {
+        if(!moonSet){
+          let percentIncrease = 1/moon.cycleLength;
+          console.log(percentIncrease)
+          if(moon.isWaxing)
+            moon.cyclePercent += percentIncrease;
+          else
+            moon.cyclePercent -= percentIncrease;
+        }
+        let moonPhase = ''
+        let phasePrefix = ''
+        let moonSymbol = ''
+        //New Moon
+        if(moon.cyclePercent <= 0){
+          moonPhase = game.i18n.localize('MoonNew')
+          moonSymbol = '○'
+          moon.cyclePercent = 0;
+          moon.isWaxing = true;
+        }else if(moon.cyclePercent > 0 && moon.cyclePercent <= 33){
+          moonPhase = game.i18n.localize('MoonCrescent')
+          if(moon.isWaxing){
+            phasePrefix = game.i18n.localize('MoonIsWaxing')
+            moonSymbol = '☽'
+          }
+          else{
+            phasePrefix = game.i18n.localize('MoonWaning')
+            moonSymbol = '☾'
+          }
+        }else if(moon.cyclePercent > 33 && moon.cyclePercent <= 66){
+          moonPhase = game.i18n.localize('MoonQuarter')
+          if(moon.isWaxing){
+            phasePrefix = game.i18n.localize('MoonFirstQuarter')
+            moonSymbol = '◑'
+          }
+          else{
+            phasePrefix = game.i18n.localize('MoonThirdQuarter')
+            moonSymbol = '◐'
+          }
+        }else if(moon.cyclePercent > 66 && moon.cyclePercent < 100){
+          moonPhase = game.i18n.localize('MoonGibbous')
+          if(moon.isWaxing){
+            phasePrefix = game.i18n.localize('MoonIsWaxing')
+            moonSymbol = '⁍'
+          }
+          else{
+            phasePrefix = game.i18n.localize('MoonWaning')
+            moonSymbol = '⁌'
+          }
+        }else if(moon.cyclePercent >= 100){
+          moonPhase = game.i18n.localize('MoonFull')
+          moonSymbol = '●'
+          moon.cyclePercent = 100;
+          moon.isWaxing = false;
+        }
+
+        let percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.solarEclipseChance) / Math.log(10)))))
+        let solar = moon.solarEclipseChance * percentMod
+        let roll = Math.floor(Math.random() * Math.floor(100)) * percentMod;
+        if(roll < solar){
+          //solar eclipse
+        } else {
+          percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.lunarEclipseChance) / Math.log(10)))))
+          let lunar = moon.lunarEclipseChance * percentMod
+          roll = Math.floor(Math.random() * Math.floor(100)) * percentMod;
+          if(roll < lunar){
+            //lunar eclipse
+          }
+        }
+      })
     }
   
     checkEvents() {

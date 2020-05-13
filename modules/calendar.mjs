@@ -76,6 +76,7 @@ export class Calendar extends Application {
           cwdtData.dt.seasons = data.default.seasons;
           cwdtData.dt.reEvents = data.default.reEvents;
           cwdtData.dt.events = data.default.events;
+          cwdtData.dt.moons = data.default.moons;
           let timeout = game.settings.get("about-time", "election-timeout");
           setTimeout(function () {
             if (game.Gametime.isMaster()) {
@@ -125,6 +126,7 @@ export class Calendar extends Application {
         cwdtData.dt.seasons = data.seasons;
         cwdtData.dt.reEvents = data.reEvents;
         cwdtData.dt.events = data.events;
+        cwdtData.dt.moons = data.moons;
         cwdtData.dt.genDateWordy();
       }
     }
@@ -202,7 +204,9 @@ export class Calendar extends Application {
       cwdtData.dt.seasons = data.seasons
       cwdtData.dt.reEvents = data.reEvents
       cwdtData.dt.events = data.events
+      cwdtData.dt.moons = data.moons
       cwdtData.dt.checkEvents();
+      cwdtData.dt.checkMoons(true);
     }
   
     updateSettings() {
@@ -303,7 +307,8 @@ export class Calendar extends Application {
         weather: cwdtData.dt.weather,
         seasons: cwdtData.dt.seasons,
         reEvents: cwdtData.dt.reEvents,
-        events: cwdtData.dt.events
+        events: cwdtData.dt.events,
+        moons: cwdtData.dt.moons
       }
     }
 

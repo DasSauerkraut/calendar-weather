@@ -20,6 +20,52 @@ export class CalendarEvents extends FormApplication {
         events: [],
         moons: []
       };
+
+      let moonName = document.getElementsByClassName("calendar-moon-name")
+      let moonLength = document.getElementsByClassName("calendar-moon-length")
+      let moonPercent = document.getElementsByClassName("calendar-moon-percent")
+      let moonWaxing = document.getElementsByClassName("calendar-moon-waxing")
+      let moonLEclipse = document.getElementsByClassName("calendar-moon-leclipse")
+      let moonSEclipse = document.getElementsByClassName("calendar-moon-seclipse")
+      let moon = {}
+      for(let i = 0; i < moonName.length; i++){
+        if(moonName[i].value == "")
+          moon['name'] = 'Moon ' + i
+        else
+          moon['name'] = moonName[i].value
+
+        if(parseInt(moonLength[i].value) < 1 || moonLength[i].value == NaN)
+          moon['cycleLength'] = 1
+        else
+          moon['cycleLength'] = parseInt(moonLength[i].value)
+
+        if(parseFloat(moonPercent[i].value) < 0 || moonPercent[i].value == NaN)
+          moon['cyclePercent'] = 0
+        else if(parseFloat(moonPercent[i].value) > 100)
+          moon['cyclePercent'] = 100
+        else
+          moon['cyclePercent'] = parseFloat(moonPercent[i].value)
+
+        moon['isWaxing'] = moonWaxing[i].checked;
+
+        if(parseFloat(moonLEclipse[i].value) < 0 || moonLEclipse[i].value == NaN)
+          moon['lunarEclipseChance'] = 0
+        else if(parseFloat(moonLEclipse[i].value) > 100)
+          moon['lunarEclipseChance'] = 100
+        else
+          moon['lunarEclipseChance'] = parseFloat(moonLEclipse[i].value)
+
+          if(parseFloat(moonSEclipse[i].value) < 0 || moonSEclipse[i].value == NaN)
+          moon['solarEclipseChance'] = 0
+        else if(parseFloat(moonSEclipse[i].value) > 100)
+          moon['solarEclipseChance'] = 100
+        else
+          moon['solarEclipseChance'] = parseFloat(moonSEclipse[i].value)
+
+        console.log(moon)
+        savedData.moons.push(moon);
+        moon = {};
+      }
   
       let seasonName = document.getElementsByClassName("calendar-season-name");
       let seasonMonth = document.getElementsByClassName("calendar-season-month-value");
@@ -177,20 +223,16 @@ export class CalendarEvents extends FormApplication {
       return this.data;
     }
   
-    formLoaded(element) {
-      return new Promise(resolve => {
-        function check() {
-          if (document.getElementById(element)) {
-            resolve();
-          } else {
-            setTimeout(check, 30);
-          }
-        }
-        check();
-      })
-    }
-  
     async checkBoxes() {
+      let moonName = document.getElementsByClassName("calendar-moon-name")
+      let moonWaxing = document.getElementsByClassName("calendar-moon-waxing")
+      let moon = undefined
+      for(let i = 0; i < moonWaxing.length; i++){
+        moon = this.data.moons.find(moon => moon.name == moonName[i].value);
+        if(moon)
+          moonWaxing[i].checked = moon.isWaxing;
+      }
+
       let names = document.getElementsByClassName("calendar-season-name");
       let days = document.getElementsByClassName("calendar-season-day");
       let months = document.getElementsByClassName("calendar-season-month-value");
@@ -385,7 +427,7 @@ export class CalendarEvents extends FormApplication {
     activateListeners(html) {
       const submit = '#calendar-events-submit';
       const addMoon = '#calendar-events-add-moon'
-      const delMoon = '#calendar-events-moon-del'
+      const delMoon = 'button[class="calendar-moon-del"]'
       const addSeason = '#calendar-events-add-season';
       const delSeason = "button[class='calendar-season-del']";
       const addReEvent = "#calendar-events-add-reEvent";
@@ -402,10 +444,11 @@ export class CalendarEvents extends FormApplication {
         ev.preventDefault();
         this.saveData();
         this.data.moons.push({
+          cycleLength: 30,
+          cyclePercent: 0,
           lunarEclipseChance: 0.02,
           solarEclipseChance: 0.0005
         })
-        console.log(this.data.moons)
         this.render(true);
       })
       html.find(addSeason).click(ev => {
@@ -530,14 +573,6 @@ export class CalendarEvents extends FormApplication {
   
     renderForm(newData) {
       this.data = Object.assign(this.data, JSON.parse(newData));
-      this.data.moons.push({
-        name: "Luna",
-        cycleLength: 30,
-        cyclePercent: 25,
-        isWaxing: true,
-        lunarEclipseChance: 0.02,
-        solarEclipseChance: 0.0005
-      })
       let templatePath = "modules/calendar-weather/templates/calendar-events.html";
       renderTemplate(templatePath, this.data).then(html => {
         this.render(true)

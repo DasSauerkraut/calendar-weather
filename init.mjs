@@ -218,6 +218,7 @@ $(document).ready(() => {
         cwdtData.dt.genDateWordy();
         if (Gametime.isMaster() && cwdtData.dt.lastDays) {
           cwdtData.dt.checkEvents();
+          cwdtData.dt.checkMoons();
           cwdtData.dt.weather.generate();
         }
       }

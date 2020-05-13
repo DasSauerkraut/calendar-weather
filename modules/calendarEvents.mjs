@@ -2,7 +2,8 @@ export class CalendarEvents extends FormApplication {
     data = {
       seasons: [],
       reEvents: [],
-      events: []
+      events: [],
+      moons: []
     };
     static get defaultOptions() {
       const options = super.defaultOptions;
@@ -17,6 +18,7 @@ export class CalendarEvents extends FormApplication {
         seasons: [],
         reEvents: [],
         events: [],
+        moons: []
       };
   
       let seasonName = document.getElementsByClassName("calendar-season-name");
@@ -382,6 +384,8 @@ export class CalendarEvents extends FormApplication {
   
     activateListeners(html) {
       const submit = '#calendar-events-submit';
+      const addMoon = '#calendar-events-add-moon'
+      const delMoon = '#calendar-events-moon-del'
       const addSeason = '#calendar-events-add-season';
       const delSeason = "button[class='calendar-season-del']";
       const addReEvent = "#calendar-events-add-reEvent";
@@ -392,10 +396,18 @@ export class CalendarEvents extends FormApplication {
       html.find(submit).click(ev => {
         ev.preventDefault();
         Hooks.callAll("calendarEventsClose", this.saveData());
-        // this.saveData();
         this.close();
-        // Hooks.callAll("calendarSettingsClose", this.saveData());
       });
+      html.find(addMoon).click(ev => {
+        ev.preventDefault();
+        this.saveData();
+        this.data.moons.push({
+          lunarEclipseChance: 0.02,
+          solarEclipseChance: 0.0005
+        })
+        console.log(this.data.moons)
+        this.render(true);
+      })
       html.find(addSeason).click(ev => {
         ev.preventDefault();
         this.saveData();
@@ -440,6 +452,14 @@ export class CalendarEvents extends FormApplication {
         });
         this.render(true);
       });
+      html.find(delMoon).click(ev => {
+        ev.preventDefault();
+        this.saveData();
+        const targetName = ev.currentTarget.name.split("-");
+        const index = targetName[targetName.length - 1];
+        this.data.moons.splice(index, 1);
+        this.render(true);
+      })
       html.find(delSeason).click(ev => {
         ev.preventDefault();
         this.saveData();
@@ -470,7 +490,6 @@ export class CalendarEvents extends FormApplication {
       let evText = html.find(".calendar-event-content");
       for (let i = 0; i < evText.length; i++) evText[i].ondrop = this.onDrop.bind(null, evText[i]);
       let rollText = html.find(".calendar-season-rolltable");
-      let rollTarget = html.find(".calendar-season-listitem");
       for(let i = 0; i < rollText.length; i++) rollText[i].ondrop = this.onRollDrop.bind(null, rollText[i])
     }
   
@@ -511,6 +530,14 @@ export class CalendarEvents extends FormApplication {
   
     renderForm(newData) {
       this.data = Object.assign(this.data, JSON.parse(newData));
+      this.data.moons.push({
+        name: "Luna",
+        cycleLength: 30,
+        cyclePercent: 25,
+        isWaxing: true,
+        lunarEclipseChance: 0.02,
+        solarEclipseChance: 0.0005
+      })
       let templatePath = "modules/calendar-weather/templates/calendar-events.html";
       renderTemplate(templatePath, this.data).then(html => {
         this.render(true)

@@ -165,9 +165,90 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
+
+  .calendar-moon-top {
+    width: 100%;
+    display: inline-flex;
+    height: fit-content;
+    align-items: center;
+  }
+
+  .calendar-moon-bottom {
+    display: inline-flex;
+  }
+
+  .calendar-moon-name-container {
+    width: 33%;
+  }
+
+  .calendar-moon-name {
+    width: 10px;
+  }
+
+  .calendar-moon-length {
+    width: 40px;
+    margin-right: 10px;
+  }
+
+  .calendar-moon-percent {
+    width: 40px;
+    margin-right: 10px;
+  }
+
+  .calendar-moon-leclipse {
+    width: 60px;
+    margin-right: 10px;
+  }
+  .calendar-moon-seclipse {
+    width: 60px;
+    margin-right: 10px;
+  }
+  .calendar-moon-del {
+    width: 40px;
+    margin-left: auto;
+  }
 </style>
 <form id="calendar-events-form" autocomplete="off" onsubmit="event.preventDefault();" class="calendar-events-container">
   <h1>{{localize 'Events'}}</h1>
+  <h2>{{localize 'Moon'}}</h2>
+  <div>
+    <p>{{localize 'MoonIntro'}}</p>
+    <ol>
+      {{#each moons as |moon|}}
+      <li class="calendar-season-listitem">
+        <div class="calendar-moon-top">
+          <span class="calendar-moon-name-container">
+            <input class="calendar-moon-name" value="{{moon.name}}" type="text" placeholder="{{localize 'MoonName'}}"
+            title="{{localize 'MoonNameDesc'}}" id="calendar-moon-{{@index}}">
+          </span>
+          <span class="calendar-moon-length-text">{{localize 'MoonLength'}}</span>
+          <input class="calendar-moon-length" value="{{moon.cycleLength}}" type="number" placeholder="{{localize 'MoonLengthPH'}}"
+          title="{{localize 'MoonLengthDesc'}}" id="calendar-moon-length-{{@index}}">
+          <span class="calendar-moon-percent-text">{{localize 'MoonPercent'}}</span>
+          <input class="calendar-moon-percent" value="{{moon.cyclePercent}}" type="number" placeholder="{{localize 'MoonPercentPH'}}"
+          title="{{localize 'MoonPercentDesc'}}" id="calendar-moon-percent-{{@index}}"> 
+          <span class="calendar-moon-waxing-text">{{localize 'MoonWaxing'}}</span>
+          <input class="calendar-moon-waxing" type="checkbox" id="calendar-moon-waxing-{{@index}}">
+          <button class="calendar-moon-del" id="calendar-moon-del-{{@index}}" name="del-moon-{{@index}}"
+            title="Delete Moon">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+        <div class="calendar-moon-bottom">
+          <span class="calendar-leclipse-text">{{localize 'MoonLEclipse'}}</span>
+          <input class="calendar-moon-leclipse" value="{{moon.lunarEclipseChance}}" type="number" placeholder="{{localize 'MoonLEclipsePH'}}"
+          title="{{localize 'MoonLEclipseDesc'}}" id="calendar-moon-leclipse-{{@index}}"> 
+          <span class="calendar-seclipse-text">{{localize 'MoonSEclipse'}}</span>
+          <input class="calendar-moon-seclipse" value="{{moon.solarEclipseChance}}" type="number" placeholder="{{localize 'MoonSEclipsePH'}}"
+          title="{{localize 'MoonSEclipseDesc'}}" id="calendar-moon-seclipse-{{@index}}"> 
+        </div>
+      </li>
+      {{/each}}
+    </ol>
+    <button id="calendar-events-add-moon" name="add-moon" title="{{localize 'MoonAdd'}}">
+      <i class="fas fa-plus"></i> {{localize 'MoonAdd'}}
+    </button>
+  </div>
   <h2>{{localize 'Seasons'}}</h2>
   <div>
     <p>{{localize 'SeasonIntro'}}</p>

@@ -49,6 +49,8 @@
   "MoonWaning" : "Waning",
   "MoonFirstQuarter" : "First",
   "MoonThirdQuarter" : "Third",
+  "Moon2Chat": "Output Moon Changes to Chat?",
+  "Moon2ChatHelp": "If true, any moon phase changes will be output to chat, displayed only to GM level users.",
   "ColorRed": "Red",
   "ColorOrange": "Orange",
   "ColorYellow": "Yellow",

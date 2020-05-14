@@ -206,6 +206,13 @@ export class Calendar extends Application {
       cwdtData.dt.events = data.events
       cwdtData.dt.moons = data.moons
       cwdtData.dt.checkEvents();
+      cwdtData.dt.moons.forEach((moon, index) => {
+        if(!document.getElementById(`calender-moon-symbol-${index}`)){
+          document.getElementsByClassName('calendar-weekday-cntr')[0].innerHTML += `
+            <img src="./modules/calendar-weather/icons/new.png" id='calender-moon-symbol-${index}'>
+          `
+        }
+      });
       cwdtData.dt.checkMoons(true);
     }
   

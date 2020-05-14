@@ -293,59 +293,74 @@ export var _myCalendarSpec = {
     checkMoons(moonSet = false){
       if (!Gametime.isMaster()) return;
 
-      this.moons.forEach(moon => {
-        if(!moonSet){
-          let percentIncrease = 1/moon.cycleLength;
-          console.log(percentIncrease)
-          if(moon.isWaxing)
-            moon.cyclePercent += percentIncrease;
-          else
-            moon.cyclePercent -= percentIncrease;
-        }
+      this.moons.forEach((moon, index) => {
+        console.log(moon)
+        let percentIncrease = 1/moon.cycleLength * 100;
+        if(moon.isWaxing)
+          moon.cyclePercent += percentIncrease;
+        else
+          moon.cyclePercent -= percentIncrease;
+        console.log(moon.cyclePercent)
         let moonPhase = ''
         let phasePrefix = ''
         let moonSymbol = ''
         //New Moon
         if(moon.cyclePercent <= 0){
           moonPhase = game.i18n.localize('MoonNew')
-          moonSymbol = '○'
+          moonSymbol = './modules/calendar-weather/icons/new.png'
           moon.cyclePercent = 0;
           moon.isWaxing = true;
         }else if(moon.cyclePercent > 0 && moon.cyclePercent <= 33){
           moonPhase = game.i18n.localize('MoonCrescent')
           if(moon.isWaxing){
             phasePrefix = game.i18n.localize('MoonIsWaxing')
-            moonSymbol = '☽'
+            moonSymbol = './modules/calendar-weather/icons/waxingCrescent.png'
           }
           else{
             phasePrefix = game.i18n.localize('MoonWaning')
-            moonSymbol = '☾'
+            moonSymbol = './modules/calendar-weather/icons/waningCrescent.png'
           }
         }else if(moon.cyclePercent > 33 && moon.cyclePercent <= 66){
           moonPhase = game.i18n.localize('MoonQuarter')
           if(moon.isWaxing){
             phasePrefix = game.i18n.localize('MoonFirstQuarter')
-            moonSymbol = '◑'
+            moonSymbol = './modules/calendar-weather/icons/firstQuarter.png'
           }
           else{
             phasePrefix = game.i18n.localize('MoonThirdQuarter')
-            moonSymbol = '◐'
+            moonSymbol = './modules/calendar-weather/icons/lastQuarter.png'
           }
         }else if(moon.cyclePercent > 66 && moon.cyclePercent < 100){
           moonPhase = game.i18n.localize('MoonGibbous')
           if(moon.isWaxing){
             phasePrefix = game.i18n.localize('MoonIsWaxing')
-            moonSymbol = '⁍'
+            moonSymbol = './modules/calendar-weather/icons/waxingGibbous.png'
           }
           else{
             phasePrefix = game.i18n.localize('MoonWaning')
-            moonSymbol = '⁌'
+            moonSymbol = './modules/calendar-weather/icons/waningGibbous.png'
           }
         }else if(moon.cyclePercent >= 100){
           moonPhase = game.i18n.localize('MoonFull')
-          moonSymbol = '●'
+          moonSymbol = './modules/calendar-weather/icons/full.png'
           moon.cyclePercent = 100;
           moon.isWaxing = false;
+        }
+
+        if(document.getElementById(`calender-moon-symbol-${index}`).src != moonSymbol){
+          document.getElementById(`calender-moon-symbol-${index}`).src = moonSymbol;
+          document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${phasePrefix} ${moonPhase}`
+          if(game.settings.get('calendar-weather', 'moonDisplay')){
+            let messageLvl = ChatMessage.getWhisperIDs("GM")
+            let chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${phasePrefix} ${moonPhase}`
+            ChatMessage.create({
+              speaker: {
+              alias: moon.name,
+            },
+            whisper: messageLvl,
+            content: chatOut,
+            });
+          }
         }
 
         let percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.solarEclipseChance) / Math.log(10)))))

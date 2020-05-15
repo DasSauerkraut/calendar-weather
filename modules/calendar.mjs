@@ -206,13 +206,6 @@ export class Calendar extends Application {
       cwdtData.dt.events = data.events
       cwdtData.dt.moons = data.moons
       cwdtData.dt.checkEvents();
-      cwdtData.dt.moons.forEach((moon, index) => {
-        if(!document.getElementById(`calender-moon-symbol-${index}`)){
-          document.getElementsByClassName('calendar-weekday-cntr')[0].innerHTML += `
-            <img src="./modules/calendar-weather/icons/new.png" id='calender-moon-symbol-${index}'>
-          `
-        }
-      });
       cwdtData.dt.checkMoons(true);
     }
   
@@ -269,6 +262,8 @@ export class Calendar extends Application {
       if (Gametime.DTNow().toDays().days * 24 * 60 * 60 + Gametime.DTNow().seconds == 0) {
         document.getElementById("calendar-date").innerHTML = "Calendar Loading...";
       } else {
+        if(document.getElementById("calendar-date").innerHTML == "Calendar Loading...")
+          cwdtData.dt.checkMoons(true)
         document.getElementById("calendar-date").innerHTML = cwdtData.dt.dateWordy;
       }
       document.getElementById("calendar-date-num").innerHTML = cwdtData.dt.dateNum;
@@ -279,7 +274,7 @@ export class Calendar extends Application {
       if (temp && this) {
         if (cwdtData.dt.weather.isC) {
           temp.innerHTML = cwdtData.dt.getWeatherObj().cTemp;
-        } else {
+        } else {  
           temp.innerHTML = cwdtData.dt.getWeatherObj().temp;
         }
         document.getElementById("calendar-weather-precip").innerHTML = cwdtData.dt.getWeatherObj().precipitation

@@ -35,9 +35,9 @@
       "path": "langs/fr.json"
     },
     {
-      "lang": "kr",
+      "lang": "ko",
       "name": "Korean",
-      "path": "langs/kr.json"
+      "path": "langs/ko.json"
     },
     {
       "lang": "de",

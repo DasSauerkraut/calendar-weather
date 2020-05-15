@@ -295,12 +295,14 @@ export var _myCalendarSpec = {
 
       this.moons.forEach((moon, index) => {
         console.log(moon)
-        let percentIncrease = 1/moon.cycleLength * 100;
-        if(moon.isWaxing)
-          moon.cyclePercent += percentIncrease;
-        else
-          moon.cyclePercent -= percentIncrease;
-        console.log(moon.cyclePercent)
+        if(!moonSet){
+          let percentIncrease = 1/moon.cycleLength * 100;
+          if(moon.isWaxing)
+            moon.cyclePercent += percentIncrease;
+          else
+            moon.cyclePercent -= percentIncrease;
+          console.log(moon.cyclePercent)
+        }
         let moonPhase = ''
         let phasePrefix = ''
         let moonSymbol = ''
@@ -347,6 +349,12 @@ export var _myCalendarSpec = {
           moon.isWaxing = false;
         }
 
+        if(!document.getElementById(`calender-moon-symbol-${index}`)){
+          document.getElementsByClassName('calendar-weekday-cntr')[0].innerHTML += `
+            <img src="./modules/calendar-weather/icons/new.png" id='calender-moon-symbol-${index}'>
+          `
+        }
+
         if(document.getElementById(`calender-moon-symbol-${index}`).src != moonSymbol){
           document.getElementById(`calender-moon-symbol-${index}`).src = moonSymbol;
           document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${phasePrefix} ${moonPhase}`
@@ -373,7 +381,24 @@ export var _myCalendarSpec = {
           let lunar = moon.lunarEclipseChance * percentMod
           roll = Math.floor(Math.random() * Math.floor(100)) * percentMod;
           if(roll < lunar){
-            //lunar eclipse
+            let chatOut = ``
+            if(moonPhase == game.i18n.localize('MoonFull')){
+              chatOut = `<img src="${'./modules/calendar-weather/icons/totalLEclipse.png'}"> ${moon.name} | ${game.i18n.localize('MoonTotalLEclipse')}`
+              document.getElementById(`calender-moon-symbol-${index}`).src = './modules/calendar-weather/icons/totalLEclipse.png';
+              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('MoonTotalLEclipse')}`
+            }
+            else{
+              chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${game.i18n.localize('MoonPartialLEclipse')}`
+              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('MoonPartialLEclipse')}`
+            }
+            let messageLvl = ChatMessage.getWhisperIDs("GM")
+            ChatMessage.create({
+              speaker: {
+              alias: moon.name,
+            },
+            whisper: messageLvl,
+            content: chatOut,
+            });
           }
         }
       })

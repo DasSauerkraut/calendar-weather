@@ -51,6 +51,8 @@
   "MoonThirdQuarter" : "Third",
   "Moon2Chat": "Output Moon Changes to Chat?",
   "Moon2ChatHelp": "If true, any moon phase changes will be output to chat, displayed only to GM level users.",
+  "MoonTotalLEclipse" : "Total Lunar Eclipse",
+  "MoonPartialLEclipse" : "Partial Lunar Eclipse",
   "ColorRed": "Red",
   "ColorOrange": "Orange",
   "ColorYellow": "Yellow",

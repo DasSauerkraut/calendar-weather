@@ -45,4 +45,12 @@ export const registerSettings = function(calendar) {
     default: false,
     type: Boolean,
   });
+  game.settings.register('calendar-weather', 'noGlobal', {
+    name: game.i18n.localize("NoGlobal"),
+    hint: game.i18n.localize("NoGlobalHelp"),
+    scope: 'world',
+    config: true,
+    default: true,
+    type: Boolean,
+  });
 }

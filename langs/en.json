@@ -146,6 +146,7 @@
   "WeatherLabelHelp": "When checked, if the FXMaster module is installed, it will generate weather effects such as rain and clouds.",
   "NightCycleLabel": "Calendar/Weather - Scene Night Cycle",
   "NightCycleLabelHelp": "When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day.",
-
+  "NoGlobal": "Calendar/Weather - Disable Global Illumination at Night.",
+  "NoGlobalHelp": "When checked, once the scene reaches max darkness, it will disable the scenes' Global Illumination",
   "DefMonth": "Month 1"
 }

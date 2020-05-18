@@ -2,13 +2,13 @@
   "name": "calendar-weather",
   "title": "Calendar/Weather",
   "description": "Adds a customizable calendar with events and weather.",
-  "version": "2.5.2",
+  "version": "2.6.0",
   "minimumCoreVersion": "0.5.1",
-  "compatibleCoreVersion": "0.5.5",
+  "compatibleCoreVersion": "0.5.7",
   "author": "Michael Sebelski [DasSauerkraut#3215], about-time by tposney#1462",
   "url": "https://github.com/DasSauerkraut/calendar-weather",
   "manifest": "https://raw.githubusercontent.com/DasSauerkraut/calendar-weather/master/package/module.json",
-  "download": "https://github.com/DasSauerkraut/calendar-weather/raw/master/package/calendar-weather-v2.5.2.zip",
+  "download": "https://github.com/DasSauerkraut/calendar-weather/raw/master/package/calendar-weather-v2.6.0.zip",
   "esmodules": [
     "init.mjs",
     "modules/registerSettings.mjs",
@@ -35,14 +35,19 @@
       "path": "langs/fr.json"
     },
     {
-      "lang": "kr",
+      "lang": "ko",
       "name": "Korean",
-      "path": "langs/kr.json"
+      "path": "langs/ko.json"
     },
     {
       "lang": "de",
       "name": "Deutsch",
       "path": "langs/de.json"
+    },
+    {
+      "lang": "ja",
+      "name": "日本語",
+      "path": "langs/ja.json"
     }
   ]
 }

@@ -40,6 +40,7 @@
   "MoonSEclipsePH" : "ex. 0.0002 ",
   "MoonSEclipseDesc" : "Enter the chance of a Solar Eclipse on a given day.",
   "MoonSEclipseEvent": "Solar Eclipse",
+  "MoonSEclipseEventIncoming": "A Solar Eclipse will occur today.",
   "MoonSEclipseEventEnd": "The Solar Eclipse has ended.",
   "MoonAdd" : "Add a Moon",
   "MoonNew" : "New",

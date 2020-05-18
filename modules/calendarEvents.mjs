@@ -62,7 +62,6 @@ export class CalendarEvents extends FormApplication {
         else
           moon['solarEclipseChance'] = parseFloat(moonSEclipse[i].value)
 
-        console.log(moon)
         savedData.moons.push(moon);
         moon = {};
       }

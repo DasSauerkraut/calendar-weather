@@ -789,14 +789,21 @@ export class WeatherTracker {
             darkness: newDarkness
           })
         }
-        if (dt.hours >= dawn + 1 && dt.hours < dusk && canvas.scene.data.darkness > 0) {
+
+        let eclipse = false;
+        cwdtData.dt.moons.forEach((moon, index) => {
+          if(document.getElementById(`calender-moon-symbol-${index}`).src.includes('Eclipse'))
+            eclipse = true;
+        })
+
+        if (dt.hours >= dawn + 1 && dt.hours < dusk && canvas.scene.data.darkness > 0 && !eclipse) {
           console.log("calendar-weather | It is now day.")
           if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX){
             Hooks.call("switchFilter", {
               name: "bloodMoon",
               type: "color",
               options: { red: 0, green: 0, blue: 0 },
-            })            
+            })
           }
           canvas.scene.update({
             darkness: 0

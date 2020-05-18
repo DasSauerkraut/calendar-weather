@@ -376,7 +376,14 @@ export var _myCalendarSpec = {
         let solar = moon.solarEclipseChance * percentMod
         let roll = Math.floor(Math.random() * Math.floor(100)) * percentMod;
         if(roll < solar){
-          console.log('solar eclipse')
+          let chatOut = `<img src="${'./modules/calendar-weather/icons/sEclipse.png'}"> ${moon.name} | ${game.i18n.localize('MoonSEclipseEventIncoming')}`
+          ChatMessage.create({
+            speaker: {
+            alias: moon.name,
+          },
+          whisper: ChatMessage.getWhisperIDs("GM"),
+          content: chatOut,
+          });
           let solarEclipse = (moon, index, moonSymbol, moonPhase, phasePrefix) => {
             let chatOut = ``
             if(document.getElementById(`calender-moon-symbol-${index}`).src.includes('Eclipse')){
@@ -392,7 +399,7 @@ export var _myCalendarSpec = {
               document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('MoonSEclipseEvent')}`
               console.log('doNightCycle ' + cwdtData.dt.weather.doNightCycle)
               if (this.weather.doNightCycle && Gametime.isMaster()) {
-                canvas.scene.update({darkness: 0.75}, { animateDarkness: true})
+                canvas.scene.update({darkness: 1}, { animateDarkness: true})
               }
               game.Gametime.doIn({minutes:30}, solarEclipse, moon, index, moonSymbol, moonPhase, phasePrefix)
             }

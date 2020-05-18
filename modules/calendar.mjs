@@ -51,8 +51,9 @@ export class Calendar extends Application {
   
     loadSettings() {
       let data = game.settings.get('calendar-weather', 'dateTime');
-      if(game.settings.get('calendar-weather', 'calendarPos')){
-        let pos = game.settings.get('calendar-weather', 'calendarPos');
+
+      if(game.user.data.flags.calendarWeather){
+        let pos = game.user.data.flags.calendarWeather.calendarPos;
         this.setPos(pos)
       }
       this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
@@ -231,7 +232,7 @@ export class Calendar extends Application {
             elmnt.style.top = null;
             elmnt.style.bottom = (pos.bottom) + "%";
             elmnt.style.left = (pos.left) + "%";
-            game.settings.set("calendar-weather", "calendarPos", {top: elmnt.offsetTop, left: elmnt.offsetLeft});
+            game.user.update({flags: {'calendar-weather':{ 'calendarPos': {top: elmnt.offsetTop, left: elmnt.offsetLeft}}}})
             resolve();
           } else {
             setTimeout(check, 30);
@@ -252,7 +253,7 @@ export class Calendar extends Application {
         renderTemplate(templatePath, cwdtData).then(html => {
           calendar.render(true);
         }).then(
-          calendar.setPos(game.settings.get('calendar-weather', 'calendarPos'))
+          calendar.setPos(game.user.data.flags.calendarWeather.calendarPos)
         );
       }
     }
@@ -537,8 +538,7 @@ export class Calendar extends Application {
                 elmnt.style.left = (xPos) + "px";
               }
               console.log(`calendar-weather | Setting calendar position to x: ${xPos}px, y: ${yPos}px`)
-              game.settings.set("calendar-weather", "calendarPos", {top: yPos, left: xPos});
-              game.user.update()
+              game.user.update({flags: {'calendarWeather':{ 'calendarPos': {top: yPos, left: xPos}}}})
             }
           }
         }

@@ -1,5 +1,6 @@
 import { WeatherTracker } from "./weatherTracker.mjs";
 import { Month } from "./month.mjs";
+import { cwdtData } from "../init.mjs";
 
 export var _myCalendarSpec = {
     "leap_year_rule": (year) => 0,
@@ -291,6 +292,7 @@ export var _myCalendarSpec = {
     }
 
     checkMoons(moonSet = false){
+      console.log('Checking moons!')
       if (!Gametime.isMaster()) return;
 
       this.moons.forEach((moon, index) => {
@@ -301,7 +303,6 @@ export var _myCalendarSpec = {
             moon.cyclePercent += percentIncrease;
           else
             moon.cyclePercent -= percentIncrease;
-          console.log(moon.cyclePercent)
         }
         let moonPhase = ''
         let phasePrefix = ''
@@ -375,7 +376,37 @@ export var _myCalendarSpec = {
         let solar = moon.solarEclipseChance * percentMod
         let roll = Math.floor(Math.random() * Math.floor(100)) * percentMod;
         if(roll < solar){
-          //solar eclipse
+          console.log('solar eclipse')
+          let solarEclipse = (moon, index, moonSymbol, moonPhase, phasePrefix) => {
+            let chatOut = ``
+            if(document.getElementById(`calender-moon-symbol-${index}`).src.includes('Eclipse')){
+              chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${game.i18n.localize('MoonSEclipseEventEnd')}`
+              document.getElementById(`calender-moon-symbol-${index}`).src = moonSymbol;
+              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${phasePrefix} ${moonPhase}`
+              if (this.weather.doNightCycle && Gametime.isMaster()) {
+                canvas.scene.update({darkness: 0}, { animateDarkness: true})
+              }
+            } else {
+              chatOut = `<img src="${'./modules/calendar-weather/icons/sEclipse.png'}"> ${moon.name} | ${game.i18n.localize('MoonSEclipseEvent')}`
+              document.getElementById(`calender-moon-symbol-${index}`).src = './modules/calendar-weather/icons/sEclipse.png';
+              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('MoonSEclipseEvent')}`
+              console.log('doNightCycle ' + cwdtData.dt.weather.doNightCycle)
+              if (this.weather.doNightCycle && Gametime.isMaster()) {
+                canvas.scene.update({darkness: 0.75}, { animateDarkness: true})
+              }
+              game.Gametime.doIn({minutes:30}, solarEclipse, moon, index, moonSymbol, moonPhase, phasePrefix)
+            }
+            
+            ChatMessage.create({
+              speaker: {
+              alias: moon.name,
+            },
+            whisper: ChatMessage.getWhisperIDs("GM"),
+            content: chatOut,
+            });
+
+          }
+          game.Gametime.doAt(game.Gametime.DTNow().setAbsolute({hours: 11, minutes: 45}), solarEclipse, moon, index, moonSymbol, moonPhase, phasePrefix)
         } else {
           percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.lunarEclipseChance) / Math.log(10)))))
           let lunar = moon.lunarEclipseChance * percentMod

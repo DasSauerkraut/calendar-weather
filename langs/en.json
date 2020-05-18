@@ -39,6 +39,8 @@
   "MoonSEclipse" : "Solar Eclipse Chance(%): ",
   "MoonSEclipsePH" : "ex. 0.0002 ",
   "MoonSEclipseDesc" : "Enter the chance of a Solar Eclipse on a given day.",
+  "MoonSEclipseEvent": "Solar Eclipse",
+  "MoonSEclipseEventEnd": "The Solar Eclipse has ended.",
   "MoonAdd" : "Add a Moon",
   "MoonNew" : "New",
   "MoonCrescent" : "Crescent",

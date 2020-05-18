@@ -767,7 +767,7 @@ export class WeatherTracker {
         let bloodMoon = false;
         cwdtData.dt.moons.forEach((moon, index) => {
           if(moon.cyclePercent > 90)
-            fullMoonMod = 0.25
+            fullMoonMod = 0.15
           if(document.getElementById(`calender-moon-symbol-${index}`).src.includes('totalLEclipse.png'))
             bloodMoon = true;
         });
@@ -791,6 +791,13 @@ export class WeatherTracker {
         }
         if (dt.hours >= dawn + 1 && dt.hours < dusk && canvas.scene.data.darkness > 0) {
           console.log("calendar-weather | It is now day.")
+          if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX){
+            Hooks.call("switchFilter", {
+              name: "bloodMoon",
+              type: "color",
+              options: { red: 0, green: 0, blue: 0 },
+            })            
+          }
           canvas.scene.update({
             darkness: 0
           }, {
@@ -801,21 +808,24 @@ export class WeatherTracker {
             canvas.draw();
           }
         }
-        console.log("Blood Moon: " + bloodMoon)
-        console.log(canvas.scene.getFlag("core", "darknessColor"))
         if (dt.hours == dusk) {
-          // console.log("calendar-weather | Starting dusk cycle.")
           newDarkness = (dt.minutes * 60 + dt.seconds) * 0.0002778;
-          if(bloodMoon && canvas.scene.getFlag("core", "darknessColor") == CONFIG.Canvas.darknessColor)
-            canvas.scene.setFlag("core", "darknessColor", colorStringToHex("#300000"))
-          else if(canvas.scene.getFlag("core", "darknessColor") != CONFIG.Canvas.darknessColor)
-            canvas.scene.setFlag("core", "darknessColor", CONFIG.Canvas.darknessColor)
+          
+          if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX && bloodMoon){
+            Hooks.call("switchFilter", {
+              name: "bloodMoon",
+              type: "color",
+              options: { red: 1, green: 0, blue: 0.2 },
+            })            
+          }
+
           canvas.scene.update({
             darkness: (newDarkness - fullMoonMod)
           })
         }
         if ((dt.hours >= dusk + 1 || dt.hours < dawn) && canvas.scene.data.darkness < 1) {
           console.log("calendar-weather | It is now night.")
+
           canvas.scene.update({
             darkness: (1 - fullMoonMod)
           }, {

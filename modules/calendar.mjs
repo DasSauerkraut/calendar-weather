@@ -538,6 +538,7 @@ export class Calendar extends Application {
               }
               console.log(`calendar-weather | Setting calendar position to x: ${xPos}px, y: ${yPos}px`)
               game.settings.set("calendar-weather", "calendarPos", {top: yPos, left: xPos});
+              game.user.update()
             }
           }
         }

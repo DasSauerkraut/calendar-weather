@@ -292,11 +292,9 @@ export var _myCalendarSpec = {
     }
 
     checkMoons(moonSet = false){
-      console.log('Checking moons!')
       if (!Gametime.isMaster()) return;
 
       this.moons.forEach((moon, index) => {
-        console.log(moon)
         if(!moonSet){
           let percentIncrease = 1/moon.cycleLength * 100;
           if(moon.isWaxing)
@@ -343,7 +341,7 @@ export var _myCalendarSpec = {
             phasePrefix = game.i18n.localize('MoonWaning')
             moonSymbol = './modules/calendar-weather/icons/waningGibbous.png'
           }
-        }else if(moon.cyclePercent >= 100){
+        }else if(moon.cyclePercent >= 96){
           moonPhase = game.i18n.localize('MoonFull')
           moonSymbol = './modules/calendar-weather/icons/full.png'
           moon.cyclePercent = 100;
@@ -360,7 +358,7 @@ export var _myCalendarSpec = {
           document.getElementById(`calender-moon-symbol-${index}`).src = moonSymbol;
           document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${phasePrefix} ${moonPhase}`
           if(game.settings.get('calendar-weather', 'moonDisplay')){
-            let messageLvl = ChatMessage.getWhisperIDs("GM")
+            let messageLvl = ChatMessage.getWhisperRecipients("GM")
             let chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${phasePrefix} ${moonPhase}`
             ChatMessage.create({
               speaker: {
@@ -381,7 +379,7 @@ export var _myCalendarSpec = {
             speaker: {
             alias: moon.name,
           },
-          whisper: ChatMessage.getWhisperIDs("GM"),
+          whisper: ChatMessage.getWhisperRecipients("GM"),
           content: chatOut,
           });
           let solarEclipse = (moon, index, moonSymbol, moonPhase, phasePrefix) => {
@@ -408,7 +406,7 @@ export var _myCalendarSpec = {
               speaker: {
               alias: moon.name,
             },
-            whisper: ChatMessage.getWhisperIDs("GM"),
+            whisper: ChatMessage.getWhisperRecipients("GM"),
             content: chatOut,
             });
 
@@ -429,7 +427,7 @@ export var _myCalendarSpec = {
               chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${game.i18n.localize('MoonPartialLEclipse')}`
               document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('MoonPartialLEclipse')}`
             }
-            let messageLvl = ChatMessage.getWhisperIDs("GM")
+            let messageLvl = ChatMessage.getWhisperRecipients("GM")
             ChatMessage.create({
               speaker: {
               alias: moon.name,
@@ -479,7 +477,7 @@ export var _myCalendarSpec = {
               speaker: {
                 alias: "Season Change:",
               },
-              whisper: ChatMessage.getWhisperIDs("GM"),
+              whisper: ChatMessage.getWhisperRecipients("GM"),
               content: chatOut,
             });
           }
@@ -502,7 +500,7 @@ export var _myCalendarSpec = {
             speaker: {
               alias: "Reoccuring Event:",
             },
-            whisper: ChatMessage.getWhisperIDs("GM"),
+            whisper: ChatMessage.getWhisperRecipients("GM"),
             content: chatOut,
           });
         }

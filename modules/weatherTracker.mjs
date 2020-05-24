@@ -186,7 +186,7 @@ export class WeatherTracker {
               // if no match search by name
               if (!entity) entity = game.tables.entities.find(m => m.name === macroMatch[1]);
               let tableRoll = entity.roll()
-              return `Roll: ${tableRoll[0]._result} <br> ${tableRoll[1].text}`
+              return `Roll: ${tableRoll.roll._result} <br> ${tableRoll.results[0].text}`
             }
         }
         return "Error: RollTable not found!";
@@ -644,7 +644,7 @@ export class WeatherTracker {
       } else {
         tempOut = this.temp + " °F"
       }
-      let messageLvl = ChatMessage.getWhisperIDs("GM")
+      let messageLvl = ChatMessage.getWhisperRecipients("GM")
       let chatOut = "<b>" + tempOut + "</b> - " + this.precipitation;
       ChatMessage.create({
         speaker: {
@@ -798,11 +798,19 @@ export class WeatherTracker {
 
         if (dt.hours >= dawn + 1 && dt.hours < dusk && canvas.scene.data.darkness > 0 && !eclipse) {
           console.log("calendar-weather | It is now day.")
-          if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX){
+
+          if(game.settings.get('calendar-weather', 'noGlobal') && !canvas.scene.data.globalLight && canvas.scene.data.flags.cwGlobalIllumination){
+            console.log('enabling global illuminations')
+            canvas.scene.update({
+              globalLight: true
+            })
+          }
+
+          if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX && canvas.scene.getFlag('fxmaster', 'filters').bloodMoon){
             Hooks.call("switchFilter", {
               name: "bloodMoon",
               type: "color",
-              options: { red: 0, green: 0, blue: 0 },
+              options: {},
             })
           }
           canvas.scene.update({
@@ -830,8 +838,16 @@ export class WeatherTracker {
             darkness: (newDarkness - fullMoonMod)
           })
         }
-        if ((dt.hours >= dusk + 1 || dt.hours < dawn) && canvas.scene.data.darkness < 1) {
+        if ((dt.hours >= dusk + 1 || dt.hours < dawn) && canvas.scene.data.darkness < 1 - fullMoonMod) {
           console.log("calendar-weather | It is now night.")
+
+          if(game.settings.get('calendar-weather', 'noGlobal') && canvas.scene.data.globalLight){
+            console.log('Disabling global illuminations')
+            canvas.scene.update({
+              'flags.cwGlobalIllumination': true,
+              globalLight: false
+            })
+          }
 
           canvas.scene.update({
             darkness: (1 - fullMoonMod)

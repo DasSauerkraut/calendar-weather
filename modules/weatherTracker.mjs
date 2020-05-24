@@ -192,7 +192,7 @@ export class WeatherTracker {
         return "Error: RollTable not found!";
       }
 
-      if (game.modules.get("fxmaster").active) {
+      if (game.modules.get("fxmaster") && game.modules.get("fxmaster").active) {
         if(this.showFX || canvas.scene.getFlag('calendar-weather', 'showFX')){
           fxAvailable = true;
           this.showFX = true;

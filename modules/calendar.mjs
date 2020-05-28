@@ -285,8 +285,10 @@ export class Calendar extends Application {
       }
       if (Gametime.isRunning()) {
         document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
+        document.getElementById('calender-time-running').innerHTML = '⪧'
       } else {
         document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
+        document.getElementById('calender-time-running').innerHTML = '■'
       }
   
       game.Gametime._save(true);
@@ -440,6 +442,7 @@ export class Calendar extends Application {
             document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
             document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
             document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
+            document.getElementById('calender-time-running').innerHTML = '⪧'
           } else {
             console.log("calendar-weather | Starting about-time pseudo clock.");
             Gametime.startRunning();
@@ -450,8 +453,9 @@ export class Calendar extends Application {
             document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
             document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
             document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
-  
+            document.getElementById('calender-time-running').innerHTML = '■'
           }
+          this.updateDisplay();
           this.updateSettings();
         } else if(isRightMB){
           Calendar.resetPos()

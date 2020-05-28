@@ -99,6 +99,7 @@ $(document).ready(() => {
       document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
       document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
       document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
+      document.getElementById('calender-time-running').innerHTML = '⪧'
     } else {
       document.getElementById('calendar-btn-sec').disabled = false;
       document.getElementById('calendar-btn-halfMin').disabled = false;
@@ -107,6 +108,7 @@ $(document).ready(() => {
       document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
       document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
       document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
+      document.getElementById('calender-time-running').innerHTML = '■'
     }
     let icon = document.getElementById('calendar-weather');
     switch (cwdtData.dt.weather.seasonColor) {
@@ -200,7 +202,7 @@ $(document).ready(() => {
       let notes = controls.find(control => control.name == 'notes')
       notes.tools.splice( notes.tools.length-1, 0, {
           name: "toggleCalendar",
-          title: "ToggleControl",
+          title: "CWMISC.toggleControl",
           icon: "far fa-calendar-alt",
           onClick: () => {
             CWCalendar.toggleCalendar(c);

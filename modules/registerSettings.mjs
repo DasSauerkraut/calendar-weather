@@ -3,7 +3,6 @@ export const registerSettings = function(calendar) {
     name: "Date/Time Data",
     scope: 'world',
     config: false,
-    // default: {},
     type: Object,
     onChange: calendar.loadSettings.bind(calendar)
   });
@@ -14,43 +13,51 @@ export const registerSettings = function(calendar) {
     type: Object,
   });
   game.settings.register('calendar-weather', 'calendarDisplay', {
-    name: game.i18n.localize("CalDispNonGm"),
-    hint: game.i18n.localize("CalDispNonGmHelp"),
+    name: game.i18n.localize("CWSETTING.CalDispNonGm"),
+    hint: game.i18n.localize("CWSETTING.CalDispNonGmHelp"),
     scope: 'world',
     config: true,
     default: true,
     type: Boolean,
   });
   game.settings.register('calendar-weather', 'weatherDisplay', {
-    name: game.i18n.localize("Weather2Chat"),
-    hint: game.i18n.localize("Weather2ChatHelp"),
+    name: game.i18n.localize("CWSETTING.Weather2Chat"),
+    hint: game.i18n.localize("CWSETTING.Weather2ChatHelp"),
     scope: 'world',
     config: true,
     default: true,
     type: Boolean,
   });
   game.settings.register('calendar-weather', 'moonDisplay', {
-    name: game.i18n.localize("Moon2Chat"),
-    hint: game.i18n.localize("Moon2ChatHelp"),
+    name: game.i18n.localize("CWSETTING.Moon2Chat"),
+    hint: game.i18n.localize("CWSETTING.Moon2ChatHelp"),
     scope: 'world',
     config: true,
     default: true,
     type: Boolean,
   });
   game.settings.register('calendar-weather', 'is24', {
-    name: game.i18n.localize("Display24H"),
-    hint: game.i18n.localize("Display24HHelp"),
+    name: game.i18n.localize("CWSETTING.Display24H"),
+    hint: game.i18n.localize("CWSETTING.Display24HHelp"),
     scope: 'world',
     config: true,
     default: false,
     type: Boolean,
   });
   game.settings.register('calendar-weather', 'noGlobal', {
-    name: game.i18n.localize("NoGlobal"),
-    hint: game.i18n.localize("NoGlobalHelp"),
+    name: game.i18n.localize("CWSETTING.NoGlobal"),
+    hint: game.i18n.localize("CWSETTING.NoGlobalHelp"),
     scope: 'world',
     config: true,
     default: true,
     type: Boolean,
   });
+  // game.settings.register('calendar-weather', 'colorblindIcon', {
+  //   name: game.i18n.localize("CWSETTING.Colorblind"),
+  //   hint: game.i18n.localize("CWSETTING.ColorblindHelp"),
+  //   scope: 'world',
+  //   config: true,
+  //   default: true,
+  //   type: Boolean,
+  // })
 }

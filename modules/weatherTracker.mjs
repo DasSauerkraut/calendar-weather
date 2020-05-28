@@ -323,7 +323,7 @@ export class WeatherTracker {
         }
       } else if (roll == 8) {
         this.humidity -= 1;
-        if (this.climate = "desert") {
+        if (this.climate == "desert") {
           this.humidity -= 1;
         }
         if (this.isVolcanic) {
@@ -406,7 +406,7 @@ export class WeatherTracker {
   
       } else if (roll == 9) {
         this.humidity -= 2;
-        if (this.climate = "desert") {
+        if (this.climate == "desert") {
           this.humidity -= 2;
         }
         if (this.isVolcanic) {
@@ -484,7 +484,7 @@ export class WeatherTracker {
   
       } else if (roll >= 10) {
         this.humidity -= 2;
-        if (this.climate = "desert") {
+        if (this.climate == "desert") {
           this.humidity = 0;
         }
         if (this.rand(1, 20) == 20) {
@@ -800,13 +800,12 @@ export class WeatherTracker {
           console.log("calendar-weather | It is now day.")
 
           if(game.settings.get('calendar-weather', 'noGlobal') && !canvas.scene.data.globalLight && canvas.scene.data.flags.cwGlobalIllumination){
-            console.log('enabling global illuminations')
             canvas.scene.update({
               globalLight: true
             })
           }
 
-          if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX && canvas.scene.getFlag('fxmaster', 'filters').bloodMoon){
+          if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX && canvas.scene.getFlag('fxmaster', 'filters') && canvas.scene.getFlag('fxmaster', 'filters').bloodMoon){
             Hooks.call("switchFilter", {
               name: "bloodMoon",
               type: "color",
@@ -842,7 +841,6 @@ export class WeatherTracker {
           console.log("calendar-weather | It is now night.")
 
           if(game.settings.get('calendar-weather', 'noGlobal') && canvas.scene.data.globalLight){
-            console.log('Disabling global illuminations')
             canvas.scene.update({
               'flags.cwGlobalIllumination': true,
               globalLight: false

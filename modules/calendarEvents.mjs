@@ -433,6 +433,7 @@ export class CalendarEvents extends FormApplication {
       const delReEvent = "button[class='calendar-reEvent-del']";
       const addEvent = "#calendar-events-add-event";
       const delEvent = "button[class='calendar-event-del']";
+      const collapsables = "button[class='calendar-collapsable']"
   
       html.find(submit).click(ev => {
         ev.preventDefault();
@@ -526,6 +527,19 @@ export class CalendarEvents extends FormApplication {
         this.data.events.splice(index, 1);
         this.render(true);
       });
+      html.find(collapsables).click(ev => {
+        ev.preventDefault();
+        ev.currentTarget.classList.toggle('active')
+        let content = ev.currentTarget.nextElementSibling;
+        if(content.style.display != 'block' || content.style.display === ""){
+          content.style.display = 'block';
+          ev.currentTarget.innerHTML = ev.currentTarget.innerHTML.replace("+", "-"); 
+        } else {
+          content.style.display = 'none';
+          ev.currentTarget.innerHTML = ev.currentTarget.innerHTML.replace("-", "+"); 
+        }
+        this.setPosition();
+      })
   
       let reText = html.find(".calendar-reEvent-text");
       for (let i = 0; i < reText.length; i++) reText[i].ondrop = this.onDrop.bind(null, reText[i]);

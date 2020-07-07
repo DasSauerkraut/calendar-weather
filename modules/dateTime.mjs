@@ -278,17 +278,21 @@ export var _myCalendarSpec = {
     findSeason(dateTime) {
       let targetDay = dateTime.days + 1;
       let targetMonth = dateTime.months;
-  
       let abbrevs = this.months.map(m => `${m.abbrev}`); // need text abbreviations here so they can be looked up
   
       // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
-      let season = this.seasons.find(s => {
+      let seasonArr = this.seasons;
+      seasonArr.sort((lhs, rhs) => {
+        return parseInt(lhs.date.month) - parseInt(rhs.date.month);
+      })
+      let season = seasonArr.find(s => {
         let smn = abbrevs.indexOf(s.date.month);
-        return smn > targetMonth || (smn === targetMonth && s.date.day > targetDay)
+        return (smn === targetMonth && s.date.day < targetDay) || parseInt(smn + 1) > targetMonth 
       });
-      let index = season ? ((this.seasons.indexOf(season) - 1 + this.seasons.length) % this.seasons.length) : this.seasons.length - 1;
-  
-      return this.seasons[index];
+      if(abbrevs.indexOf(season.date.month) > targetMonth || (abbrevs.indexOf(season.date.month) === targetMonth && season.date.day > targetDay))
+        season = seasonArr[seasonArr.indexOf(season) - 1];
+
+      return season ? ((this.seasons.find(s => season.name === s.name))) : this.seasons[this.seasons.length - 1];;
     }
 
     checkMoons(moonSet = false){

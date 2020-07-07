@@ -164,14 +164,14 @@ $(document).ready(() => {
     
     const fxHtml = `
     <div class="form-group">
-        <label>${game.i18n.localize('WeatherLabel')}</label>
+        <label>${game.i18n.localize('CWSETTING.WeatherLabel')}</label>
         <input id="calendar-weather-showFX" type="checkbox" name="calendarFXWeather" data-dtype="Boolean" ${loadedWeatherData ? 'checked' : ''}>
-        <p class="notes">${game.i18n.localize('WeatherLabelHelp')}</p>
+        <p class="notes">${game.i18n.localize('CWSETTING.WeatherLabelHelp')}</p>
     </div>
     <div class="form-group">
-        <label>${game.i18n.localize('NightCycleLabel')}</label>
+        <label>${game.i18n.localize('CWSETTING.NightCycleLabel')}</label>
         <input id="calendar-weather-doNightCycle" type="checkbox" name="calendarFXNight" data-dtype="Boolean" ${loadedNightData ? 'checked' : ''}>
-        <p class="notes">${game.i18n.localize('NightCycleLabelHelp')}</p>
+        <p class="notes">${game.i18n.localize('CWSETTING.NightCycleLabelHelp')}</p>
     </div>
     `
     const fxFind = html.find("select[name ='weather']");

@@ -671,20 +671,22 @@ export class WeatherTracker {
       }
   
       if (force) {
-        let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
-        this.temp = temp + season + climate;
-        // console.log("Forced Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
-      } else if (this.rand(1, 5) >= 5) {
-        let temp = this.rand(20, 60)
-        // console.log("Fresh Roll: " + temp + " Season Mod: " + this.seasonTemp + " Climate Mod: " + this.climateTemp)
-        this.temp = temp + season + climate;
+        this.temp = this.rand(this.lastTemp - 5, this.lastTemp + 5) + season + climate + (rand(1,20) === 20 ? 20 : 0);
+      } else if (this.rand(1, 3) === 3) {
+        this.temp = this.rand(40, 70) + season + climate;
       } else {
-        let temp = this.rand(this.lastTemp - 5, this.lastTemp + 5);
-        this.temp = temp + Math.floor(climate / 20 + season / 20);
+         this.temp = this.rand(this.lastTemp - 5, this.lastTemp + 5) + Math.floor(climate / 20 + season / 20);
       }
-      this.temp = Math.clamped(this.temp, this.tempRange.min, this.tempRange.max);
+      
+      if(this.temp > this.tempRange.max){
+        this.temp = rand(this.temp+5, this.temp+10)
+      } else if (this.temp < this.tempRange.min) {
+        this.temp = rand(this.temp-10, this.temp-5)
+      }
+
       this.lastTemp = this.temp;
       this.cTemp = ((this.temp - 32) * 5 / 9).toFixed(1);
+
       //Morrslieb weather events
       let morrTrigger = (this.rand(1, 400) == 1 || cwdtData.dt.months[Gametime.DTNow().months].name == "Hexenstag" || cwdtData.dt.months[Gametime.DTNow().months].name == "Geheimnistag")
       if (morrTrigger && game.data.system.data.name == "wfrp4e" && Gametime.isMaster()) {

@@ -289,10 +289,12 @@ export var _myCalendarSpec = {
         let smn = abbrevs.indexOf(s.date.month);
         return (smn === targetMonth && s.date.day < targetDay) || parseInt(smn + 1) > targetMonth 
       });
-      if(abbrevs.indexOf(season.date.month) > targetMonth || (abbrevs.indexOf(season.date.month) === targetMonth && season.date.day > targetDay))
+      if(season && (abbrevs.indexOf(season.date.month) > targetMonth || (abbrevs.indexOf(season.date.month) === targetMonth && season.date.day > targetDay)))
         season = seasonArr[seasonArr.indexOf(season) - 1];
+      else if (!season)
+        season = this.seasons[this.seasons.length - 1]
 
-      return season ? ((this.seasons.find(s => season.name === s.name))) : this.seasons[this.seasons.length - 1];;
+      return this.seasons.find(s => season.name === s.name)
     }
 
     checkMoons(moonSet = false){

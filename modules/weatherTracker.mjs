@@ -679,9 +679,9 @@ export class WeatherTracker {
       }
       
       if(this.temp > this.tempRange.max){
-        this.temp = rand(this.temp+5, this.temp+10)
+        this.temp = this.rand(this.temp+5, this.temp+10)
       } else if (this.temp < this.tempRange.min) {
-        this.temp = rand(this.temp-10, this.temp-5)
+        this.temp = this.rand(this.temp-10, this.temp-5)
       }
 
       this.lastTemp = this.temp;

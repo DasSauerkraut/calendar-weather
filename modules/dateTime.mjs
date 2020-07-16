@@ -294,7 +294,7 @@ export var _myCalendarSpec = {
       else if (!season)
         season = this.seasons[this.seasons.length - 1]
 
-      return this.seasons.find(s => season.name === s.name)
+      return this.seasons.find(s => season?.name === s.name)
     }
 
     checkMoons(moonSet = false){

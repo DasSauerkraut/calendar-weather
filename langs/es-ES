@@ -149,7 +149,7 @@
   "AddMonth": "Agregar un nuevo mes.",
   "DefMonth": "Mes 1.",
   "SaveCalendar": "Guardar los ajustes del calendario.",
-  "LoadDefaultCalendar": "Cargar los ajustes por defectoLoad default calendar.",
+  "LoadDefaultCalendar": "Cargar los ajustes por defecto.",
 
   "CWSETTING.CalDispNonGm": "Visualización del calendario para los usuarios que no son DM.",
   "CWSETTING.CalDispNonGmHelp": "Cuando esté activo, los usuarios que no tienen permisos de DM, serán capaces de ver el calendario.",

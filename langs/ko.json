@@ -163,5 +163,5 @@
   "CWSETTING.NightCycleLabel": "씬 주야 사이클",
   "CWSETTING.NightCycleLabelHelp": "체크시 주야 사이클로 인해 밤에 어두워지고 낮에 밝아진다.",
   "CWSETTING.NoGlobal": "달력/날씨 - 밤의 전체 조명을 비활성화한다.",
-  "CWSETTING.NoGlobalHelp": "체크 되었을 때, 씬의 어둠 수치가 최대에 도달하면 글로벌 조명이 비활성화된다.",
+  "CWSETTING.NoGlobalHelp": "체크 되었을 때, 씬의 어둠 수치가 최대에 도달하면 글로벌 조명이 비활성화된다."
 }

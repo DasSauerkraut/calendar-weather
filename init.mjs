@@ -219,6 +219,9 @@ $(document).ready(() => {
       if (cwdtData.dt.lastDays !== newDays) {
         cwdtData.dt.genDateWordy();
         if (Gametime.isMaster() && cwdtData.dt.lastDays) {
+          Hooks.callAll("CWCalendar.newDay", {
+            date: Gametime.DTNow(),
+          });
           cwdtData.dt.checkEvents();
           cwdtData.dt.checkMoons();
           cwdtData.dt.weather.generate();

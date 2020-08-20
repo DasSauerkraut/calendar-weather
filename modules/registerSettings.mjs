@@ -29,8 +29,8 @@ export const registerSettings = function(calendar) {
     type: Boolean,
   });
   game.settings.register('calendar-weather', 'moonDisplay', {
-    name: game.i18n.localize("CWSETTING.Moon2Chat"),
-    hint: game.i18n.localize("CWSETTING.Moon2ChatHelp"),
+    name: game.i18n.localize("CWMOON.2Chat"),
+    hint: game.i18n.localize("CWMOON.2ChatHelp"),
     scope: 'world',
     config: true,
     default: true,

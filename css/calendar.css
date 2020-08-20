@@ -69,7 +69,8 @@ background: rgba(0, 0, 0, 0.5);
 	float: left; 
 	margin-right: 5px;
 	width: 10%;
-	text-align: center; 
+	text-align: center;
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 }
 #calendar-events:hover {
 	color: #FFF;
@@ -83,7 +84,8 @@ background: rgba(0, 0, 0, 0.5);
 	float: inline-end; 
 	margin-left: 5px;
 	width: 10%;
-	text-align: center; 
+	text-align: center;
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 }
 #calendar-weather:hover {
 	color: #FFF;
@@ -114,6 +116,7 @@ background: rgba(0, 0, 0, 0.5);
 	grid-column: 1;
 	margin: auto;
 	color: rgba(0, 0, 0, 0.5);
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 	cursor: not-allowed;
 }
 
@@ -122,18 +125,21 @@ background: rgba(0, 0, 0, 0.5);
 	grid-column: 2;
 	margin: auto;
 	color: rgba(0, 0, 0, 0.5);
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 	cursor: not-allowed;
 }
 #calendar-btn-min{
 	grid-row: 2;
 	grid-column: 1;
 	margin-left: 10px;
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 }
 
 #calendar-btn-fiveMin{
 	grid-row: 2;
 	grid-column: 2;
 	margin-left: 10px;
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 }
 
 #calendar-btn-night{
@@ -142,6 +148,7 @@ background: rgba(0, 0, 0, 0.5);
 	height: fit-content;
 	text-align: center; 
 	vertical-align: center;
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 }
 
 #calendar-btn-day{
@@ -150,6 +157,7 @@ background: rgba(0, 0, 0, 0.5);
 	height: fit-content;
 	text-align: center; 
 	vertical-align: center;
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 }
 
 #calendar-btn-quick{
@@ -158,6 +166,7 @@ background: rgba(0, 0, 0, 0.5);
 	height: fit-content;
 	text-align: center; 
 	vertical-align: center;
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 }
 
 #calendar-btn-long{
@@ -166,6 +175,7 @@ background: rgba(0, 0, 0, 0.5);
 	height: fit-content;
 	text-align: center; 
 	vertical-align: center;
+	-webkit-text-stroke: 0.5px rgb(92, 92, 92);
 }
 
 #calendar-btn-sec:hover {
@@ -241,8 +251,19 @@ background: rgba(0, 0, 0, 0.5);
 	margin-left: auto;
 	margin-right: auto;
 	border-bottom: 1px solid #111;
-	display: inline-flex;
+	display: flex;
 }
+
+#calendar-moon-overflow {
+	margin-top: 23px;
+	text-align: center;
+	border: 1px solid #000;
+	border-radius: 3%;
+	background: rgba(0, 0, 0, 0.5);
+	width: 125px;
+}
+
+
 .calendar-time{
 	grid-column: 1;
 	grid-row: 2;
@@ -250,6 +271,7 @@ background: rgba(0, 0, 0, 0.5);
 	margin: auto;
 	cursor: pointer;
 	display: inline-flex;
+	height: 24px;
 }
 .calendar-time-disp{
 	position: relative;

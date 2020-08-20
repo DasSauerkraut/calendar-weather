@@ -36,8 +36,10 @@ export class Calendar extends Application {
           let elmnt = document.getElementById("calendar-time-container")
           if (elmnt) {
             elmnt.style.bottom = null;
-            elmnt.style.top = (pos.top) + "px";
-            elmnt.style.left = (pos.left) + "px";
+            let xPos = (pos.left) > window.innerWidth ? window.innerWidth-200 : pos.left;
+            let yPos = (pos.top) > window.innerHeight-20 ? window.innerHeight-100 : pos.top;
+            elmnt.style.top = (yPos) + "px";
+            elmnt.style.left = (xPos) + "px";
             elmnt.style.position = 'fixed';
             elmnt.style.zIndex = 100;
             resolve();
@@ -533,7 +535,7 @@ export class Calendar extends Application {
               elmnt.onmousedown = null;
               document.onmouseup = null;
               document.onmousemove = null;
-              let xPos = (elmnt.offsetLeft - pos1) > window.innerWidth ? window.innerWidth : (elmnt.offsetLeft - pos1);
+              let xPos = (elmnt.offsetLeft - pos1) > window.innerWidth ? window.innerWidth-200 : (elmnt.offsetLeft - pos1);
               let yPos = (elmnt.offsetTop - pos2) > window.innerHeight-20 ? window.innerHeight-100 : (elmnt.offsetTop - pos2)
               xPos = xPos < 0 ? 0 : xPos
               yPos = yPos < 0 ? 0 : yPos

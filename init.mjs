@@ -137,6 +137,10 @@ $(document).ready(() => {
   })
 
   Hooks.on("renderSceneConfig", (app, html, data) => {
+    //fix cyclical issues
+    if ( app.renderCalendarScene) return ; 
+    app.renderCalendarScene = true;
+
     let loadedWeatherData = undefined;
     let loadedNightData = undefined;
 
@@ -189,6 +193,7 @@ $(document).ready(() => {
   });
 
   Hooks.on("closeSceneConfig", (app, html, data) => {
+    app.renderCalendarScene = false;
     app.object.setFlag('calendar-weather', 'showFX', html.find("input[name ='calendarFXWeather']").is(":checked"))
     app.object.setFlag('calendar-weather', 'doNightCycle', html.find("input[name ='calendarFXNight']").is(":checked"))
 

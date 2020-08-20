@@ -300,6 +300,10 @@ export var _myCalendarSpec = {
     checkMoons(moonSet = false){
       if (!Gametime.isMaster()) return;
 
+      let updatedMoons = '';
+      let moonDisplayOutput = '';
+      let moonInfo = [];
+
       this.moons.forEach((moon, index) => {
         if(!moonSet){
           let percentIncrease = 1/moon.cycleLength * 100;
@@ -312,12 +316,12 @@ export var _myCalendarSpec = {
         let phasePrefix = ''
         let moonSymbol = ''
         //New Moon
-        if(moon.cyclePercent <= 0){
+        if(moon.cyclePercent <= 1){
           moonPhase = game.i18n.localize('CWMOON.New')
           moonSymbol = './modules/calendar-weather/icons/new.png'
           moon.cyclePercent = 0;
           moon.isWaxing = true;
-        }else if(moon.cyclePercent > 0 && moon.cyclePercent <= 33){
+        }else if(moon.cyclePercent > 1 && moon.cyclePercent <= 33){
           moonPhase = game.i18n.localize('CWMOON.Crescent')
           if(moon.isWaxing){
             phasePrefix = game.i18n.localize('CWMOON.IsWaxing')
@@ -337,7 +341,7 @@ export var _myCalendarSpec = {
             phasePrefix = game.i18n.localize('CWMOON.ThirdQuarter')
             moonSymbol = './modules/calendar-weather/icons/lastQuarter.png'
           }
-        }else if(moon.cyclePercent > 66 && moon.cyclePercent < 100){
+        }else if(moon.cyclePercent > 66 && moon.cyclePercent < 97){
           moonPhase = game.i18n.localize('CWMOON.Gibbous')
           if(moon.isWaxing){
             phasePrefix = game.i18n.localize('CWMOON.IsWaxing')
@@ -354,28 +358,28 @@ export var _myCalendarSpec = {
           moon.isWaxing = false;
         }
 
-        if(!document.getElementById(`calender-moon-symbol-${index}`)){
-          document.getElementsByClassName('calendar-weekday-cntr')[0].innerHTML += `
-            <img src="./modules/calendar-weather/icons/new.png" id='calender-moon-symbol-${index}'>
-          `
+        //add moons to display
+        if( !document.getElementById(`calender-moon-symbol-${index}`)){
+          moonDisplayOutput += `<img src="./modules/calendar-weather/icons/new.png" id='calender-moon-symbol-${index}'>`
         }
 
-        if(document.getElementById(`calender-moon-symbol-${index}`).src != moonSymbol){
-          document.getElementById(`calender-moon-symbol-${index}`).src = moonSymbol;
-          document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${phasePrefix} ${moonPhase}`
-          if(game.settings.get('calendar-weather', 'moonDisplay')){
-            let messageLvl = ChatMessage.getWhisperRecipients("GM")
-            let chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${phasePrefix} ${moonPhase}`
-            ChatMessage.create({
-              speaker: {
-              alias: moon.name,
-            },
-            whisper: messageLvl,
-            content: chatOut,
-            });
-          }
+        if(this.moons.lastMoons && this.moons.lastMoons[index] != moonSymbol){
+          updatedMoons += `${moon.name} | ${phasePrefix} ${moonPhase} <br> <img src="${moonSymbol}"> <hr>`
+          moonInfo.push({
+            index: index,
+            symbol: moonSymbol,
+            name: moon.name,
+            phase: moonPhase,
+            prefix: phasePrefix
+          })
         }
 
+        if(!this.moons.lastMoons)
+          this.moons["lastMoons"] = {};
+
+        this.moons.lastMoons[index] = moonSymbol;
+
+        //check solar eclipse
         let percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.solarEclipseChance) / Math.log(10)))))
         let solar = moon.solarEclipseChance * percentMod
         let roll = Math.floor(Math.random() * Math.floor(100)) * percentMod;
@@ -444,6 +448,29 @@ export var _myCalendarSpec = {
           }
         }
       })
+
+      if(this.moons.length > 5 && !document.getElementById('calendar-moon-overflow')){
+        document.getElementsByClassName('calendar-weekday-cntr')[0].style.display = "grid"
+        document.getElementsByClassName('calendar-weekday-cntr')[0].innerHTML += `<div id='calendar-moon-overflow'>${moonDisplayOutput}</div>`
+      }
+      else
+        document.getElementsByClassName('calendar-weekday-cntr')[0].innerHTML += moonDisplayOutput
+
+      moonInfo.forEach((moon) => {
+        document.getElementById(`calender-moon-symbol-${moon.index}`).src = moon.symbol;
+        document.getElementById(`calender-moon-symbol-${moon.index}`).title = `${moon.name} | ${moon.prefix} ${moon.phase}`
+      })
+
+      if(updatedMoons && game.settings.get('calendar-weather', 'moonDisplay')){
+        let messageLvl = ChatMessage.getWhisperRecipients("GM")
+        ChatMessage.create({
+          speaker: {
+          alias: 'Moons',
+        },
+        whisper: messageLvl,
+        content: updatedMoons,
+        });
+      }
     }
   
     checkEvents() {

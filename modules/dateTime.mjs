@@ -13,8 +13,8 @@ export var _myCalendarSpec = {
     "has_year_0": true,
     "month_len": {},
     "weekdays": [],
-  };
-  
+  }
+
   class DateTimeStatics {
     _weather = new WeatherTracker();
     _seasons = [];
@@ -43,7 +43,7 @@ export var _myCalendarSpec = {
         _myCalendarSpec.leap_year_rule = (year) => 0;
         this.months = Object.keys(calSpec.month_len).map((k, i) => {
           let m = calSpec.month_len[k];
-          return new Month(k, m.days[0], m.days[1], !m.intercalary, m.intercalary ? "XX" : `${i+1}`)
+          return new Month(k, m.days[0], m.days[1], !m.intercalary, m.intercalary ? "XX" : `${i+1}`);
         })
         this.daysOfTheWeek = calSpec.weekdays;
         game.Gametime.DTC.createFromData(_myCalendarSpec);
@@ -57,85 +57,85 @@ export var _myCalendarSpec = {
     _dateNum = "";
   
     static get lastDays() {
-      return dateTimeStatics._lastDays
+      return dateTimeStatics._lastDays;
     };
     static set lastDays(days) {
-      dateTimeStatics._lastDays = days
+      dateTimeStatics._lastDays = days;
     }
     get lastDays() {
-      return DateTime.lastDays
+      return DateTime.lastDays;
     };
     set lastDays(days) {
-      DateTime.lastDays = days
+      DateTime.lastDays = days;
     }
 
     static get moons() {
-      return dateTimeStatics._moons ? dateTimeStatics._moons : []
+      return dateTimeStatics._moons ? dateTimeStatics._moons : [];
     };
     static set moons(moons) {
-      dateTimeStatics._moons = moons || []
+      dateTimeStatics._moons = moons || [];
     };
     get moons() {
-      return DateTime.moons
+      return DateTime.moons;
     };
     set moons(moons) {
-      DateTime.moons = moons
+      DateTime.moons = moons;
     };
   
     static get reEvents() {
-      return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : []
+      return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : [];
     };
     static set reEvents(reEvents) {
-      dateTimeStatics._reEvents = reEvents || []
+      dateTimeStatics._reEvents = reEvents || [];
     };
     get reEvents() {
-      return DateTime.reEvents
+      return DateTime.reEvents;
     };
     set reEvents(reEvents) {
-      DateTime.reEvents = reEvents
+      DateTime.reEvents = reEvents;
     };
   
     static get events() {
-      return dateTimeStatics._events ? dateTimeStatics._events : []
+      return dateTimeStatics._events ? dateTimeStatics._events : [];
     };
     static set events(events) {
-      dateTimeStatics._events = events || []
+      dateTimeStatics._events = events || [];
     };
     get events() {
-      return DateTime.events
+      return DateTime.events;
     };
     set events(events) {
-      DateTime.events = events
+      DateTime.events = events;
     };
   
     static get seasons() {
-      return dateTimeStatics._seasons ? dateTimeStatics._seasons : []
+      return dateTimeStatics._seasons ? dateTimeStatics._seasons : [];
     };
     static set seasons(seasons) {
-      dateTimeStatics._seasons = seasons || []
+      dateTimeStatics._seasons = seasons || [];
     };
     get seasons() {
-      return DateTime.seasons
+      return DateTime.seasons;
     };
     set seasons(seasons) {
-      DateTime.seasons = seasons
+      DateTime.seasons = seasons;
     };
   
     static get weather() {
-      return dateTimeStatics._weather ? dateTimeStatics._weather : new WeatherTracker()
+      return dateTimeStatics._weather ? dateTimeStatics._weather : new WeatherTracker();
     }
     static set weather(weather) {
-      dateTimeStatics._weather = weather || new WeatherTracker()
+      dateTimeStatics._weather = weather || new WeatherTracker();
     }
     get weather() {
-      return DateTime.weather
+      return DateTime.weather;
     }
     set weather(weather) {
-      DateTime.weather = weather
+      DateTime.weather = weather;
     }
   
     static get months() {
-      return dateTimeStatics._months
+      return dateTimeStatics._months;
     }
     static set months(months) {
       _myCalendarSpec._month_len = {};
@@ -146,10 +146,10 @@ export var _myCalendarSpec = {
       dateTimeStatics._months = months;
     }
     get months() {
-      return DateTime.months
+      return DateTime.months;
     }
     set months(months) {
-      DateTime.months = months
+      DateTime.months = months;
     }
   
     static set daysOfTheWeek(days) {
@@ -157,20 +157,20 @@ export var _myCalendarSpec = {
       dateTimeStatics._daysOfTheWeek = days;
     }
     static get daysOfTheWeek() {
-      return dateTimeStatics._daysOfTheWeek
+      return dateTimeStatics._daysOfTheWeek;
     }
     set daysOfTheWeek(days) {
-      DateTime.daysOfTheWeek = days
+      DateTime.daysOfTheWeek = days;
     }
     get daysOfTheWeek() {
-      return DateTime.daysOfTheWeek
+      return DateTime.daysOfTheWeek;
     }
   
     get year() {
       return Gametime.DTNow().years;
     }
     get day() {
-      return Gametime.DTNow().days
+      return Gametime.DTNow().days;
     }
   
     get dateWordy() {
@@ -181,7 +181,7 @@ export var _myCalendarSpec = {
     }
   
     set year(y) {
-      this.setYear(y)
+      this.setYear(y);
     }
   
     get currentWeekDay() {
@@ -206,11 +206,11 @@ export var _myCalendarSpec = {
       Gametime.setAbsolute(Gametime.DTNow().setAbsolute({
         years: Number(year)
       }));
-      this._year = year
+      this._year = year;
     }
   
     get currentMonth() {
-      return Gametime.DTNow().months
+      return Gametime.DTNow().months;
     }
     set currentMonth(currentMonth) {
       Gametime.setAbsolute(Gametime.DTNow().setAbsolute({
@@ -219,19 +219,19 @@ export var _myCalendarSpec = {
     }
   
     set era(era) {
-      this._era = era
+      this._era = era;
     }
     get era() {
-      return this._era
+      return this._era;
     }
     setEra(era) {
-      this._era = era
+      this._era = era;
     }
   
     setDayLength(length) {
       _myCalendarSpec.hours_per_day = Number(length);
       if (isNaN(_myCalendarSpec.hours_per_day)) {
-        console.warn("Error setting day length to", length)
+        console.warn("Error setting day length to", length);
         _myCalendarSpec.hours_per_day = 24;
   
       }
@@ -239,22 +239,22 @@ export var _myCalendarSpec = {
   
     set numDayOfTheWeek(dow) {
       Gametime.DTNow().setCalDow(dow);
-      _myCalendarSpec.first_day = Gametime.DTC.firstDay
+      _myCalendarSpec.first_day = Gametime.DTC.firstDay;
     }
     get numDayOfTheWeek() {
-      return Gametime.DTNow().dow()
+      return Gametime.DTNow().dow();
     }
   
   
     get dateNum() {
-      return this._datenum
+      return this._datenum;
     }
     set dateNum(dateNum) {
-      this._datenum = dateNum
+      this._datenum = dateNum;
     };
   
     get weekday() {
-      return this.daysOfTheWeek[this.numDayOfTheWeek]
+      return this.daysOfTheWeek[this.numDayOfTheWeek];
     }
     set weekday(day) {
       let newDow = this.daysOfTheWeek.indexOf(day);
@@ -266,7 +266,7 @@ export var _myCalendarSpec = {
         let macroMatch = text.match(matchRe);
         if (macroMatch && macroMatch.length === 2) {
           // match by id
-          let entity = collection.get(macroMatch[1])
+          let entity = collection.get(macroMatch[1]);
           // if no match search by name
           if (!entity) entity = collection.entities.find(m => m.name === macroMatch[1]);
           return entity;
@@ -287,19 +287,20 @@ export var _myCalendarSpec = {
       })
       let season = seasonArr.find(s => {
         let smn = abbrevs.indexOf(s.date.month);
-        return (smn === targetMonth && s.date.day < targetDay) || parseInt(smn + 1) > targetMonth 
+        return (smn === targetMonth && s.date.day < targetDay) || parseInt(smn + 1) > targetMonth;
       });
-      if(season && (abbrevs.indexOf(season.date.month) > targetMonth || (abbrevs.indexOf(season.date.month) === targetMonth && season.date.day > targetDay)))
+      if(season && (abbrevs.indexOf(season.date.month) > targetMonth || (abbrevs.indexOf(season.date.month) === targetMonth && season.date.day > targetDay))) {
         season = seasonArr[seasonArr.indexOf(season) - 1];
-      else if (!season)
-        season = this.seasons[this.seasons.length - 1]
+      }
+      else if (!season) {
+        season = this.seasons[this.seasons.length - 1];
+      }
 
-      return this.seasons.find(s => season?.name === s.name)
+      return this.seasons.find(s => season?.name === s.name);
     }
 
     checkMoons(moonSet = false){
       if (!Gametime.isMaster()) return;
-
       let updatedMoons = '';
       let moonDisplayOutput = '';
       let moonInfo = [];
@@ -307,84 +308,83 @@ export var _myCalendarSpec = {
       this.moons.forEach((moon, index) => {
         if(!moonSet){
           let percentIncrease = 1/moon.cycleLength * 100;
-          if(moon.isWaxing)
+          if(moon.isWaxing) {
             moon.cyclePercent += percentIncrease;
-          else
+          } else {
             moon.cyclePercent -= percentIncrease;
+          }
         }
-        let moonPhase = ''
-        let phasePrefix = ''
-        let moonSymbol = ''
+        let moonPhase = '';
+        let phasePrefix = '';
+        let moonSymbol = '';
         //New Moon
-        if(moon.cyclePercent <= 1){
-          moonPhase = game.i18n.localize('CWMOON.New')
-          moonSymbol = './modules/calendar-weather/icons/new.png'
+        if (moon.cyclePercent <= 1) {
+          moonPhase = game.i18n.localize('CWMOON.New');
+          moonSymbol = './modules/calendar-weather/icons/new.png';
           moon.cyclePercent = 0;
           moon.isWaxing = true;
-        }else if(moon.cyclePercent > 1 && moon.cyclePercent <= 33){
-          moonPhase = game.i18n.localize('CWMOON.Crescent')
-          if(moon.isWaxing){
-            phasePrefix = game.i18n.localize('CWMOON.IsWaxing')
-            moonSymbol = './modules/calendar-weather/icons/waxingCrescent.png'
+        } else if (moon.cyclePercent > 1 && moon.cyclePercent <= 33) {
+          moonPhase = game.i18n.localize('CWMOON.Crescent');
+          if (moon.isWaxing) {
+            phasePrefix = game.i18n.localize('CWMOON.IsWaxing');
+            moonSymbol = './modules/calendar-weather/icons/waxingCrescent.png';
+          } else {
+            phasePrefix = game.i18n.localize('CWMOON.Waning');
+            moonSymbol = './modules/calendar-weather/icons/waningCrescent.png';
           }
-          else{
-            phasePrefix = game.i18n.localize('CWMOON.Waning')
-            moonSymbol = './modules/calendar-weather/icons/waningCrescent.png'
-          }
-        }else if(moon.cyclePercent > 33 && moon.cyclePercent <= 66){
-          moonPhase = game.i18n.localize('CWMOON.Quarter')
-          if(moon.isWaxing){
-            phasePrefix = game.i18n.localize('CWMOON.FirstQuarter')
-            moonSymbol = './modules/calendar-weather/icons/firstQuarter.png'
-          }
-          else{
+        } else if (moon.cyclePercent > 33 && moon.cyclePercent <= 66) {
+          moonPhase = game.i18n.localize('CWMOON.Quarter');
+          if (moon.isWaxing) {
+            phasePrefix = game.i18n.localize('CWMOON.FirstQuarter');
+            moonSymbol = './modules/calendar-weather/icons/firstQuarter.png';
+          } else {
             phasePrefix = game.i18n.localize('CWMOON.ThirdQuarter')
             moonSymbol = './modules/calendar-weather/icons/lastQuarter.png'
           }
-        }else if(moon.cyclePercent > 66 && moon.cyclePercent < 97){
-          moonPhase = game.i18n.localize('CWMOON.Gibbous')
-          if(moon.isWaxing){
-            phasePrefix = game.i18n.localize('CWMOON.IsWaxing')
-            moonSymbol = './modules/calendar-weather/icons/waxingGibbous.png'
-          }
-          else{
+        } else if (moon.cyclePercent > 66 && moon.cyclePercent < 97) {
+          moonPhase = game.i18n.localize('CWMOON.Gibbous');
+          if (moon.isWaxing) {
+            phasePrefix = game.i18n.localize('CWMOON.IsWaxing');
+            moonSymbol = './modules/calendar-weather/icons/waxingGibbous.png';
+          } else {
             phasePrefix = game.i18n.localize('CWMOON.Waning')
-            moonSymbol = './modules/calendar-weather/icons/waningGibbous.png'
+            moonSymbol = './modules/calendar-weather/icons/waningGibbous.png';
           }
-        }else if(moon.cyclePercent >= 96){
-          moonPhase = game.i18n.localize('CWMOON.Full')
-          moonSymbol = './modules/calendar-weather/icons/full.png'
+        } else if (moon.cyclePercent >= 96) {
+          moonPhase = game.i18n.localize('CWMOON.Full');
+          moonSymbol = './modules/calendar-weather/icons/full.png';
           moon.cyclePercent = 100;
           moon.isWaxing = false;
         }
 
         //add moons to display
-        if( !document.getElementById(`calender-moon-symbol-${index}`)){
-          moonDisplayOutput += `<img src="./modules/calendar-weather/icons/new.png" id='calender-moon-symbol-${index}'>`
+        if ( !document.getElementById(`calender-moon-symbol-${index}`)) {
+          moonDisplayOutput += `<img src="./modules/calendar-weather/icons/new.png" id='calender-moon-symbol-${index}'>`;
         }
 
-        if(this.moons.lastMoons && this.moons.lastMoons[index] != moonSymbol){
-          updatedMoons += `${moon.name} | ${phasePrefix} ${moonPhase} <br> <img src="${moonSymbol}"> <hr>`
+        if (this.moons.lastMoons && this.moons.lastMoons[index] != moonSymbol) {
+          updatedMoons += `${moon.name} | ${phasePrefix} ${moonPhase} <br> <img src="${moonSymbol}"> <hr>`;
           moonInfo.push({
             index: index,
             symbol: moonSymbol,
             name: moon.name,
             phase: moonPhase,
             prefix: phasePrefix
-          })
+          });
         }
 
-        if(!this.moons.lastMoons)
+        if (!this.moons.lastMoons) {
           this.moons["lastMoons"] = {};
-
+        }
+        
         this.moons.lastMoons[index] = moonSymbol;
 
         //check solar eclipse
-        let percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.solarEclipseChance) / Math.log(10)))))
-        let solar = moon.solarEclipseChance * percentMod
+        let percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.solarEclipseChance) / Math.log(10)))));
+        let solar = moon.solarEclipseChance * percentMod;
         let roll = Math.floor(Math.random() * Math.floor(100)) * percentMod;
-        if(roll < solar){
-          let chatOut = `<img src="${'./modules/calendar-weather/icons/sEclipse.png'}"> ${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEventIncoming')}`
+        if (roll < solar) {
+          let chatOut = `<img src="${'./modules/calendar-weather/icons/sEclipse.png'}"> ${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEventIncoming')}`;
           ChatMessage.create({
             speaker: {
             alias: moon.name,
@@ -393,23 +393,23 @@ export var _myCalendarSpec = {
           content: chatOut,
           });
           let solarEclipse = (moon, index, moonSymbol, moonPhase, phasePrefix) => {
-            let chatOut = ``
-            if(document.getElementById(`calender-moon-symbol-${index}`).src.includes('Eclipse')){
-              chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEventEnd')}`
+            let chatOut = ``;
+            if (document.getElementById(`calender-moon-symbol-${index}`).src.includes('Eclipse')) {
+              chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEventEnd')}`;
               document.getElementById(`calender-moon-symbol-${index}`).src = moonSymbol;
-              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${phasePrefix} ${moonPhase}`
+              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${phasePrefix} ${moonPhase}`;
               if (this.weather.doNightCycle && Gametime.isMaster()) {
-                canvas.scene.update({darkness: 0}, { animateDarkness: true})
+                canvas.scene.update({darkness: 0}, { animateDarkness: true});
               }
             } else {
-              chatOut = `<img src="${'./modules/calendar-weather/icons/sEclipse.png'}"> ${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEvent')}`
+              chatOut = `<img src="${'./modules/calendar-weather/icons/sEclipse.png'}"> ${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEvent')}`;
               document.getElementById(`calender-moon-symbol-${index}`).src = './modules/calendar-weather/icons/sEclipse.png';
-              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEvent')}`
-              console.log('doNightCycle ' + cwdtData.dt.weather.doNightCycle)
+              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEvent')}`;
+              console.log('doNightCycle ' + cwdtData.dt.weather.doNightCycle);
               if (this.weather.doNightCycle && Gametime.isMaster()) {
-                canvas.scene.update({darkness: 1}, { animateDarkness: true})
+                canvas.scene.update({darkness: 1}, { animateDarkness: true});
               }
-              game.Gametime.doIn({minutes:30}, solarEclipse, moon, index, moonSymbol, moonPhase, phasePrefix)
+              game.Gametime.doIn({minutes:30}, solarEclipse, moon, index, moonSymbol, moonPhase, phasePrefix);
             }
             
             ChatMessage.create({
@@ -421,23 +421,23 @@ export var _myCalendarSpec = {
             });
 
           }
-          game.Gametime.doAt(game.Gametime.DTNow().setAbsolute({hours: 11, minutes: 45}), solarEclipse, moon, index, moonSymbol, moonPhase, phasePrefix)
+          game.Gametime.doAt(game.Gametime.DTNow().setAbsolute({hours: 11, minutes: 45}), solarEclipse, moon, index, moonSymbol, moonPhase, phasePrefix);
         } else {
-          percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.lunarEclipseChance) / Math.log(10)))))
-          let lunar = moon.lunarEclipseChance * percentMod
+          percentMod = (Math.pow(10, (-Math.floor( Math.log(moon.lunarEclipseChance) / Math.log(10)))));
+          let lunar = moon.lunarEclipseChance * percentMod;
           roll = Math.floor(Math.random() * Math.floor(100)) * percentMod;
-          if(roll < lunar){
-            let chatOut = ``
-            if(moonPhase == game.i18n.localize('CWMOON.Full')){
-              chatOut = `<img src="${'./modules/calendar-weather/icons/totalLEclipse.png'}"> ${moon.name} | ${game.i18n.localize('CWMOON.TotalLEclipse')}`
+          if (roll < lunar) {
+            let chatOut = ``;
+            if (moonPhase == game.i18n.localize('CWMOON.Full')) {
+              chatOut = `<img src="${'./modules/calendar-weather/icons/totalLEclipse.png'}"> ${moon.name} | ${game.i18n.localize('CWMOON.TotalLEclipse')}`;
               document.getElementById(`calender-moon-symbol-${index}`).src = './modules/calendar-weather/icons/totalLEclipse.png';
-              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('CWMOON.TotalLEclipse')}`
+              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('CWMOON.TotalLEclipse')}`;
             }
-            else{
-              chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${game.i18n.localize('CWMOON.PartialLEclipse')}`
-              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('CWMOON.PartialLEclipse')}`
+            else if (document.getElementById(`calender-moon-symbol-${index}`)){
+              chatOut = `<img src="${moonSymbol}"> ${moon.name} | ${game.i18n.localize('CWMOON.PartialLEclipse')}`;
+              document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('CWMOON.PartialLEclipse')}`;
             }
-            let messageLvl = ChatMessage.getWhisperRecipients("GM")
+            let messageLvl = ChatMessage.getWhisperRecipients("GM");
             ChatMessage.create({
               speaker: {
               alias: moon.name,
@@ -447,22 +447,24 @@ export var _myCalendarSpec = {
             });
           }
         }
-      })
-
-      if(this.moons.length > 5 && !document.getElementById('calendar-moon-overflow')){
-        document.getElementsByClassName('calendar-weekday-cntr')[0].style.display = "grid"
-        document.getElementsByClassName('calendar-weekday-cntr')[0].innerHTML += `<div id='calendar-moon-overflow'>${moonDisplayOutput}</div>`
+      });
+      
+      /* display single/multiple moons */
+      if (this.moons.length > 1) {
+        document.getElementById('calendar--moon-list').classList.add('hasMoon');
+        document.getElementById('calendar--moon-list').innerHTML += moonDisplayOutput;
+      } else {
+        document.getElementById('calendar--moon').classList.add('hasMoon');
+        document.getElementById('calendar--moon').innerHTML += moonDisplayOutput;
       }
-      else
-        document.getElementsByClassName('calendar-weekday-cntr')[0].innerHTML += moonDisplayOutput
 
       moonInfo.forEach((moon) => {
         document.getElementById(`calender-moon-symbol-${moon.index}`).src = moon.symbol;
-        document.getElementById(`calender-moon-symbol-${moon.index}`).title = `${moon.name} | ${moon.prefix} ${moon.phase}`
-      })
+        document.getElementById(`calender-moon-symbol-${moon.index}`).title = `${moon.name} | ${moon.prefix} ${moon.phase}`;
+      });
 
-      if(updatedMoons && game.settings.get('calendar-weather', 'moonDisplay')){
-        let messageLvl = ChatMessage.getWhisperRecipients("GM")
+      if (updatedMoons && game.settings.get('calendar-weather', 'moonDisplay')) {
+        let messageLvl = ChatMessage.getWhisperRecipients("GM");
         ChatMessage.create({
           speaker: {
           alias: 'Moons',
@@ -474,6 +476,7 @@ export var _myCalendarSpec = {
     }
   
     checkEvents() {
+      console.log('checking events')
       if (!Gametime.isMaster()) return;
   
       let currentMonth = this.currentMonth;
@@ -481,29 +484,29 @@ export var _myCalendarSpec = {
   
       // seasons
       let newSeason = this.findSeason(Gametime.DTNow());
-      let newTemp = 0
-      let newHumidity = 0
+      let newTemp = 0;
+      let newHumidity = 0;
       if (newSeason) {
         if (newSeason.temp == "-") {
-          newTemp = -10
+          newTemp = -10;
         } else if (newSeason.temp == "+") {
-          newTemp = 10
+          newTemp = 10;
         }
         if (newSeason.humidity == "-") {
-          newHumidity = -1
+          newHumidity = -1;
         } else if (newSeason.humidity == "+") {
-          newHumidity = 1
+          newHumidity = 1;
         }
-        let updateFlag = this.weather.season !== newSeason.name || 
-        this.weather.dawn !== newSeason.dawn || 
-        this.weather.dusk !== newSeason.dusk || 
-        this.weather.seasonColor !== newSeason.color || 
-        this.weather.seasonTemp !== newTemp || 
+        let updateFlag = this.weather.season !== newSeason.name ||
+        this.weather.dawn !== newSeason.dawn ||
+        this.weather.dusk !== newSeason.dusk ||
+        this.weather.seasonColor !== newSeason.color ||
+        this.weather.seasonTemp !== newTemp ||
         this.weather.seasonHumidity !== newHumidity ||
         this.weather.seasonRolltable !== newSeason.rolltable
         if (newSeason && updateFlag) {
           // season change
-          this.weather.setSeason(newSeason)
+          this.weather.setSeason(newSeason);
           if (this.weather.season !== newSeason.name) {
             let chatOut = "<b>" + newSeason.name + "</b> - " + this.dateNum;
             ChatMessage.create({
@@ -519,7 +522,7 @@ export var _myCalendarSpec = {
   
       //Find reoccuring events
       const macroRe = /\@Macro\[(.*)\].*/;
-      const journalRe = /\@\@JournalEntry\[(.*)\].*/
+      const journalRe = /\@\@JournalEntry\[(.*)\].*/;
   
       let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
       filtReEvents.forEach((event) => {
@@ -541,7 +544,7 @@ export var _myCalendarSpec = {
   
       combinedDate += "-" + this.year
       let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
-      this.events = this.events.filter(event => event.date.combined !== combinedDate)
+      this.events = this.events.filter(event => event.date.combined !== combinedDate);
   
       filtEvents.forEach((event) => {
         let dt = game.Gametime.DTNow();
@@ -565,14 +568,14 @@ export var _myCalendarSpec = {
         }
         let macro = this.getEntity(event.text, game.macros, macroRe);
         if (macro) {
-          game.Gametime.doAt(dt, macro.name)
+          game.Gametime.doAt(dt, macro.name);
         } else {
           let journal = this.getEntity(event.text, game.journal, journalRe);
-          let infoOut = (journal != null) ? journal.data.content : event.text
+          let infoOut = (journal != null) ? journal.data.content : event.text;
           let chatOut = "<b>" + event.name + "</b> - " + this.dateNum + timeOut + "<hr>" + infoOut;
           game.Gametime.reminderAt(dt, chatOut, "Event:", "GM");
         }
-      })
+      });
     }
   
     getWeatherObj() {
@@ -621,7 +624,7 @@ export var _myCalendarSpec = {
         sec = "0" + sec;
       }
       if (this.is24) {
-        this.timeDisp = hours + ":" + minutes + ":" + sec
+        this.timeDisp = hours + ":" + minutes + ":" + sec;
       } else {
         hours = (hours % 12) || 12;
         this.timeDisp = hours + ":" + minutes + ":" + sec + " " + AmOrPm;

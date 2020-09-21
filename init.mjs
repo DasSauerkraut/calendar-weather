@@ -77,12 +77,6 @@ $(document).ready(() => {
     c.updateSettings()
   })
 
-  Hooks.on("calendarWeatherRegenerate", () => {
-    cwdtData.dt.weather.generate();
-    c.updateDisplay();
-    c.updateSettings();
-  })
-
   Hooks.on('calendarWeatherClimateSet', (newClimate) => {
     console.log("calendar-weather | Setting climate: " + newClimate)
     cwdtData.dt.weather.setClimate(newClimate);
@@ -91,47 +85,44 @@ $(document).ready(() => {
   });
 
   Hooks.on("renderCalendar", () => {
-    if (Gametime.isRunning()) {
-      document.getElementById('calendar-btn-sec').disabled = true;
-      document.getElementById('calendar-btn-halfMin').disabled = true;
-      document.getElementById('calendar-btn-sec').style.cursor = 'not-allowed';
-      document.getElementById('calendar-btn-halfMin').style.cursor = 'not-allowed';
-      document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
-      document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
-      document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
-      document.getElementById('calender-time-running').innerHTML = '⪧'
-    } else {
-      document.getElementById('calendar-btn-sec').disabled = false;
-      document.getElementById('calendar-btn-halfMin').disabled = false;
-      document.getElementById('calendar-btn-sec').style.cursor = 'pointer';
-      document.getElementById('calendar-btn-halfMin').style.cursor = 'pointer';
-      document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
-      document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
-      document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
-      document.getElementById('calender-time-running').innerHTML = '■'
+    if(!game.user.isGM){
+      document.getElementById('calendar-time-container').classList.add('calendar-weather-ltd');
     }
-    let icon = document.getElementById('calendar-weather');
+    if (Gametime.isRunning()) {
+      console.log('gameTime is Running!');
+      document.getElementById('calendar-btn-advance_01').classList.add('disabled');
+      document.getElementById('calendar-btn-advance_02').classList.add('disabled');
+      document.getElementById('calendar-time-running').classList.add('isRunning');
+      document.getElementById('clock-run-indicator').classList.add('isRunning');
+    } else {
+      console.log('gameTime is not Running!');
+      document.getElementById('calendar-btn-advance_01').classList.remove('disabled');
+      document.getElementById('calendar-btn-advance_02').classList.remove('disabled');
+      document.getElementById('calendar-time-running').classList.remove('isRunning');
+      document.getElementById('clock-run-indicator').classList.remove('isRunning');
+    }
+    let seasonIndicator = document.getElementById('season-indicator');
     switch (cwdtData.dt.weather.seasonColor) {
       case 'red':
-        icon.style.color = "#B12E2E"
+        seasonIndicator.style.color = "#B12E2E"
         break;
       case 'orange':
-        icon.style.color = "#B1692E"
+        seasonIndicator.style.color = "#B1692E"
         break;
       case 'yellow':
-        icon.style.color = "#B99946"
+        seasonIndicator.style.color = "#B99946"
         break;
       case 'green':
-        icon.style.color = "#258E25"
+        seasonIndicator.style.color = "#258E25"
         break;
       case 'blue':
-        icon.style.color = "#5b80a5"
+        seasonIndicator.style.color = "#5b80a5"
         break;
       case 'white':
-        icon.style.color = "#CCC"
+        seasonIndicator.style.color = "#CCC"
         break;
       default:
-        icon.style.color = "#000"
+        // icon.style.color = "#000"
         break
     }
   })
@@ -248,4 +239,8 @@ $(document).ready(() => {
       });
     }
   });
+
+  Hooks.on("pauseGame", (pause) => {
+    console.log('Game Paused: ' + pause)
+  })
 });

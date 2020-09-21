@@ -1,0 +1,14 @@
+# clock always starts when opening/closing setting windows
+# first moon does not have info-label
+# moons reset on reload (are always displayed as "new") - problem with "lastMoons"?
+# season highlight color does not get applied upon loading/reload
+# 24 hr format gets displayed as PM/AM when making gerneral setting changes
+
+### wishlist
+
+# add configurable time controls
+- create input fields with numeric values (1-60), unit dropdown (seconds, minutes, hours) checkbox to set inactive (invisible)
+
+# visualize when the clock is paused because of the paused game state.
+- add a class to the clock when the game is paused
+# if month only has on Day ommit Day number in Date

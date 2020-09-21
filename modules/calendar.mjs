@@ -1,5 +1,5 @@
 import  { CalendarEvents } from "./calendarEvents.mjs";
-import { WeatherForm } from "./weatherForm.mjs";
+// import { WeatherForm } from "./weatherForm.mjs";
 import { _myCalendarSpec, DateTime } from "./dateTime.mjs";
 import { Month } from "./month.mjs";
 import { WeatherTracker } from "./weatherTracker.mjs";
@@ -12,7 +12,7 @@ export class Calendar extends Application {
     toggled = true;
     showToPlayers = true;
     eventsForm = new CalendarEvents();
-    weatherForm = new WeatherForm();
+    // weatherForm = new WeatherForm();
     cwdtData = {};
     static get defaultOptions() {
       const options = super.defaultOptions;
@@ -27,13 +27,13 @@ export class Calendar extends Application {
     }
   
     getPlayerDisp() {
-      return this.showToPlayers
+      return this.showToPlayers;
     }
 
     setPos(pos) {
       return new Promise(resolve => {
         function check() {
-          let elmnt = document.getElementById("calendar-time-container")
+          let elmnt = document.getElementById("calendar-time-container");
           if (elmnt) {
             elmnt.style.bottom = null;
             let xPos = (pos.left) > window.innerWidth ? window.innerWidth-200 : pos.left;
@@ -48,7 +48,7 @@ export class Calendar extends Application {
           }
         }
         check();
-      })
+      });
     }
   
     loadSettings() {
@@ -56,10 +56,10 @@ export class Calendar extends Application {
 
       if(game.user.data.flags.calendarWeather){
         let pos = game.user.data.flags.calendarWeather.calendarPos;
-        this.setPos(pos)
+        this.setPos(pos);
       }
       this.showToPlayers = game.settings.get('calendar-weather', 'calendarDisplay');
-      cwdtData.dt.is24 = game.settings.get('calendar-weather', 'is24')
+      cwdtData.dt.is24 = game.settings.get('calendar-weather', 'is24');
       if (!data || !data.months) {
         if (data.default) {
           console.log("calendar-weather | rebuilding data", data.default);
@@ -68,7 +68,7 @@ export class Calendar extends Application {
           data.default.months = data.default.months.map((m, i) => {
             m.leapLength = m.length;
             if (!m.abbrev) m.abbrev = `${i+1}`;
-            return m
+            return m;
           });
           cwdtData.dt.months = data.default.months;
           cwdtData.dt.daysOfTheWeek = data.default.daysOfTheWeek;
@@ -161,11 +161,12 @@ export class Calendar extends Application {
       this.isOpen = isOpen;
       if (isOpen) {
         game.Gametime.stopRunning();
-        console.log("calendar-weather | Pausing real time clock.")
-      } else {
-        game.Gametime.startRunning();
-        console.log("calendar-weather | Resuming real time clock.")
-      }
+        console.log("calendar-weather | Pausing real time clock.");
+      } 
+      // else {
+      //   game.Gametime.startRunning();
+      //   console.log("calendar-weather | Resuming real time clock.");
+      // }
     }
   
     rebuild(obj) {
@@ -204,10 +205,10 @@ export class Calendar extends Application {
   
     setEvents(newData) {
       let data = JSON.parse(newData);
-      cwdtData.dt.seasons = data.seasons
-      cwdtData.dt.reEvents = data.reEvents
-      cwdtData.dt.events = data.events
-      cwdtData.dt.moons = data.moons
+      cwdtData.dt.seasons = data.seasons;
+      cwdtData.dt.reEvents = data.reEvents;
+      cwdtData.dt.events = data.events;
+      cwdtData.dt.moons = data.moons;
       cwdtData.dt.checkEvents();
       cwdtData.dt.checkMoons(true);
     }
@@ -228,13 +229,13 @@ export class Calendar extends Application {
       let pos = {bottom: 8, left: 15}
       return new Promise(resolve => {
         function check() {
-          let elmnt = document.getElementById("calendar-time-container")
+          let elmnt = document.getElementById("calendar-time-container");
           if (elmnt) {
-            console.log('calendar-weather | Resetting Calendar Position')
+            console.log('calendar-weather | Resetting Calendar Position');
             elmnt.style.top = null;
             elmnt.style.bottom = (pos.bottom) + "%";
             elmnt.style.left = (pos.left) + "%";
-            game.user.update({flags: {'calendar-weather':{ 'calendarPos': {top: elmnt.offsetTop, left: elmnt.offsetLeft}}}})
+            game.user.update({flags: {'calendar-weather':{ 'calendarPos': {top: elmnt.offsetTop, left: elmnt.offsetLeft}}}});
             resolve();
           } else {
             setTimeout(check, 30);
@@ -245,7 +246,7 @@ export class Calendar extends Application {
     }
 
     static toggleCalendar(calendar){
-      console.log('calendar-weather | Toggling calendar display.')
+      console.log('calendar-weather | Toggling calendar display.');
       let templatePath = "modules/calendar-weather/templates/calendar.html";
       if (calendar.toggled) {
         calendar.toggled = false;
@@ -263,35 +264,57 @@ export class Calendar extends Application {
     updateDisplay() {
       let now = game.Gametime.DTNow();
       if (Gametime.DTNow().toDays().days * 24 * 60 * 60 + Gametime.DTNow().seconds == 0) {
-        document.getElementById("calendar-date").innerHTML = "Calendar Loading...";
+        document.getElementById("calendar-time-container").classList.add('loading');
+        document.getElementById("calendar-weekday").innerHTML = "Calendar Loading...";
       } else {
-        if(document.getElementById("calendar-date").innerHTML == "Calendar Loading...")
-          cwdtData.dt.checkMoons(true)
-        document.getElementById("calendar-date").innerHTML = cwdtData.dt.dateWordy;
+        if(document.getElementById("calendar-time-container").classList.contains('loading'))
+          cwdtData.dt.checkMoons(true);
+        document.getElementById("calendar-time-container").classList.remove('loading');
+        document.getElementById("calendar-weekday").innerHTML = Gametime.DTC.weekDays[now.dow()];
       }
+      document.getElementById("calendar-date").innerHTML = cwdtData.dt.dateWordy;
       document.getElementById("calendar-date-num").innerHTML = cwdtData.dt.dateNum;
-      document.getElementById("calendar-weekday").innerHTML = Gametime.DTC.weekDays[now.dow()];
       cwdtData.dt.setTimeDisp();
       document.getElementById("calendar-time").innerHTML = cwdtData.dt.timeDisp;
-      let temp = document.getElementById("calendar-weather-temp")
+
+      let temp = document.getElementById("calendar-weather--temp");
       if (temp && this) {
-        if (cwdtData.dt.weather.isC) {
-          temp.innerHTML = cwdtData.dt.getWeatherObj().cTemp;
+       
+        if (game.settings.get( "calendar-weather", "useCelcius")) {
+          temp.innerHTML = cwdtData.dt.getWeatherObj().cTemp + " °C";
         } else {  
-          temp.innerHTML = cwdtData.dt.getWeatherObj().temp;
+          temp.innerHTML = cwdtData.dt.getWeatherObj().temp + " °F";
         }
-        document.getElementById("calendar-weather-precip").innerHTML = cwdtData.dt.getWeatherObj().precipitation
-        let offset = document.getElementById("calendar-time-container")
-        document.getElementById("calendar-weather-container").style.left = (parseInt(offset.style.left.slice(0, -2)) + offset.offsetWidth) + 'px'
-        this.weatherForm.updateData(cwdtData.dt.getWeatherObj())
+        document.getElementById("calendar-weather-precip").innerHTML = cwdtData.dt.getWeatherObj().precipitation;
+
+
+        let offset = document.getElementById("calendar-time-container");
+        document.getElementById("calendar-weather--container").style.left = (parseInt(offset.style.left.slice(0, -2)) + offset.offsetWidth) + 'px';
+        // this.weatherForm.updateData(cwdtData.dt.getWeatherObj());
       }
       if (Gametime.isRunning()) {
-        document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
-        document.getElementById('calender-time-running').innerHTML = '⪧'
+        document.getElementById('calendar-btn-advance_01').classList.add('disabled');
+        document.getElementById('calendar-btn-advance_02').classList.add('disabled');
+        document.getElementById('calendar-time-running').classList.add('isRunning');
+        document.getElementById('clock-run-indicator').classList.add('isRunning');
       } else {
-        document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
-        document.getElementById('calender-time-running').innerHTML = '■'
+        document.getElementById('calendar-btn-advance_01').classList.remove('disabled');
+        document.getElementById('calendar-btn-advance_02').classList.remove('disabled');
+        document.getElementById('calendar-time-running').classList.remove('isRunning');
+        document.getElementById('clock-run-indicator').classList.remove('isRunning');
       }
+
+    //   let units = " °F";
+    //   if (this.data.isC) {
+    //     units = " °C";
+    //     document.getElementsByClassName("calendar-weather-temp")[0].innerHTML = this.data.cTemp;
+    //   } else {
+    //     document.getElementsByClassName("calendar-weather-temp")[0].innerHTML = this.data.temp;
+    //   }
+    //   document.getElementById("calendar-weather-units").innerHTML = units;
+    //   Hooks.callAll('calendarWeatherUpdateUnits', this.data.isC);
+    // }
+  
   
       game.Gametime._save(true);
     }
@@ -320,26 +343,34 @@ export class Calendar extends Application {
     }
 
     activateListeners(html) {
-      const nextDay = '#calendar-btn-day';
-      const quickAction = '#calendar-btn-quick';
-      const calendarSetup = '#calendar-date';
-      const longAction = '#calendar-btn-long';
-      const nightSkip = '#calendar-btn-night';
-      const sec = '#calendar-btn-sec';
-      const halfMin = '#calendar-btn-halfMin';
-      const min = '#calendar-btn-min';
-      const fiveMin = '#calendar-btn-fiveMin';
-      const toggleClock = '#calendar-time';
+      const calendarContainer = '#calendar-time-container';
+      const toggleDateFormat = '#calendar--date-display';
+      const advanceToDawn = '#calendar-btn-dawn';
+      const advanceToNoon = '#calendar-btn-noon';
+      const advanceToDusk = '#calendar-btn-dusk';
+      const advanceToMidnight = '#calendar-btn-midnight';
+      const advance = '.advance-btn';
+      const calendarSetup = '#calendar-setup';
+      const calendarMove = '#calendar--move-handle';
+      const startStopClock = '#start-stop-clock';
       const events = '#calendar-events';
       const weather = '#calendar-weather';
-      this.updateDisplay()
+      const refreshWeather = "#calendar-weather-regenerate"
+      this.updateDisplay();
       cwdtData.dt.checkEvents();
       let form = new CalendarForm(JSON.stringify(this.toObject()));
-      //Next Morning
-      html.find(nextDay).click(ev => {
+
+      // toggle date format 
+      html.find(toggleDateFormat).click(ev =>{
+        ev.preventDefault();
+        ev.currentTarget.classList.toggle('altFormat');
+      });
+
+      //Next Dawn
+      html.find(advanceToDawn).click(ev => {
         ev.preventDefault();
         if (!this.isOpen && game.user.isGM) {
-          console.log("calendar-weather | Advancing to 7am.");
+          console.log("calendar-weather | Advancing to dawn.");
           let now = Gametime.DTNow();
           let newDT = now.add({
             days: now.hours < 7 ? 0 : 1
@@ -351,65 +382,43 @@ export class Calendar extends Application {
           Gametime.setAbsolute(newDT);
         }
       });
-      //Quick Action
-      html.find(quickAction).click(ev => {
+
+      //To Midday
+      html.find(advanceToNoon).click(ev => {
         ev.preventDefault();
         if (!this.isOpen && game.user.isGM) {
-          console.log("calendar-weather | Advancing 15 min.");
-          Gametime.advanceTime({
-            minutes: 15
+          console.log("calendar-weather | Advancing to midday.");
+          let now = Gametime.DTNow();
+          let newDT = now.add({
+            days: now.hours < 12 ? 0 : 1
+          }).setAbsolute({
+            hours: 12,
+            minutes: 0,
+            seconds: 0
           });
+          Gametime.setAbsolute(newDT);
         }
       });
-      //1 sec advance
-      html.find(sec).click(ev => {
-        ev.preventDefault();
-        if (!this.isOpen && game.user.isGM && !Gametime.isRunning()) {
-          console.log("calendar-weather | Advancing 1 sec.");
-          game.Gametime.advanceClock(1)
-        }
-      });
-      //advance 30s
-      html.find(halfMin).click(ev => {
-        ev.preventDefault();
-        if (!this.isOpen && game.user.isGM && !Gametime.isRunning()) {
-          console.log("calendar-weather | Advancing 30 sec");
-          game.Gametime.advanceClock(30)
-        }
-      });
-      //advance 1 min
-      html.find(min).click(ev => {
+
+      //To Dusk
+      html.find(advanceToDusk).click(ev => {
         ev.preventDefault();
         if (!this.isOpen && game.user.isGM) {
-          console.log("calendar-weather | Advancing 1 min.");
-          game.Gametime.advanceTime({
-            minutes: 1
-          })
+          console.log("calendar-weather | Advancing to dusk.");
+          let now = Gametime.DTNow();
+          let newDT = now.add({
+            days: now.hours < 20 ? 0 : 1
+          }).setAbsolute({
+            hours: 20,
+            minutes: 0,
+            seconds: 0
+          });
+          Gametime.setAbsolute(newDT);
         }
       });
-      //advance 5 min
-      html.find(fiveMin).click(ev => {
-        ev.preventDefault();
-        if (!this.isOpen && game.user.isGM) {
-          console.log("calendar-weather | Advancing 5 min.");
-          game.Gametime.advanceTime({
-            minutes: 5
-          })
-        }
-      });
-      //Long Action
-      html.find(longAction).click(ev => {
-        ev.preventDefault();
-        if (!this.isOpen && game.user.isGM) {
-          console.log("calendar-weather | Advancing 1 hour.");
-          game.Gametime.advanceTime({
-            hours: 1
-          })
-  
-        }
-      });
+
       //To Midnight
-      html.find(nightSkip).click(ev => {
+      html.find(advanceToMidnight).click(ev => {
         ev.preventDefault();
         if (!this.isOpen && game.user.isGM) {
           console.log("calendar-weather | Advancing to midnight.");
@@ -423,84 +432,66 @@ export class Calendar extends Application {
           Gametime.setAbsolute(newDT);
         }
       });
+
+      //advance granular
+      html.find(advance).click(ev => {
+        ev.preventDefault();
+        if (!this.isOpen && game.user.isGM && !ev.target.classList.contains('disabled')) {
+          let unit = ev.target.dataset.unit;
+          let step = parseInt(ev.target.dataset.step);
+          if (unit == 's'){
+            game.Gametime.advanceClock(step);
+          } else if (unit == 'min'){
+            game.Gametime.advanceTime({
+              minutes: step
+            });
+          } else if (unit == 'h'){
+            game.Gametime.advanceTime({
+              hours: step
+            });
+          }
+        }
+      });
+
       //toggles real time clock on off, disabling granular controls
-      html.find(toggleClock).mousedown(ev => {
+      html.find(startStopClock).click(ev => {
         ev.preventDefault();
         ev = ev || window.event;
-        let isRightMB = false;
-        if ("which" in ev)  // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
-          isRightMB = ev.which == 3
-        else if ("button" in ev)  // IE, Opera 
-          isRightMB = ev.button == 2;
 
-        if (!this.isOpen && game.Gametime.isMaster() && !isRightMB) {
+        if (!this.isOpen && game.Gametime.isMaster()) {
           if (Gametime.isRunning()) {
             console.log("calendar-weather | Stopping about-time pseudo clock.");
             game.Gametime.stopRunning();
-            document.getElementById('calendar-btn-sec').disabled = false;
-            document.getElementById('calendar-btn-halfMin').disabled = false;
-            document.getElementById('calendar-btn-sec').style.cursor = 'pointer';
-            document.getElementById('calendar-btn-halfMin').style.cursor = 'pointer';
-            document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 1)";
-            document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 1)";
-            document.getElementById('calender-time-running').style.color = "rgba(255, 0, 0, 1)";
-            document.getElementById('calender-time-running').innerHTML = '⪧'
           } else {
             console.log("calendar-weather | Starting about-time pseudo clock.");
             Gametime.startRunning();
-            document.getElementById('calendar-btn-sec').disabled = true;
-            document.getElementById('calendar-btn-halfMin').disabled = true;
-            document.getElementById('calendar-btn-sec').style.cursor = 'not-allowed';
-            document.getElementById('calendar-btn-halfMin').style.cursor = 'not-allowed';
-            document.getElementById('calendar-btn-sec').style.color = "rgba(0, 0, 0, 0.5)";
-            document.getElementById('calendar-btn-halfMin').style.color = "rgba(0, 0, 0, 0.5)";
-            document.getElementById('calender-time-running').style.color = "rgba(0, 255, 0, 1)";
-            document.getElementById('calender-time-running').innerHTML = '■'
           }
           this.updateDisplay();
           this.updateSettings();
-        } else if(isRightMB){
-          Calendar.resetPos()
         }
       });
-      //handles hover events because can't access css hover property
-      html.find(sec).mouseover(ev => {
-        ev.preventDefault();
-        if (!Gametime.isRunning()) {
-          document.getElementById('calendar-btn-sec').style.color = "#FFF"
-        }
-      });
-      html.find(sec).mouseleave(ev => {
-        ev.preventDefault();
-        if (!Gametime.isRunning()) {
-          document.getElementById('calendar-btn-sec').style.color = "#000"
-        }
-      });
-      html.find(halfMin).mouseover(ev => {
-        ev.preventDefault();
-        if (!Gametime.isRunning()) {
-          document.getElementById('calendar-btn-halfMin').style.color = "#FFF"
-        }
-      });
-      html.find(halfMin).mouseleave(ev => {
-        ev.preventDefault();
-        if (!Gametime.isRunning()) {
-          document.getElementById('calendar-btn-halfMin').style.color = "#000"
-        }
-      });
+
       //Launch Calendar Form
-      html.find(calendarSetup).mousedown(ev => {
+      html.find(calendarSetup).click(ev => {
+        ev.preventDefault();
+        ev = ev || window.event;
+        if (game.user.isGM) {
+          form.renderForm(JSON.stringify(this.toObject()));
+        }
+      });
+
+      html.find(calendarMove).mousedown(ev => {
         ev.preventDefault();
         ev = ev || window.event;
         let isRightMB = false;
-        if ("which" in ev)  // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
-          isRightMB = ev.which == 3
-        else if ("button" in ev)  // IE, Opera 
+        if ("which" in ev) { // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+          isRightMB = ev.which == 3;
+        } else if ("button" in ev) { // IE, Opera 
           isRightMB = ev.button == 2;
-        if (game.user.isGM && !isRightMB) {
-          form.renderForm(JSON.stringify(this.toObject()));
-        } else if(isRightMB){
-          dragElement(document.getElementById("calendar-time-container"))
+        }
+
+        if (!isRightMB) {
+          dragElement(document.getElementById("calendar-time-container"));
           let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
           function dragElement(elmnt) {
@@ -537,19 +528,21 @@ export class Calendar extends Application {
               document.onmousemove = null;
               let xPos = (elmnt.offsetLeft - pos1) > window.innerWidth ? window.innerWidth-200 : (elmnt.offsetLeft - pos1);
               let yPos = (elmnt.offsetTop - pos2) > window.innerHeight-20 ? window.innerHeight-100 : (elmnt.offsetTop - pos2)
-              xPos = xPos < 0 ? 0 : xPos
-              yPos = yPos < 0 ? 0 : yPos
+              xPos = xPos < 0 ? 0 : xPos;
+              yPos = yPos < 0 ? 0 : yPos;
               if(xPos != (elmnt.offsetLeft - pos1) || yPos != (elmnt.offsetTop - pos2)){
                 elmnt.style.top = (yPos) + "px";
                 elmnt.style.left = (xPos) + "px";
               }
-              console.log(`calendar-weather | Setting calendar position to x: ${xPos}px, y: ${yPos}px`)
-              game.user.update({flags: {'calendarWeather':{ 'calendarPos': {top: yPos, left: xPos}}}})
+              console.log(`calendar-weather | Setting calendar position to x: ${xPos}px, y: ${yPos}px`);
+              game.user.update({flags: {'calendarWeather':{ 'calendarPos': {top: yPos, left: xPos}}}});
             }
           }
+        } else if(isRightMB){
+          Calendar.resetPos();
         }
       });
-
+     
       html.find(events).click(ev => {
         ev.preventDefault();
         if (game.user.isGM) {
@@ -558,9 +551,16 @@ export class Calendar extends Application {
       })
       html.find(weather).click(ev => {
         ev.preventDefault();
-        if (game.user.isGM) {
-          this.weatherForm.toggleForm(cwdtData.dt.getWeatherObj());
+        if (game.user.isGM || game.settings.get("calendar-weather", "playerSeeWeather")) {
+          document.getElementById('calendar-time-container').classList.toggle('showWeather');
         }
+      })
+      html.find(refreshWeather).click(ev => {
+        ev.preventDefault();
+        console.log('CLICK')
+        cwdtData.dt.weather.generate();
+        this.updateDisplay();
+        this.updateSettings();
       })
     }
   }

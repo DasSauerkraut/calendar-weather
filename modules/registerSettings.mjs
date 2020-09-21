@@ -52,12 +52,20 @@ export const registerSettings = function(calendar) {
     default: true,
     type: Boolean,
   });
-  // game.settings.register('calendar-weather', 'colorblindIcon', {
-  //   name: game.i18n.localize("CWSETTING.Colorblind"),
-  //   hint: game.i18n.localize("CWSETTING.ColorblindHelp"),
-  //   scope: 'world',
-  //   config: true,
-  //   default: true,
-  //   type: Boolean,
-  // })
+  game.settings.register('calendar-weather', 'useCelcius', {
+    name: game.i18n.localize("CWSETTING.useCelcius"),
+    hint: game.i18n.localize("CWSETTING.useCelciusHelp"),
+    scope: 'world',
+    config: true,
+    default: false,
+    type: Boolean,
+  });
+  game.settings.register('calendar-weather', 'playerSeeWeather', {
+    name: game.i18n.localize("CWSETTING.playerSeeWeather"),
+    hint: game.i18n.localize("CWSETTING.playerSeeWeatherHelp"),
+    scope: 'world',
+    config: true,
+    default: false,
+    type: Boolean,
+  });
 }

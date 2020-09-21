@@ -656,6 +656,7 @@ export class WeatherTracker {
     }
   
     generate(force = false) {
+      console.log('Generating')
       let roll = this.rand(1, 6)
       roll = roll + this.humidity + this.climateHumidity + Math.floor(this.seasonHumidity)
       let season = this.seasonTemp;
@@ -671,7 +672,7 @@ export class WeatherTracker {
       }
   
       if (force) {
-        this.temp = this.rand(this.lastTemp - 5, this.lastTemp + 5) + season + climate + (rand(1,20) === 20 ? 20 : 0);
+        this.temp = this.rand(this.lastTemp - 5, this.lastTemp + 5) + season + climate + (this.rand(1,20) === 20 ? 20 : 0);
       } else if (this.rand(1, 3) === 3) {
         this.temp = this.rand(40, 70) + season + climate;
       } else {

@@ -1,27 +1,164 @@
 <div id="calendar-time-container">
-	<div id="calendar">
-		<h3 id="calendar-hdr">
-			<i id=calendar-events class="far fa-calendar-alt" title="{{localize 'Events'}}"></i>
-			<span id="calendar-date" title="{{localize 'CWCALENDAR.EditCalendar'}}">Date</span><span title="{{localize 'CWCALENDAR.EditCalendar'}}" id="calendar-date-num">DateNum</span>
-			<i id=calendar-weather class="fas fa-cloud-sun" title="{{localize 'Weather'}}"></i>
-		</h3>
-		<div class="calendar-container">
-			<div class="calendar-btn-container-left">
-				<i id="calendar-btn-sec" class="fas fa-angle-right" title="{{localize 'CWTIME.Advance1second'}}" disabled></i>
-				<i id="calendar-btn-halfMin" class="fas fa-angle-double-right" title="{{localize 'CWTIME.Advance30seconds'}}" disabled></i>
-				<i id="calendar-btn-min" class="fas fa-play" title="{{localize 'CWTIME.Advance1minute'}}"></i>
-				<i id="calendar-btn-fiveMin" class="fas fa-step-forward" title="{{localize 'CWTIME.Advance5minutes'}}"></i>
+	<section id="calendar">
+
+		<!-- header -->
+		<header id="calendar-header" class="calendar--header">
+			<div class="header-navigation">
+				<div class="calendar--setup calendar-btn">
+					<i id="calendar-setup" class="fas fa-cog" title="{{localize 'CWCALENDAR.EditCalendar'}}"></i>
+				</div>
+				<div class="calendar--events calendar-btn">
+					<i id=calendar-events class="far fa-calendar" title="{{localize 'Events'}}"></i>
+				</div>
 			</div>
-			<div class="calendar-weekday-time">
-				<span class="calendar-weekday-cntr"><p id="calendar-weekday">Day of the Week</p></span>
-				<span class="calendar-time"><p class="calendar-time-disp" id="calendar-time" title="{{localize 'CWTIME.StartStopPseudo'}}">Time</p><span id='calender-time-running'>⪧</span></span>
+
+			<!-- day name -->
+			<h1 id="calendar--move-handle">
+				<span id="calendar-weekday">Day of the Week</span>
+			</h1>
+
+			<div class="header-navigation">
+				<div class="calendar--season-indicator" id="season-indicator">
+					<i class="fas fa-circle" title="{{localize 'Season'}}"></i>
+				</div>
+				<div class="calendar--weather-toggle calendar-btn">
+					<i id=calendar-weather class="fas fa-cloud-sun" title="{{localize 'Weather'}}"></i>
+				</div>
 			</div>
-			<div class="calendar-btn-container-right">
-				<i id="calendar-btn-quick" class="fas fa-forward" title="{{localize 'CWTIME.Advance15minutes'}}" ></i>
-				<i id="calendar-btn-long" class="fas fa-fast-forward" title="{{localize 'CWTIME.Advance1hour'}}" ></i>
-				<i id="calendar-btn-day" class="fas fa-sun" title="{{localize 'CWTIME.Advance7amNextDay'}}"></i>
-				<i id="calendar-btn-night" class="fas fa-moon" title="{{localize 'CWTIME.AdvanceToMidnight'}}"></i>
+		</header>
+
+		<!-- content -->
+		<div class="calendar--content">
+
+			<!-- date display -->
+			<section id="calendar--date-display" title="Click to toggle date format">
+				<h2>
+					<span id="calendar-date">Date</span>
+					<span id="calendar-date-num">DateNum</span>
+					<span id="calendar--moon"></span>
+				</h2>
+			</section>
+
+			<!-- multiple moon display -->
+			<section id="calendar--moon-list">
+			</section>
+
+			<!-- clock display -->
+			<section class="calendar--clock">
+
+				<div class="day-time-cues">
+					<div id="calendar-btn-dawn" class="time-cue--dawn calendar-btn" title="Advance to dawn.">
+						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sunrise" class="svg-inline--fa fa-sunrise fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M250.9 374.5c-20.6 8.5-36.3 23.5-46.6 41.5h167.2c-23.8-41.6-75.1-60.3-120.6-41.5zM80.7 416h87.6c.2-.5.2-1 .4-1.4 27.3-65.8 102.9-97.2 168.7-69.9 33.4 13.8 57.8 40.2 70.3 71.3h87.6l28.4-32.7c9.4-10.9 2.4-27.9-12-28.9l-106.5-7.6-7.6-106.5c-1-14.4-18-21.4-28.9-12l-80.7 70-80.7-70c-10.9-9.4-27.9-2.4-28.9 12l-7.6 106.5-106.5 7.6c-14.4 1-21.4 18-12 28.9L80.7 416zM560 464H16c-8.8 0-16 7.2-16 16v16c0 8.8 7.2 16 16 16h544c8.8 0 16-7.2 16-16v-16c0-8.8-7.2-16-16-16zM190.8 128H256v80c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-80h65.2c14.3 0 21.4-17.3 11.2-27.4L300 5c-6.6-6.6-17.4-6.6-24 0l-96.4 95.7c-10.2 10-3 27.3 11.2 27.3z"></path></svg>
+					</div>
+					<div id="calendar-btn-noon" class="time-cue--noon calendar-btn" title="Advance to noon.">
+						<i class="fas fa-sun"></i>
+					</div>
+				</div>
+
+				<div id="start-stop-clock" class="clock--time-display"  title="{{localize 'CWTIME.StartStopPseudo'}}">
+					<div id="clock-run-indicator" title="{{localize 'ClockRunning'}}">
+						<ul>
+							<li>
+								<i class="fas fa-hourglass-start"></i>
+							</li>
+							<li>
+								<i class="fas fa-hourglass-half"></i>
+							</li>
+							<li>
+								<i class="fas fa-hourglass-end"></i>
+							</li>
+							<li>
+								<i class="fas fa-hourglass"></i>
+							</li>
+						</ul>
+					</div>
+					<div class="time">
+						<span class="calendar-time-disp" id="calendar-time">00:00:00</span>
+					</div>
+					<div id='calendar-time-running' class="start-stop">
+						<i class="fas fa-play"></i>
+						<i class="fas fa-stop"></i>
+					</div>
+				</div>
+
+				<div class="day-time-cues">
+					<div id="calendar-btn-dusk" class="time-cue--dusk calendar-btn" title="Advance to dusk.">
+						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sunset" class="svg-inline--fa fa-sunset fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M250.9 374.5c-20.6 8.5-36.3 23.5-46.6 41.5h167.2c-23.8-41.6-75.1-60.3-120.6-41.5zM80.7 416h87.6c.2-.5.2-1 .4-1.4 27.3-65.8 102.9-97.2 168.7-69.9 33.4 13.8 57.8 40.2 70.3 71.3h87.6l28.4-32.7c9.4-10.9 2.4-27.9-12-28.9l-106.5-7.6-7.6-106.5c-1-14.4-18-21.4-28.9-12l-80.7 70-80.7-70c-10.9-9.4-27.9-2.4-28.9 12l-7.6 106.5-106.5 7.6c-14.4 1-21.4 18-12 28.9L80.7 416zM560 464H16c-8.8 0-16 7.2-16 16v16c0 8.8 7.2 16 16 16h544c8.8 0 16-7.2 16-16v-16c0-8.8-7.2-16-16-16zM276 219c6.6 6.6 17.4 6.6 24 0l96.4-95.7c10.1-10.1 3-27.4-11.3-27.4H320V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v80h-65.2c-14.3 0-21.4 17.3-11.2 27.4L276 219z"></path></svg>
+					</div>
+					<div id="calendar-btn-midnight" class="time-cue--midnight calendar-btn" title="{{localize 'CWTIME.AdvanceToMidnight'}}">				
+						<i class="fas fa-moon"></i>
+					</div>
+				</div>
+			</section>
+
+		</div>
+
+		<!-- footer -->
+		<footer class="calendar--time-controls">
+			<ul>
+				<li id="calendar-btn-advance_01" class="advance-btn disabled" title="{{localize 'CWTIME.Advance1second'}}" data-display="enabled" data-step="1" data-unit="s"></li>
+				<li id="calendar-btn-advance_02" class="advance-btn disabled" title="{{localize 'CWTIME.Advance30seconds'}}" data-display="enabled" data-step="30" data-unit="s"></li>
+				<li class="advance-btn" title="{{localize 'CWTIME.Advance1minute'}}" data-display="enabled" data-step="1" data-unit="min"></li>
+				<li class="advance-btn" title="{{localize 'CWTIME.Advance5minutes'}}" data-display="enabled" data-step="5" data-unit="min"></li>
+				<li class="advance-btn" title="{{localize 'CWTIME.Advance15minutes'}}" data-display="enabled" data-step="15" data-unit="min"></li>
+				<li class="advance-btn" title="{{localize 'CWTIME.Advance1hour'}}" data-display="enabled" data-step="1" data-unit="h"></li>
+			</ul>
+		</footer>
+
+		<div id="loader">
+			<div class="spinner">
+				<i class="fas fa-spinner"></i>
 			</div>
 		</div>
-	</div>
+
+	</section>
+
+	<section id="weather">
+		<div id="calendar-weather--container">
+			<header>
+				<span id="calendar-weather--temp">24.5°C</span>
+		    <select class="calendar-weather-climate" title="{{localize 'SelectClimate'}}" onChange="Hooks.callAll('calendarWeatherClimateSet', this.value);">
+		    	<option title="Temp: Neutral, Humidity: Neutral" value="temperate">{{localize 'Temperate'}}</option>
+		      <option title="Temp: Cold, Humidity: Neutral" value="tempMountain">{{localize 'TemperateMountain'}}</option>
+		      <option title="Temp: Very Hot, Humidity: Very Dry" value="desert">{{localize 'Desert'}}</option>
+		      <option title="Temp: Very Cold, Humidity: Neutral" value="tundra">{{localize 'Tundra'}}</option>
+		      <option title="Temp: Very Hot, Humidity: Wet" value="tropical">{{localize 'Tropical'}}</option>
+		      <option title="Temp: Very Cold, Humidity: Dry" value="taiga">{{localize 'Taiga'}}</option>
+		      <option title="Temp: Extremely Hot, Humidity: Volcanic" value="volcanic">{{localize 'Volcanic'}}</option>
+		      <option title="Temp: Extremely Cold, Humidity: Neutral. Adjusts Night cycle to be more extreme depending on season's temperature." value="polar">{{localize 'Polar'}}</option>
+		    </select>
+		    <div class="calendar-weather--refresh calendar-btn" id="calendar-weather-regenerate" title="Regenerate Weather">
+					<i class="fas fa-redo"></i>
+				</div>
+			</header>
+			<div class="calendar-weather--content">
+				<div class="calendar-weather--description">
+					<p id="calendar-weather-precip" >Lorem, ipsum dolor sit amet, consectetur adipisicing elit. Nisi ratione animi ab reiciendis blanditiis illo placeat iure similique pariatur Quam.</p>
+				</div>
+				<!-- <div class="calendar-weather--temp-display">
+					<span class="calendar-weather-temp" title="{{localize 'SwitchFC'}}">24.5</span> <span class="calendar-weather-units">°C</span>
+				</div> -->
+			</div>
+		</div>
+<!-- 
+		<div id="calendar-weather-container">
+			<h3 id="calendar-weather-hdr">
+		    <span id="calendar-weather-temp" title="{{localize 'SwitchFC'}}">{{temp}}</span><span id="calendar-weather-units">{{#if isC}} °C {{else}} °F{{/if}}</span>
+		    <select id="calendar-weather-climate" title="{{localize 'SelectClimate'}}" onChange="
+		      Hooks.callAll('calendarWeatherClimateSet', this.value);
+		    ">
+		      <option title="Temp: Neutral, Humidity: Neutral" value="temperate">{{localize 'Temperate'}}</option>
+		      <option title="Temp: Cold, Humidity: Neutral" value="tempMountain">{{localize 'TemperateMountain'}}</option>
+		      <option title="Temp: Very Hot, Humidity: Very Dry" value="desert">{{localize 'Desert'}}</option>
+		      <option title="Temp: Very Cold, Humidity: Neutral" value="tundra">{{localize 'Tundra'}}</option>
+		      <option title="Temp: Very Hot, Humidity: Wet" value="tropical">{{localize 'Tropical'}}</option>
+		      <option title="Temp: Very Cold, Humidity: Dry" value="taiga">{{localize 'Taiga'}}</option>
+		      <option title="Temp: Extremely Hot, Humidity: Volcanic" value="volcanic">{{localize 'Volcanic'}}</option>
+		      <option title="Temp: Extremely Cold, Humidity: Neutral. Adjusts Night cycle to be more extreme depending on season's temperature." value="polar">{{localize 'Polar'}}</option>
+		    </select>
+		  </h3>
+		  <p id="calendar-weather-precip" title="Regenerate Weather">{{precipitation}}</p>
+		</div> 
+-->
+	</section>
 </div>

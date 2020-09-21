@@ -135,7 +135,7 @@
   "TodayW": "Today's Weather:",
   "MorrsliebFull": "Morrslieb is full...",
 
-  "CWCALENDAR.EditCalendar": "Edit Calendar, Right Click & Drag to move Calendar",
+  "CWCALENDAR.EditCalendar": "Edit Calendar",
   "CalendarSettings": "Calendar Settings",
   "CurrentDay": "Current Day: ", 
   "AM": "AM",
@@ -163,5 +163,10 @@
   "CWSETTING.NightCycleLabel": "Scene Night Cycle",
   "CWSETTING.NightCycleLabelHelp": "When checked, the scene will undergo a night cycle, darkening during the night and getting brighter during the day.",
   "CWSETTING.NoGlobal": "Disable Global Illumination at Night",
-  "CWSETTING.NoGlobalHelp": "When checked, once the scene reaches max darkness, it will disable the scene's Global Illumination"
+  "CWSETTING.NoGlobalHelp": "When checked, once the scene reaches max darkness, it will disable the scene's Global Illumination",
+  "CWSETTING.useCelcius": "Use Celcius",
+  "CWSETTING.useCelciusHelp": "Use Celcius for temperature display.",
+  "CWSETTING.useCelcius": "Can Players see the Weather",
+  "CWSETTING.useCelciusHelp": "When checked, players can toggle the weather form."
+
 }

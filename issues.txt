@@ -1,6 +1,4 @@
 # clock always starts when opening/closing setting windows
-# first moon does not have info-label
-# moons reset on reload (are always displayed as "new") - problem with "lastMoons"?
 # season highlight color does not get applied upon loading/reload
 # 24 hr format gets displayed as PM/AM when making gerneral setting changes
 

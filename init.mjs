@@ -221,6 +221,7 @@ $(document).ready(() => {
           cwdtData.dt.checkEvents();
           cwdtData.dt.checkMoons();
           cwdtData.dt.weather.generate();
+          c.updateSettings();
         }
       }
       cwdtData.dt.lastDays = newDays;

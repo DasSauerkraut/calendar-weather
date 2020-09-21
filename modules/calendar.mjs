@@ -217,6 +217,7 @@ export class Calendar extends Application {
       if (game.user.isGM) {
         game.settings.set("calendar-weather", "dateTime", this.toObject());
         if (Gametime.DTC.saveUserCalendar && game.user.isGM) {
+          console.log(_myCalendarSpec)
           Gametime.DTC.saveUserCalendar(_myCalendarSpec);
           // set about-time to use our calendar spec on startup
           if (game.settings.get("about-time", "calendar") !== 0) game.settings.set("about-time", "calendar", 0);
@@ -557,7 +558,6 @@ export class Calendar extends Application {
       })
       html.find(refreshWeather).click(ev => {
         ev.preventDefault();
-        console.log('CLICK')
         cwdtData.dt.weather.generate();
         this.updateDisplay();
         this.updateSettings();

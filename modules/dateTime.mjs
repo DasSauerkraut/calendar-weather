@@ -305,6 +305,10 @@ export var _myCalendarSpec = {
       let moonDisplayOutput = '';
       let moonInfo = [];
 
+      if (!this.moons.lastMoons) {
+        this.moons["lastMoons"] = {};
+      }
+
       this.moons.forEach((moon, index) => {
         if(!moonSet){
           let percentIncrease = 1/moon.cycleLength * 100;
@@ -359,7 +363,7 @@ export var _myCalendarSpec = {
 
         //add moons to display
         if ( !document.getElementById(`calender-moon-symbol-${index}`)) {
-          moonDisplayOutput += `<img src="./modules/calendar-weather/icons/new.png" id='calender-moon-symbol-${index}'>`;
+          moonDisplayOutput += `<img src="${moonSymbol}" id='calender-moon-symbol-${index}'>`;
         }
 
         if (this.moons.lastMoons && this.moons.lastMoons[index] != moonSymbol) {
@@ -371,10 +375,6 @@ export var _myCalendarSpec = {
             phase: moonPhase,
             prefix: phasePrefix
           });
-        }
-
-        if (!this.moons.lastMoons) {
-          this.moons["lastMoons"] = {};
         }
         
         this.moons.lastMoons[index] = moonSymbol;
@@ -405,7 +405,6 @@ export var _myCalendarSpec = {
               chatOut = `<img src="${'./modules/calendar-weather/icons/sEclipse.png'}"> ${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEvent')}`;
               document.getElementById(`calender-moon-symbol-${index}`).src = './modules/calendar-weather/icons/sEclipse.png';
               document.getElementById(`calender-moon-symbol-${index}`).title = `${moon.name} | ${game.i18n.localize('CWMOON.SEclipseEvent')}`;
-              console.log('doNightCycle ' + cwdtData.dt.weather.doNightCycle);
               if (this.weather.doNightCycle && Gametime.isMaster()) {
                 canvas.scene.update({darkness: 1}, { animateDarkness: true});
               }
@@ -476,7 +475,6 @@ export var _myCalendarSpec = {
     }
   
     checkEvents() {
-      console.log('checking events')
       if (!Gametime.isMaster()) return;
   
       let currentMonth = this.currentMonth;

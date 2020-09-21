@@ -67,7 +67,7 @@
 }
 
 #calendar--move-handle {
-	font-size: 11px;
+	font-size: 13px;
 	line-height: 1;
 	text-align: center;
 	padding: 0;
@@ -315,7 +315,7 @@
   background: #444;
 }
 
-#calendar-weather--container header .calendar-weather--temp {
+#calendar-weather--container header #calendar-weather--temp {
   font-size: 14px;
   padding: 0 8px 0 4px;
   border-right: 1px solid rgba(255,255,255,.4);
@@ -329,7 +329,7 @@
   border: none;
   border-radius: 0;
   height: 20px;
-  font-size: 11px;
+  font-size: 14px;
   flex: 1;
   color: rgba(255,255,255,.9);
   padding: 0 4px;
@@ -387,13 +387,10 @@
 }
 
 .calendar-weather--description {
-  display: flex;
-  flex: 0 0 249px;
-  align-items: center;
   padding: 4px 10px;
-  font-size: 12px;
-  line-height: 14px;
-  text-align: center;
+  font-size: 15px;
+	line-height: 14px;
+	margin: auto;
 }
 
 .calendar-weather-precip {

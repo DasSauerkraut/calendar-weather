@@ -237,6 +237,7 @@ export class Calendar extends Application {
             elmnt.style.bottom = (pos.bottom) + "%";
             elmnt.style.left = (pos.left) + "%";
             game.user.update({flags: {'calendar-weather':{ 'calendarPos': {top: elmnt.offsetTop, left: elmnt.offsetLeft}}}});
+            elmnt.style.bottom = null;
             resolve();
           } else {
             setTimeout(check, 30);
@@ -516,6 +517,7 @@ export class Calendar extends Application {
               pos3 = e.clientX;
               pos4 = e.clientY;
               // set the element's new position:
+              elmnt.style.bottom = null
               elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
               elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
               elmnt.style.position = 'fixed';

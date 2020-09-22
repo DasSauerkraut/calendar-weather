@@ -163,5 +163,10 @@
   "CWSETTING.NightCycleLabel": "씬 주야 사이클",
   "CWSETTING.NightCycleLabelHelp": "체크시 주야 사이클로 인해 밤에 어두워지고 낮에 밝아진다.",
   "CWSETTING.NoGlobal": "달력/날씨 - 밤의 전체 조명을 비활성화한다.",
-  "CWSETTING.NoGlobalHelp": "체크 되었을 때, 씬의 어둠 수치가 최대에 도달하면 글로벌 조명이 비활성화된다."
+  "CWSETTING.NoGlobalHelp": "체크 되었을 때, 씬의 어둠 수치가 최대에 도달하면 글로벌 조명이 비활성화된다.",
+  "CWSETTING.useCelcius": "섭씨 사용",
+  "CWSETTING.useCelciusHelp": "기온 표시에 섭씨를 사용한다.",
+  "CWSETTING.playerSeeWeather": "플레이어에게 날씨 표시",
+  "CWSETTING.playerSeeWeatherHelp": "체크시 플레이어들이 날씨를 전환할 수 있다."
+
 }

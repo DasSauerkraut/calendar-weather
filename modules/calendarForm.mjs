@@ -27,6 +27,7 @@ export class CalendarForm extends FormApplication {
       options.template = "modules/calendar-weather/templates/calendar-form.html";
       options.width = 600;
       options.height = "auto";
+      options.title = "Calendar Weather Settings";
       return options;
     }
   

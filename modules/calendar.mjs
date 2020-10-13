@@ -217,7 +217,6 @@ export class Calendar extends Application {
       if (game.user.isGM) {
         game.settings.set("calendar-weather", "dateTime", this.toObject());
         if (Gametime.DTC.saveUserCalendar && game.user.isGM) {
-          console.log(_myCalendarSpec)
           Gametime.DTC.saveUserCalendar(_myCalendarSpec);
           // set about-time to use our calendar spec on startup
           if (game.settings.get("about-time", "calendar") !== 0) game.settings.set("about-time", "calendar", 0);
@@ -264,16 +263,10 @@ export class Calendar extends Application {
     }
   
     updateDisplay() {
-      let now = game.Gametime.DTNow();
-      if (Gametime.DTNow().toDays().days * 24 * 60 * 60 + Gametime.DTNow().seconds == 0) {
-        document.getElementById("calendar-time-container").classList.add('loading');
-        document.getElementById("calendar-weekday").innerHTML = "Calendar Loading...";
-      } else {
-        if(document.getElementById("calendar-time-container").classList.contains('loading'))
-          cwdtData.dt.checkMoons(true);
-        document.getElementById("calendar-time-container").classList.remove('loading');
-        document.getElementById("calendar-weekday").innerHTML = Gametime.DTC.weekDays[now.dow()];
-      }
+      let now = Gametime.DTNow();
+
+      document.getElementById("calendar-weekday").innerHTML = Gametime.DTC.weekDays[now.dow()];
+
       document.getElementById("calendar-date").innerHTML = cwdtData.dt.dateWordy;
       document.getElementById("calendar-date-num").innerHTML = cwdtData.dt.dateNum;
       cwdtData.dt.setTimeDisp();

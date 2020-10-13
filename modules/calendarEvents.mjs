@@ -10,9 +10,11 @@ export class CalendarEvents extends FormApplication {
       options.template = "modules/calendar-weather/templates/calendar-events.html";
       options.width = 600;
       options.height = "auto";
+      options.title = "Calendar Weather Events";
       return options;
     }
-  
+    
+    // save form data function
     saveData() {
       let savedData = {
         seasons: [],
@@ -22,26 +24,30 @@ export class CalendarEvents extends FormApplication {
       };
 
       let moonName = document.getElementsByClassName("calendar-moon-name");
-      let moonLength = document.getElementsByClassName("calendar-moon-length");
+      let moonCycleLength = document.getElementsByClassName("calendar-moon-length");
       let moonPercent = document.getElementsByClassName("calendar-moon-percent");
       let moonWaxing = document.getElementsByClassName("calendar-moon-waxing");
       let moonLEclipse = document.getElementsByClassName("calendar-moon-leclipse");
       let moonSEclipse = document.getElementsByClassName("calendar-moon-seclipse");
       let moon = {};
 
+      // iterate through all moons
       for(let i = 0; i < moonName.length; i++){
+        // Set the moon names
         if (moonName[i].value == "") {
           moon['name'] = 'Moon ' + i;
         } else {
           moon['name'] = moonName[i].value;
         }
 
-        if (parseInt(moonLength[i].value) < 1 || moonLength[i].value == NaN) {
+        // length of lunar cycle
+        if (parseInt(moonCycleLength[i].value) < 1 || moonCycleLength[i].value == NaN) {
           moon['cycleLength'] = 1;
         } else {
-          moon['cycleLength'] = parseInt(moonLength[i].value);
+          moon['cycleLength'] = parseInt(moonCycleLength[i].value);
         }
 
+        // lunar cycle progress in percent
         if (parseFloat(moonPercent[i].value) < 0 || moonPercent[i].value == NaN) {
           moon['cyclePercent'] = 0;
         } else if (parseFloat(moonPercent[i].value) > 100) {
@@ -50,8 +56,10 @@ export class CalendarEvents extends FormApplication {
           moon['cyclePercent'] = parseFloat(moonPercent[i].value);
         }
 
+        // moon is waxing
         moon['isWaxing'] = moonWaxing[i].checked;
 
+        // lunar eclipse chance
         if (parseFloat(moonLEclipse[i].value) < 0 || moonLEclipse[i].value == NaN) {
           moon['lunarEclipseChance'] = 0;
         } else if (parseFloat(moonLEclipse[i].value) > 100) {
@@ -60,6 +68,7 @@ export class CalendarEvents extends FormApplication {
           moon['lunarEclipseChance'] = parseFloat(moonLEclipse[i].value);
         }
 
+        // solar eclipse chance
         if (parseFloat(moonSEclipse[i].value) < 0 || moonSEclipse[i].value == NaN) {
           moon['solarEclipseChance'] = 0;
         } else if (parseFloat(moonSEclipse[i].value) > 100) {
@@ -68,7 +77,10 @@ export class CalendarEvents extends FormApplication {
           moon['solarEclipseChance'] = parseFloat(moonSEclipse[i].value);
         }
 
+        // push moon array data to moons array
         savedData.moons.push(moon);
+
+        // clear moon array
         moon = {};
       }
   
@@ -78,11 +90,11 @@ export class CalendarEvents extends FormApplication {
       let seasonTemp = document.getElementsByClassName("calendar-season-temp");
       let seasonHumid = document.getElementsByClassName("calendar-season-humidity");
       let seasonColor = document.getElementsByClassName("calendar-season-color");
-      let seasonDawn = document.getElementsByClassName("calendar-dawn")
-      let seasonDusk = document.getElementsByClassName("calendar-dusk")
-      let seasonRolltable = document.getElementsByClassName("calendar-season-rolltable")
-      let dawnAmpm = document.getElementsByClassName("calendar-dawn-ampm")
-      let duskAmpm = document.getElementsByClassName("calendar-dusk-ampm")
+      let seasonDawn = document.getElementsByClassName("calendar-dawn");
+      let seasonDusk = document.getElementsByClassName("calendar-dusk");
+      let seasonRolltable = document.getElementsByClassName("calendar-season-rolltable");
+      let dawnAmpm = document.getElementsByClassName("calendar-dawn-ampm");
+      let duskAmpm = document.getElementsByClassName("calendar-dusk-ampm");
       let event = {};
       let day = 0;
       let hours = 0;

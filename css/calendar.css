@@ -129,9 +129,9 @@
 #calendar--moon img,
 #calendar--moon-list img {
 	margin-left: 4px;
-	flex: 0 0 16px;
-	width: 16px;
-	height: 16px;
+	flex: 0 0 14px;
+	width: 14px;
+	height: 14px;
 	border: none;
 	vertical-align: middle;
 }
@@ -142,7 +142,7 @@
 
 #calendar--moon img {
 	position: relative;
-	top: -1px;
+	top: -2px;
 }
 
 #start-stop-clock {
@@ -173,10 +173,11 @@
 #clock-run-indicator {
 	color: rgba(255,255,255,.4);
 	transition: color .3s ease;
-	width: 12px;
-	height: 12px;
-	/*border-radius: 50%;*/
+	width: 13px;
+	height: 13px;
   overflow: hidden;
+  position: relative;
+  top: -1px;
 }
 
 #clock-run-indicator ul {
@@ -188,6 +189,8 @@
   margin: 0;
   padding: 0;
 	transform: translateX(-36px);
+  position: relative;
+  top: 1px;
 }
 
 #clock-run-indicator li {
@@ -208,6 +211,17 @@
 	transform: translateX(0px);
 	animation: hourglass 6s steps(3, end) infinite;
 	color: rgba(0,255,150,1);
+}
+
+.clockPaused #clock-run-indicator.isRunning ul {
+	animation: none;
+	transform: translateX(-36px);
+	color: rgba(255,155,0,1);
+}
+
+.clockPaused #clock-run-indicator.isRunning {
+	transform: rotate(90deg);
+	top: 0;
 }
 
 .clock--time-display {
@@ -316,12 +330,13 @@
 }
 
 #calendar-weather--container header #calendar-weather--temp {
-  font-size: 14px;
+  font-size: 13px;
   padding: 0 8px 0 4px;
   border-right: 1px solid rgba(255,255,255,.4);
   height: 100%;
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 #calendar-weather--container header select {
@@ -329,7 +344,8 @@
   border: none;
   border-radius: 0;
   height: 20px;
-  font-size: 14px;
+  font-size: 13px;
+  font-family: Signika, sans-serif;
   flex: 1;
   color: rgba(255,255,255,.9);
   padding: 0 4px;
@@ -374,6 +390,7 @@
   align-items: center;
   /*border-left: 1px solid rgba(255,255,255,.4);*/
   background: rgba(0,0,0,.5);
+  overflow: hidden; 
 }
 
 .calendar-weather--temp-display {
@@ -389,12 +406,14 @@
 .calendar-weather--description {
   padding: 4px 10px;
   font-size: 15px;
-	line-height: 14px;
+	line-height: 17px;
 	margin: auto;
 }
 
-.calendar-weather-precip {
+#calendar-weather-precip {
 	margin: 0;
+	width: 230px;
+	text-align: center;
 }
 
 /* Player View */
@@ -482,4 +501,45 @@
 #calendar-time-container:hover .day-time-cues,
 #calendar-time-container:hover .calendar--time-controls  {
 	opacity: 1;
+}
+
+/* CHAT OUTPUT */
+
+.calendar-weather-chat {
+	display: flex;
+	align-items: center;
+}
+
+.calendar-weather-chat:first-child {
+	padding-top: 12px;
+}
+
+.calendar-weather-chat + .calendar-weather-chat {
+	margin-top: 12px;
+	border-top: 1px solid rgba(0,0,0,.1);
+	padding-top: 12px;
+}
+
+.calendar-weather-chat img {
+	flex: 0 0 50px;
+	width: 50px;
+	height: 50px;
+	vertical-align: middle;
+	border: none;
+	margin-right: 8px;
+}
+
+.calendar-weather-chat .calendar-weather-chat--description {
+	flex: 1;
+}
+
+.calendar-weather-chat h4 {
+	font-weight: 600;
+  padding: 0 0 2px 0;
+  margin: 0 0 4px 0;
+  border-bottom: 1px solid rgba(0,0,0,.3);
+}
+
+.calendar-weather-chat p {
+	margin: 0;
 }

@@ -723,7 +723,7 @@ export class WeatherTracker {
       this.seasonRolltable = season.rolltable
       this.dawn = season.dawn
       this.dusk = season.dusk
-      let icon = document.getElementById('calendar-weather');
+      let icon = document.getElementById('season-indicator');
       switch (season.color) {
         case 'red':
           icon.style.color = "#B12E2E"
@@ -744,7 +744,7 @@ export class WeatherTracker {
           icon.style.color = "#CCC"
           break;
         default:
-          icon.style.color = "#000"
+          // icon.style.color = "#000"
           break
       }
       this.seasonColor = season.color;

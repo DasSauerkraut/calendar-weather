@@ -17,6 +17,7 @@ $(document).ready(() => {
     CONFIG.supportedLanguages['fr'] = 'French';
     console.log("calendar-weather | Initializing Calendar/Weather")
     registerSettings(c)
+    c.isLoading = true;
   });
 
   Hooks.on('setup', () => {
@@ -125,6 +126,9 @@ $(document).ready(() => {
         // icon.style.color = "#000"
         break
     }
+    if ( game.data.paused && document.getElementById('calendar-time-container')) {
+      document.getElementById('calendar-time-container').classList.add('clockPaused');
+    }
   })
 
   Hooks.on("renderSceneConfig", (app, html, data) => {
@@ -210,7 +214,9 @@ $(document).ready(() => {
 
   Hooks.on('ready', () => {
     c.loadSettings();
-    Hooks.on("pseudoclockSet", () => {
+    // CONFIG.debug.hooks = true;
+
+    Hooks.on("updateWorldTime", () => {
       let newDays = Gametime.DTNow().toDays().days;
       if (cwdtData.dt.lastDays !== newDays) {
         cwdtData.dt.genDateWordy();
@@ -232,7 +238,9 @@ $(document).ready(() => {
       }
     })
     Hooks.on("about-time.clockRunningStatus", c.updateDisplay)
-    // CONFIG.debug.hooks = true;
+    Hooks.on("about-time.pseudoclockMaster", () => {
+      cwdtData.dt.checkMoons(true);
+    })
     WarningSystem.validateAboutTime();
     if (c.getPlayerDisp() || game.user.isGM) {
       renderTemplate(templatePath, cwdtData).then(html => {
@@ -242,6 +250,13 @@ $(document).ready(() => {
   });
 
   Hooks.on("pauseGame", (pause) => {
-    console.log('Game Paused: ' + pause)
-  })
+    console.log('Game Paused: ' + pause);
+    if (document.getElementById('calendar-time-container')) {
+      if (pause) {
+        document.getElementById('calendar-time-container').classList.add('clockPaused');
+      } else {
+        document.getElementById('calendar-time-container').classList.remove('clockPaused');
+      }
+    }
+  });
 });

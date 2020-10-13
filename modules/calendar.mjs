@@ -53,7 +53,7 @@ export class Calendar extends Application {
   
     loadSettings() {
       let data = game.settings.get('calendar-weather', 'dateTime');
-
+      console.log("-------------------------------LOADING", data)
       if(game.user.data.flags.calendarWeather){
         let pos = game.user.data.flags.calendarWeather.calendarPos;
         this.setPos(pos);
@@ -215,6 +215,7 @@ export class Calendar extends Application {
   
     updateSettings() {
       if (game.user.isGM) {
+        console.log("Updating Settings", JSON.parse(JSON.stringify(this.toObject())))
         game.settings.set("calendar-weather", "dateTime", this.toObject());
         if (Gametime.DTC.saveUserCalendar && game.user.isGM) {
           Gametime.DTC.saveUserCalendar(_myCalendarSpec);
@@ -223,6 +224,7 @@ export class Calendar extends Application {
         }
         if (Gametime.isMaster()) Gametime._save(true);
       }
+      console.log('AFTER UPDATE', game.settings.get('calendar-weather', 'dateTime'))
     }
 
     static resetPos(){

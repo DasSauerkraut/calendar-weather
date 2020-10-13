@@ -53,6 +53,7 @@ $(document).ready(() => {
 
   Hooks.on('calendarSettingsClose', (updatedData) => {
     console.log("calendar-weather | Closing Calendar form.");
+    console.log(updatedData)
     c.rebuild(JSON.parse(updatedData));
     cwdtData.dt.genDateWordy();
     c.updateDisplay();

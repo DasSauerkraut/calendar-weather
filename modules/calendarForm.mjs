@@ -31,13 +31,15 @@ export class CalendarForm extends FormApplication {
       return options;
     }
   
-    saveData() {
+    async saveData() {
       let savedData = new DateTime();
   
       let year = parseInt(document.getElementById("calendar-form-year-input").value);
       if (year < 0) {
         year = 1;
       }
+
+      console.log("year" + year)
   
       savedData.era = document.getElementById("calendar-form-era-input").value;
   
@@ -124,7 +126,7 @@ export class CalendarForm extends FormApplication {
       }
       day -= 1;
   
-      Gametime.setAbsolute({
+      await Gametime.setAbsolute({
         years: year,
         months: monthTarget,
         days: day,
@@ -132,6 +134,8 @@ export class CalendarForm extends FormApplication {
         minutes: minutes,
         seconds: seconds
       })
+
+      console.log(game.Gametime.DTNow().years)
       let weekdayTarget = 0;
       if (document.querySelector('input[class="calendar-form-weekday-radio"]:checked') == null) {
         weekdayTarget = savedData.daysOfTheWeek.length - 1
@@ -174,7 +178,9 @@ export class CalendarForm extends FormApplication {
       html.find(submit).click(ev => {
         ev.preventDefault();
         this.close();
-        Hooks.callAll("calendarSettingsClose", this.saveData());
+        let newData = this.saveData()
+        console.log(newData)
+        Hooks.callAll("calendarSettingsClose", newData);
       });
       html.find(addWeekday).click(ev => {
         ev.preventDefault();

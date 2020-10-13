@@ -193,7 +193,7 @@ export class WeatherTracker {
       }
 
       if (game.modules.get("fxmaster") && game.modules.get("fxmaster").active) {
-        if(this.showFX || canvas.scene.getFlag('calendar-weather', 'showFX')){
+        if(this.showFX || canvas.scene?.getFlag('calendar-weather', 'showFX')){
           fxAvailable = true;
           this.showFX = true;
         }

@@ -58,5 +58,11 @@
       "name": "Español (España)",
       "path": "langs/es-ES.json"
     }
+  ],
+  "dependencies": [
+    {
+      "name": "about-time",
+      "manifest": "https://gitlab.com/tposney/about-time/-/raw/master/package/module.json"
+    }
   ]
 }

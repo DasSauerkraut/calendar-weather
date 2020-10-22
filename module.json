@@ -57,6 +57,11 @@
       "lang": "es",
       "name": "Español (España)",
       "path": "langs/es-ES.json"
+    },
+    {
+      "lang": "pl",
+      "name": "Polski",
+      "path": "langs/pl.json"
     }
   ],
   "dependencies": [

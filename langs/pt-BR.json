@@ -11,7 +11,9 @@
   "CWTIME.Advance5minutes": "Avance 5 minutos",
   "CWTIME.Advance15minutes": "Avance 15 minutos",
   "CWTIME.Advance1hour": "Avançar 1 hora",
-  "CWTIME.Advance7amNextDay": "Avance para as 7h do dia seguinte",
+  "CWTIME.AdvanceToDawn": "Avançar para o amanhecer",
+  "CWTIME.AdvanceToNoon": "Avançar para o meio-dia",
+  "CWTIME.AdvanceToDusk": "Avançar para o entardecer",
   "CWTIME.AdvanceToMidnight": "Avançar para meia-noite",
   "CWTIME.StartStopPseudo": "Pare/inicie o pseudo relógio em tempo real, clique com o botão direito do mouse para redefinir a posição do calendário.",
   "CWTIME.First": "º",
@@ -39,7 +41,6 @@
   "CWSEASONS.SeasonHourDark": "Digite a hora que escurece",
   "CWSEASONS.SeasonColor": "Que cor você deseja exibir com a estação?",
   "CWSEASONS.SeasonRolltable" : "OPCIONAL: digitar uma @RollTable[] desativará a geração avançada de clima e, em vez disso, o clima será gerado por meio da tabela.",
-
 
   "CWMOON.Title" : "Luas",
   "CWMOON.Intro" : "Digite a duração do ciclo, a porcentagem do ciclo atual e as informações de eclipse da(s) lua(s).",
@@ -75,7 +76,7 @@
   "CWMOON.2ChatHelp": "Se verdadeiro, qualquer alteração na fase da lua será exibida no chat, exibida apenas para usuários no nível GM.",
   "CWMOON.TotalLEclipse" : "Eclipse Lunar Total",
   "CWMOON.PartialLEclipse" : "Eclipse Lunar Parcial",
-
+  "CWMOON.ChatTitle" : "Fases da Lua",
 
   "Events": "Eventos",
   "ReoccuringEvents": "Eventos Recorrentes",
@@ -93,7 +94,6 @@
   "AllDayEvent": "Evento o dia inteiro",
   "AddOneTimeEvent": "Adicione um novo evento único",
   "SaveEvent": "Salvar Configurações do Evento",
-
 
   "Weather": "Clima",
   "SwitchFC": "Alternar entre °F e °C",
@@ -138,8 +138,6 @@
   "TodayW": "O clima de hoje:",
   "MorrsliebFull": "Morrslieb está cheia ...",
 
-
-
   "CWCALENDAR.EditCalendar": "Editar Calendário, clique com o botão direito e arraste para mover o Calendário",
   "CalendarSettings": "Configurações do Calendário",
   "CurrentDay": "Dia atual: ", 
@@ -157,8 +155,6 @@
   "SaveCalendar": "Salvar configurações da agenda",
   "LoadDefaultCalendar": "Carregar calendário padrão",
 
-
- 
   "CWSETTING.CalDispNonGm": "Exibição de calendário para não-GM",
   "CWSETTING.CalDispNonGmHelp": "Quando marcado, os clientes sem permissões no nível GM poderão ver o calendário",
   "CWSETTING.Weather2Chat": "Enviar previsão do tempo para o bate-papo?",
@@ -170,5 +166,9 @@
   "CWSETTING.NightCycleLabel": "Ciclo Noturno na Cena",
   "CWSETTING.NightCycleLabelHelp": "Quando marcada, a cena passará por um ciclo noturno, escurecendo durante a noite e ficando mais brilhante durante o dia.",
   "CWSETTING.NoGlobal": "Desativar iluminação global à noite",
-  "CWSETTING.NoGlobalHelp": "Quando marcada, quando a cena atingir o máximo de escuridão, ela desativará a Iluminação Global da cena"
+  "CWSETTING.NoGlobalHelp": "Quando marcada, quando a cena atingir o máximo de escuridão, ela desativará a Iluminação Global da cena",
+  "CWSETTING.useCelcius": "Usar Celcius",
+  "CWSETTING.useCelciusHelp": "Usar Celcius para exibir a temperatura.",
+  "CWSETTING.playerSeeWeather": "Os Jogadores podem ver o clima",
+  "CWSETTING.playerSeeWeatherHelp": "Quando habilitado, jogadores podem alternar o clima."
 }

@@ -11,7 +11,9 @@
   "CWTIME.Advance5minutes": "5분 진행",
   "CWTIME.Advance15minutes": "15분 진행",
   "CWTIME.Advance1hour": "1시간 진행",
-  "CWTIME.Advance7amNextDay": "다음 날 오전 7시로 진행",
+  "CWTIME.AdvanceToDawn": "새벽으로 진행",
+  "CWTIME.AdvanceToNoon": "오후로 진행",
+  "CWTIME.AdvanceToDusk": "일몰로 진행",
   "CWTIME.AdvanceToMidnight": "자정으로 진행",
   "CWTIME.StartStopPseudo": "유사 실시간 시계 중단/개시, 우클릭으로 달력 위치 리셋.",
   "CWTIME.First": "번째",
@@ -74,6 +76,7 @@
   "CWMOON.2ChatHelp": "참일 경우, 달의 위상 변화는 GM 레벨 유저에게만 표시되는 채팅으로 출력된다.",
   "CWMOON.TotalLEclipse" : "개기 월식",
   "CWMOON.PartialLEclipse" : "부분 월식",
+  "CWMOON.ChatTitle" : "달의 위상",
 
   "Events": "이벤트",
   "ReoccuringEvents": "이벤트 재발생",

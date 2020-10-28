@@ -221,7 +221,7 @@ export class CalendarForm extends FormApplication {
       this.close();
 
       let newData = await this.saveData();
-      Hooks.callAll("calendarSettingsClose", JSON.stringify(response));
+      Hooks.callAll("calendarSettingsClose", JSON.stringify(newData));
     });
     html.find(addWeekday).click(async (ev) => {
       ev.preventDefault();
@@ -292,7 +292,7 @@ export class CalendarForm extends FormApplication {
         ev.preventDefault();
         this.close();
         let newData = await this.saveData();
-        Hooks.callAll("calendarSettingsClose", JSON.stringify(response));
+        Hooks.callAll("calendarSettingsClose", JSON.stringify(newData));
       }
     });
   }

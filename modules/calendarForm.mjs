@@ -184,36 +184,44 @@ export class CalendarForm extends FormApplication {
       });
       html.find(addWeekday).click(ev => {
         ev.preventDefault();
-        this.data = JSON.parse(this.saveData());
-        this.data.daysOfTheWeek.push("");
-        this.render(true);
-        this.checkBoxes();
+        this.saveData().then( ( result ) => {
+          this.data = JSON.parse( result );
+          this.data.daysOfTheWeek.push("");
+          this.render(true);
+          this.checkBoxes();
+        });
       });
       html.find(addMonth).click(ev => {
         ev.preventDefault();
-        this.data = JSON.parse(this.saveData());
-        let newMonth = new Month("", 30, 30, true);
-        this.data.months.push(newMonth);
-        this.render(true);
-        this.checkBoxes();
+        this.saveData().then( ( result ) => {
+          this.data = JSON.parse( result );
+          let newMonth = new Month("", 30, 30, true);
+          this.data.months.push(newMonth);
+          this.render(true);
+          this.checkBoxes();
+        });
       });
       html.find(delWeekday).click(ev => {
         ev.preventDefault();
-        this.data = JSON.parse(this.saveData());
-        const targetName = ev.currentTarget.name.split("-");
-        const index = targetName[targetName.length - 1];
-        this.data.daysOfTheWeek.splice(index, 1);
-        this.render(true);
-        this.checkBoxes();
+        this.saveData().then( ( result ) => {
+          this.data = JSON.parse( result );
+          const targetName = ev.currentTarget.name.split("-");
+          const index = targetName[targetName.length - 1];
+          this.data.daysOfTheWeek.splice(index, 1);
+          this.render(true);
+          this.checkBoxes();
+        });
       });
       html.find(delMonth).click(ev => {
         ev.preventDefault();
-        this.data = JSON.parse(this.saveData());
-        const targetName = ev.currentTarget.name.split("-");
-        const index = targetName[targetName.length - 1];
-        this.data.months.splice(index, 1);
-        this.render(true);
-        this.checkBoxes();
+        this.saveData().then( ( result ) => {
+          this.data = JSON.parse( result );
+          const targetName = ev.currentTarget.name.split("-");
+          const index = targetName[targetName.length - 1];
+          this.data.months.splice(index, 1);
+          this.render(true);
+          this.checkBoxes();
+        });
       });
       html.find(loadDefault).click(ev => {
         ev.preventDefault();

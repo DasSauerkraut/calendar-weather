@@ -178,9 +178,11 @@ export class CalendarForm extends FormApplication {
       html.find(submit).click(ev => {
         ev.preventDefault();
         this.close();
-        let newData = this.saveData()
-        console.log(newData)
-        Hooks.callAll("calendarSettingsClose", newData);
+        let newData = this.saveData();
+        newData.then( ( result ) => {
+          console.log( result )
+          Hooks.callAll("calendarSettingsClose", result );
+        });
       });
       html.find(addWeekday).click(ev => {
         ev.preventDefault();
@@ -256,7 +258,9 @@ export class CalendarForm extends FormApplication {
         if (ev.which == 13) {
           ev.preventDefault();
           this.close();
-          Hooks.callAll("calendarSettingsClose", this.saveData());
+          this.saveData().then( ( result ) => {
+            Hooks.callAll("calendarSettingsClose", result );
+          });
         }
       });
   

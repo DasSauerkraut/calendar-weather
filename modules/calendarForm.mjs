@@ -168,8 +168,7 @@ export class CalendarForm extends FormApplication {
       seconds: Number(seconds),
     };
 
-    game.Gametime.setAbsolute(timeSettings);
-
+    const newDT = game.Gametime.DTf(timeSettings);
     let weekdayTarget = 0;
     if (
       document.querySelector(
@@ -189,12 +188,12 @@ export class CalendarForm extends FormApplication {
     let returnData = {
       months: savedData.months,
       daysOfTheWeek: savedData.daysOfTheWeek,
-      year: now.years,
-      day: now.days,
-      numDayOfTheWeek: now.dow(),
+      year: newDT.years,
+      day: newDT.days,
+      numDayOfTheWeek: newDT.dow(),
       firstDay: _myCalendarSpec.first_day,
-      currentMonth: now.months,
-      currentWeekday: game.Gametime.DTC.weekDays[now.dow()],
+      currentMonth: newDT.months,
+      currentWeekday: game.Gametime.DTC.weekDays[newDT.dow()],
       dateWordy: savedData.dateWordy,
       era: savedData.era,
       dayLength: game.Gametime.DTC.hpd,

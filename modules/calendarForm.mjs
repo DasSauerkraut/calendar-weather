@@ -7,6 +7,7 @@ export class CalendarForm extends FormApplication {
     super();
     newData = JSON.parse(newData);
     let now = game.Gametime.DTNow();
+
     this.data = {
       months: newData.months,
       daysOfTheWeek: newData.daysOfTheWeek,
@@ -31,7 +32,7 @@ export class CalendarForm extends FormApplication {
     return options;
   }
 
-  async saveData() {
+  saveData() {
     let savedData = new DateTime();
 
     let year = parseInt(
@@ -158,16 +159,17 @@ export class CalendarForm extends FormApplication {
     }
     day -= 1;
 
-    await Gametime.setAbsolute({
-      years: year,
-      months: monthTarget,
-      days: day,
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds,
-    });
+    const timeSettings = {
+      years: Number(year),
+      months: Number(monthTarget),
+      days: Number(day),
+      hours: Number(hours),
+      minutes: Number(minutes),
+      seconds: Number(seconds),
+    };
 
-    console.log(game.Gametime.DTNow().years);
+    game.Gametime.setAbsolute(timeSettings);
+
     let weekdayTarget = 0;
     if (
       document.querySelector(
@@ -184,7 +186,6 @@ export class CalendarForm extends FormApplication {
     savedData.numDayOfTheWeek = Number(weekdayTarget);
     savedData.setTimeDisp();
     savedData.genAbbrev();
-    let now = game.Gametime.DTNow();
     let returnData = {
       months: savedData.months,
       daysOfTheWeek: savedData.daysOfTheWeek,
@@ -216,40 +217,38 @@ export class CalendarForm extends FormApplication {
     const delWeekday = "button[class='calendar-form-weekday-del']";
     const delMonth = "button[class='calendar-form-month-del']";
     const loadDefault = "#calendar-form-load-default";
-    html.find(submit).click(async (ev) => {
+    html.find(submit).click((ev) => {
       ev.preventDefault();
       this.close();
-
-      let newData = await this.saveData();
-      Hooks.callAll("calendarSettingsClose", JSON.stringify(newData));
+      Hooks.callAll("calendarSettingsClose", JSON.stringify(this.saveData()));
     });
-    html.find(addWeekday).click(async (ev) => {
+    html.find(addWeekday).click((ev) => {
       ev.preventDefault();
-      this.data = await this.saveData();
+      this.data = this.saveData();
       this.data.daysOfTheWeek.push("");
       this.render(true);
       this.checkBoxes();
     });
-    html.find(addMonth).click(async (ev) => {
+    html.find(addMonth).click((ev) => {
       ev.preventDefault();
-      this.data = await this.saveData();
+      this.data = this.saveData();
       let newMonth = new Month("", 30, 30, true);
       this.data.months.push(newMonth);
       this.render(true);
       this.checkBoxes();
     });
-    html.find(delWeekday).click(async (ev) => {
+    html.find(delWeekday).click((ev) => {
       ev.preventDefault();
-      this.data = await this.saveData();
+      this.data = this.saveData();
       const targetName = ev.currentTarget.name.split("-");
       const index = targetName[targetName.length - 1];
       this.data.daysOfTheWeek.splice(index, 1);
       this.render(true);
       this.checkBoxes();
     });
-    html.find(delMonth).click(async (ev) => {
+    html.find(delMonth).click((ev) => {
       ev.preventDefault();
-      this.data = await this.saveData();
+      this.data = this.saveData();
       const targetName = ev.currentTarget.name.split("-");
       const index = targetName[targetName.length - 1];
       this.data.months.splice(index, 1);
@@ -287,12 +286,11 @@ export class CalendarForm extends FormApplication {
       }).render(true);
     });
 
-    html.find("*").keydown(async (ev) => {
+    html.find("*").keydown((ev) => {
       if (ev.which == 13) {
         ev.preventDefault();
         this.close();
-        let newData = await this.saveData();
-        Hooks.callAll("calendarSettingsClose", JSON.stringify(newData));
+        Hooks.callAll("calendarSettingsClose", JSON.stringify(this.saveData()));
       }
     });
   }

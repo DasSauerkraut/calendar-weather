@@ -144,21 +144,29 @@ $(document).ready(() => {
       if (app.object.data.flags["calendar-weather"].showFX){
         loadedWeatherData = app.object.getFlag('calendar-weather', 'showFX');
       } else {
-        app.object.setFlag('calendar-weather', 'showFX', false);
+        if (app.object.compendium == null) {
+          app.object.setFlag('calendar-weather', 'showFX', false);
+        }
         loadedWeatherData = false;
       }
   
       if (app.object.data.flags["calendar-weather"].doNightCycle){
         loadedNightData = app.object.getFlag('calendar-weather', 'doNightCycle');
       } else {
-        app.object.setFlag('calendar-weather', 'doNightCycle', false);
+        if (app.object.compendium == null) {
+          app.object.setFlag('calendar-weather', 'doNightCycle', false);
+        }
         loadedNightData = false;
       }  
     } else {
-      app.object.setFlag('calendar-weather', 'showFX', false);
+      if (app.object.compendium == null) {
+        app.object.setFlag('calendar-weather', 'showFX', false);
+      }
       loadedWeatherData = false;
       
-      app.object.setFlag('calendar-weather', 'doNightCycle', false);
+      if (app.object.compendium == null) {
+        app.object.setFlag('calendar-weather', 'doNightCycle', false);
+      }
       loadedNightData = false;
     }
     
@@ -190,8 +198,10 @@ $(document).ready(() => {
 
   Hooks.on("closeSceneConfig", (app, html, data) => {
     app.renderCalendarScene = false;
-    app.object.setFlag('calendar-weather', 'showFX', html.find("input[name ='calendarFXWeather']").is(":checked"))
-    app.object.setFlag('calendar-weather', 'doNightCycle', html.find("input[name ='calendarFXNight']").is(":checked"))
+    if (app.object.compendium == null) {
+      app.object.setFlag('calendar-weather', 'showFX', html.find("input[name ='calendarFXWeather']").is(":checked"))
+      app.object.setFlag('calendar-weather', 'doNightCycle', html.find("input[name ='calendarFXNight']").is(":checked"))
+    }
 
     cwdtData.dt.weather.showFX = canvas.scene.getFlag('calendar-weather', 'showFX');
 

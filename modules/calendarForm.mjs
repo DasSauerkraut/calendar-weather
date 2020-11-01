@@ -130,102 +130,24 @@ export class CalendarForm extends FormApplication {
       if (!newWeekdays[i].value) newWeekdays[i].value = "Weekday";
       weekDays.push(newWeekdays[i].value);
     }
+    if (weekDays.length < 1) weekDays = ["Weekday"];
+    savedData.daysOfTheWeek = weekDays;
 
-    activateListeners(html) {
-      const submit = '#calendar-form-submit';
-      const addWeekday = '#calendar-form-add-weekday';
-      const addMonth = '#calendar-form-add-month';
-      const delWeekday = "button[class='calendar-form-weekday-del']";
-      const delMonth = "button[class='calendar-form-month-del']"
-      const loadDefault = "#calendar-form-load-default";
-      html.find(submit).click(ev => {
-        ev.preventDefault();
-        this.close();
-        let newData = this.saveData();
-        newData.then( ( result ) => {
-          console.log( result )
-          Hooks.callAll("calendarSettingsClose", result );
-        });
-      });
-      html.find(addWeekday).click(ev => {
-        ev.preventDefault();
-        this.saveData().then( ( result ) => {
-          this.data = JSON.parse( result );
-          this.data.daysOfTheWeek.push("");
-          this.render(true);
-          this.checkBoxes();
-        });
-      });
-      html.find(addMonth).click(ev => {
-        ev.preventDefault();
-        this.saveData().then( ( result ) => {
-          this.data = JSON.parse( result );
-          let newMonth = new Month("", 30, 30, true);
-          this.data.months.push(newMonth);
-          this.render(true);
-          this.checkBoxes();
-        });
-      });
-      html.find(delWeekday).click(ev => {
-        ev.preventDefault();
-        this.saveData().then( ( result ) => {
-          this.data = JSON.parse( result );
-          const targetName = ev.currentTarget.name.split("-");
-          const index = targetName[targetName.length - 1];
-          this.data.daysOfTheWeek.splice(index, 1);
-          this.render(true);
-          this.checkBoxes();
-        });
-      });
-      html.find(delMonth).click(ev => {
-        ev.preventDefault();
-        this.saveData().then( ( result ) => {
-          this.data = JSON.parse( result );
-          const targetName = ev.currentTarget.name.split("-");
-          const index = targetName[targetName.length - 1];
-          this.data.months.splice(index, 1);
-          this.render(true);
-          this.checkBoxes();
-        });
-      });
-      html.find(loadDefault).click(ev => {
-        ev.preventDefault();
-        let defaultCalendar = Object.keys(game.Gametime.calendars)[game.settings.get("about-time", "calendar")];
-        new Dialog({
-          title: "Choose Calendar",
-          content: `<p>${defaultCalendar}</p>`,
-          buttons: {
-            yes: {
-              icon: '<i class="fas fa-check"></i>',
-              label: "Load",
-              callback: async () => {
-                DateTime.updateFromDTC(defaultCalendar);
-                DateTime.updateDTC();
-                this.data.months = DateTime.months;
-                this.data.daysOfTheWeek = DateTime.daysOfTheWeek;
-                await this.render(true);
-                try {
-                  await this.checkBoxes();
-                } catch (err) {}
-              }
-            },
-            no: {
-              icon: '<i class="fas fa-times"></i>',
-              label: "Don't Load"
-            }
-          }
-        }).render(true);
-      });
-  
-      html.find("*").keydown(ev => {
-        if (ev.which == 13) {
-          ev.preventDefault();
-          this.close();
-          this.saveData().then( ( result ) => {
-            Hooks.callAll("calendarSettingsClose", result );
-          });
-        }
-      });
+    savedData.setDayLength(24);
+
+    DateTime.updateDTC();
+
+    let monthTarget = 0;
+    if (
+      document.querySelector(
+        'input[class="calendar-form-month-radio"]:checked'
+      ) == null
+    ) {
+      monthTarget = savedData.months.length - 1;
+    } else {
+      monthTarget = document.querySelector(
+        'input[class="calendar-form-month-radio"]:checked'
+      ).value;
     }
     monthTarget = Number(monthTarget);
 
@@ -432,3 +354,20 @@ export class CalendarForm extends FormApplication {
       document.getElementById("calendar-form-ampm")[0].selected = "true";
     }
   }
+
+  renderForm(newData) {
+    let templatePath = "modules/calendar-weather/templates/calendar-form.html";
+    this.data = JSON.parse(newData);
+    let now = game.Gametime.DTNow();
+    this.data["hours"] = now.hours % 12 || 12;
+    this.data["minutes"] = now.minutes;
+    this.data["seconds"] = now.seconds;
+    renderTemplate(templatePath, this.data)
+      .then((html) => {
+        this.render(true);
+      })
+      .then(this.checkBoxes());
+
+    Hooks.callAll("calendarSettingsOpen");
+  }
+}

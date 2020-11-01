@@ -42,7 +42,6 @@ export class CalendarForm extends FormApplication {
       year = 1;
     }
 
-    console.log("year" + year);
 
     savedData.era = document.getElementById("calendar-form-era-input").value;
 

@@ -639,7 +639,7 @@ export class WeatherTracker {
   
     output() {
       let tempOut = "";
-      if (this.isC) {
+      if (game.settings.get('calendar-weather', 'useCelcius')) {
         tempOut = this.cTemp + " °C";
       } else {
         tempOut = this.temp + " °F"

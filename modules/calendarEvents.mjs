@@ -44,7 +44,7 @@ export class CalendarEvents extends FormApplication {
         if (parseInt(moonCycleLength[i].value) < 1 || moonCycleLength[i].value == NaN) {
           moon['cycleLength'] = 1;
         } else {
-          moon['cycleLength'] = parseInt(moonCycleLength[i].value);
+          moon['cycleLength'] = parseFloat(moonCycleLength[i].value);
         }
 
         // lunar cycle progress in percent

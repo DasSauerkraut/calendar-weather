@@ -312,12 +312,19 @@ export var _myCalendarSpec = {
       this.moons.forEach((moon, index) => {
 
         // Initialize the references to the current settings if they aren't set
-        if (moon.referenceTime == 'undefined') {
+        if (!Number.isFinite(moon.referenceTime)) {
           moon.referenceTime = game.Gametime.DTNow().toSeconds();
         }
 
-        if (moon.referencePercent == 'undefined') {
-          moon.referencePercent = moon.cyclePercent > 0;
+        if (!Number.isFinite(moon.referencePercent)) {
+          if (Number.isFinite(moon.cyclePercent) && moon.cyclePercent <= 100) {
+            moon.referencePercent = moon.isWaxing ? moon.cyclePercent : 200 - moon.cyclePercent;
+          } else {
+            moon.referencePercent = 0;
+          }
+
+
+          moon.referencePercent = Number.isFinite(moon.cyclePercent) && moon.cyclePercent < 200 ? moon.cyclePercent : 0;
         }
 
         // Calculate the difference in days since the reference

@@ -310,18 +310,26 @@ export var _myCalendarSpec = {
       }
 
       this.moons.forEach((moon, index) => {
-        if(!moonSet){
-          let percentIncrease = 1/moon.cycleLength * 100;
-          if(moon.isWaxing) {
-            moon.cyclePercent += percentIncrease;
-          } else {
-            moon.cyclePercent -= percentIncrease;
-          }
+
+        // Initialize the references to the current settings if they aren't set
+        if (moon.referenceTime == 'undefined') {
+          moon.referenceTime = game.Gametime.DTNow().toSeconds();
         }
 
-        if (moon.cyclePercent < 0) {
-          moon.isWaxing = true;
-          moon.cyclePercent *= -1;
+        if (moon.referencePercent == 'undefined') {
+          moon.referencePercent = moon.cyclePercent > 0;
+        }
+
+        // Calculate the difference in days since the reference
+        let daysSinceReference = (game.Gametime.DTNow().toSeconds() - moon.referenceTime) / game.Gametime.DTC.spd;
+
+        // Determine where in the cycle the moon is in its cycle
+        moon.cyclePercent =  moon.referencePercent + ((daysSinceReference / (moon.cycleLength * 2)) % 1 * 200);
+
+        moon.isWaxing = true;
+
+        if (moon.cyclePercent > 200) {
+          moon.cyclePercent -= 200
         }
 
         if (moon.cyclePercent > 100) {

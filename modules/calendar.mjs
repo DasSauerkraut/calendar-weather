@@ -182,7 +182,7 @@ export class Calendar extends Application {
       }
       let years = obj.year !== 0 ? obj.year : now.years;
       let months = obj.currentMonth;
-      let days = obj.day !== 0 ? obj.day : now.days;
+      let days = obj.day;
       Gametime.setAbsolute(now.setAbsolute({
         years,
         months,

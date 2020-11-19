@@ -322,23 +322,19 @@ export var _myCalendarSpec = {
           } else {
             moon.referencePercent = 0;
           }
-
-
-          moon.referencePercent = Number.isFinite(moon.cyclePercent) && moon.cyclePercent < 200 ? moon.cyclePercent : 0;
         }
 
-        // Calculate the difference in days since the reference
+        // Calculate the difference in days since the reference (with decimal fraction)
         let daysSinceReference = (game.Gametime.DTNow().toSeconds() - moon.referenceTime) / game.Gametime.DTC.spd;
 
         // Determine where in the cycle the moon is in its cycle
         moon.cyclePercent =  moon.referencePercent + ((daysSinceReference / (moon.cycleLength * 2)) % 1 * 200);
 
-        moon.isWaxing = true;
-
         if (moon.cyclePercent > 200) {
           moon.cyclePercent -= 200
         }
 
+        moon.isWaxing = true;
         if (moon.cyclePercent > 100) {
           moon.cyclePercent = 200 - moon.cyclePercent;
           moon.isWaxing = false;

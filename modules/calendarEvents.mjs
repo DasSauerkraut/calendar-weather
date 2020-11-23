@@ -5,6 +5,7 @@ export class CalendarEvents extends FormApplication {
       events: [],
       moons: []
     };
+    openCollapsables = [];
     static get defaultOptions() {
       const options = super.defaultOptions;
       options.template = "modules/calendar-weather/templates/calendar-events.html";
@@ -235,6 +236,17 @@ export class CalendarEvents extends FormApplication {
         savedData.events.push(event);
         event = {};
       }
+
+      //keep collapsables open
+      this.openCollapsables = [];
+      let collapsables = document.getElementsByClassName("calendar-collapsable")
+      console.log(collapsables)
+      for (let collapsable of collapsables){
+        if(collapsable.classList.contains('active')) this.openCollapsables.push(collapsable.name)
+      }
+
+      console.log(this.openCollapsables)
+
       this.data = Object.assign(this.data, savedData);
       return JSON.stringify(this.data);
     }
@@ -442,6 +454,23 @@ export class CalendarEvents extends FormApplication {
           }
         }
       }
+
+      //keep collapsables open
+      console.log(this.openCollapsables)
+      if(this.openCollapsables.length != 0){
+        let collapsables = document.getElementsByClassName("calendar-collapsable")
+        for(let collapsable of collapsables){
+          if(this.openCollapsables.includes(collapsable.name)){
+            collapsable.classList.toggle('active');
+            let content = collapsable.nextElementSibling;
+            if(content.style.display != 'block' || content.style.display === ""){
+              content.style.display = 'block';
+              collapsable.innerHTML = collapsable.innerHTML.replace("+", "-"); 
+            }
+          }
+        }
+        document.getElementById("calendar-events-form").parentElement.parentElement.style.height = "auto"
+      }
     }
   
     activateListeners(html) {
@@ -455,7 +484,7 @@ export class CalendarEvents extends FormApplication {
       const addEvent = "#calendar-events-add-event";
       const delEvent = "button[class='calendar-event-del']";
       const collapsables = "button[class='calendar-collapsable']";
-  
+
       html.find(submit).click(ev => {
         ev.preventDefault();
         Hooks.callAll("calendarEventsClose", this.saveData());

@@ -1,5 +1,4 @@
 import  { CalendarEvents } from "./calendarEvents.mjs";
-// import { WeatherForm } from "./weatherForm.mjs";
 import { _myCalendarSpec, DateTime } from "./dateTime.mjs";
 import { Month } from "./month.mjs";
 import { WeatherTracker } from "./weatherTracker.mjs";

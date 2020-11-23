@@ -237,7 +237,7 @@
 </style>
 <form id="calendar-events-form" autocomplete="off" onsubmit="event.preventDefault();" class="calendar-events-container">
   <h1>{{localize 'Events'}}</h1>
-  <button class="calendar-collapsable">+ {{localize 'CWMOON.Title'}}</button>
+  <button class="calendar-collapsable" name="moon">+ {{localize 'CWMOON.Title'}}</button>
   <div class="calendar-collapsable-content">
     <p>{{localize 'CWMOON.Intro'}}</p>
     <ol>
@@ -276,7 +276,7 @@
       <i class="fas fa-plus"></i> {{localize 'CWMOON.Add'}}
     </button>
   </div>
-  <button class="calendar-collapsable">+ {{localize 'CWSEASONS.Title'}}</button>
+  <button class="calendar-collapsable" name="seasons">+ {{localize 'CWSEASONS.Title'}}</button>
   <div class="calendar-collapsable-content">
     <p>{{localize 'CWSEASONS.SeasonIntro'}}</p>
     <ol>
@@ -364,7 +364,7 @@
       <i class="fas fa-plus"></i> {{localize 'CWSEASONS.AddSeason'}}
     </button>
   </div>
-  <button class="calendar-collapsable">+ {{localize 'ReoccuringEvents'}}</button>
+  <button class="calendar-collapsable" name="reEvents">+ {{localize 'ReoccuringEvents'}}</button>
   <div class="calendar-collapsable-content">
     <p>{{localize 'DateReoccuringEvent'}}</p>
     <ol>
@@ -412,7 +412,7 @@
       <i class="fas fa-plus"></i> {{localize 'AddREvent'}}
     </button>
   </div>
-  <button class="calendar-collapsable">+ {{localize 'OneTimeEvents'}}</button>
+  <button class="calendar-collapsable" name="oneTimeEvents">+ {{localize 'OneTimeEvents'}}</button>
   <div class="calendar-collapsable-content">
     <p>{{localize 'OneTimeDescr'}}
     </p>

@@ -25,15 +25,15 @@ export var _myCalendarSpec = {
     _daysOfTheWeek = [];
     _lastDays = 0;
   }
-  
+
   let dateTimeStatics = new DateTimeStatics();
-  
+
   export class DateTime {
     is24 = false;
     static updateDTC() { // update the calendar spec so that about-time will know the new calendar
       Gametime.DTC.createFromData(_myCalendarSpec);
     }
-  
+
     static updateFromDTC(calendarName) {
       let calSpec = duplicate(game.Gametime.calendars[calendarName]);
       if (calSpec) {
@@ -49,13 +49,13 @@ export var _myCalendarSpec = {
         game.Gametime.DTC.createFromData(_myCalendarSpec);
       }
     }
-  
+
     _year = 0;
     _dateWordy = "";
     _era = "";
     timeDisp = "";
     _dateNum = "";
-  
+
     static get lastDays() {
       return dateTimeStatics._lastDays;
     };
@@ -81,7 +81,7 @@ export var _myCalendarSpec = {
     set moons(moons) {
       DateTime.moons = moons;
     };
-  
+
     static get reEvents() {
       return dateTimeStatics._reEvents ? dateTimeStatics._reEvents : [];
     };
@@ -94,7 +94,7 @@ export var _myCalendarSpec = {
     set reEvents(reEvents) {
       DateTime.reEvents = reEvents;
     };
-  
+
     static get events() {
       return dateTimeStatics._events ? dateTimeStatics._events : [];
     };
@@ -107,7 +107,7 @@ export var _myCalendarSpec = {
     set events(events) {
       DateTime.events = events;
     };
-  
+
     static get seasons() {
       return dateTimeStatics._seasons ? dateTimeStatics._seasons : [];
     };
@@ -120,7 +120,7 @@ export var _myCalendarSpec = {
     set seasons(seasons) {
       DateTime.seasons = seasons;
     };
-  
+
     static get weather() {
       return dateTimeStatics._weather ? dateTimeStatics._weather : new WeatherTracker();
     }
@@ -133,7 +133,7 @@ export var _myCalendarSpec = {
     set weather(weather) {
       DateTime.weather = weather;
     }
-  
+
     static get months() {
       return dateTimeStatics._months;
     }
@@ -151,7 +151,7 @@ export var _myCalendarSpec = {
     set months(months) {
       DateTime.months = months;
     }
-  
+
     static set daysOfTheWeek(days) {
       _myCalendarSpec.weekdays = days;
       dateTimeStatics._daysOfTheWeek = days;
@@ -165,29 +165,29 @@ export var _myCalendarSpec = {
     get daysOfTheWeek() {
       return DateTime.daysOfTheWeek;
     }
-  
+
     get year() {
       return Gametime.DTNow().years;
     }
     get day() {
       return Gametime.DTNow().days;
     }
-  
+
     get dateWordy() {
       return this._dateWordy;
     }
     set dateWordy(dateWordy) {
       this._dateWordy = dateWordy;
     }
-  
+
     set year(y) {
       this.setYear(y);
     }
-  
+
     get currentWeekDay() {
       return Gametime.weekDays[Gametime.DTNow().dow()];
     }
-  
+
     addMonth(month) {
       DateTime.months.push(month);
       _myCalendarSpec.month_len[month.name] = {
@@ -195,20 +195,20 @@ export var _myCalendarSpec = {
       };
       // Gametime.DTC.createFromData(_myCalendarSpec);
     };
-  
+
     addWeekday(day) {
       _myCalendarSpec.weekdays.push(day);
       DateTime.daysOfTheWeek.push(day);
       // Gametime.DTC.createFromData(_myCalendarSpec);
     };
-  
+
     setYear(year) {
       Gametime.setAbsolute(Gametime.DTNow().setAbsolute({
         years: Number(year)
       }));
       this._year = year;
     }
-  
+
     get currentMonth() {
       return Gametime.DTNow().months;
     }
@@ -217,7 +217,7 @@ export var _myCalendarSpec = {
         months: Number(currentMonth)
       }))
     }
-  
+
     set era(era) {
       this._era = era;
     }
@@ -227,16 +227,16 @@ export var _myCalendarSpec = {
     setEra(era) {
       this._era = era;
     }
-  
+
     setDayLength(length) {
       _myCalendarSpec.hours_per_day = Number(length);
       if (isNaN(_myCalendarSpec.hours_per_day)) {
         console.warn("Error setting day length to", length);
         _myCalendarSpec.hours_per_day = 24;
-  
+
       }
     }
-  
+
     set numDayOfTheWeek(dow) {
       Gametime.DTNow().setCalDow(dow);
       _myCalendarSpec.first_day = Gametime.DTC.firstDay;
@@ -244,15 +244,15 @@ export var _myCalendarSpec = {
     get numDayOfTheWeek() {
       return Gametime.DTNow().dow();
     }
-  
-  
+
+
     get dateNum() {
       return this._datenum;
     }
     set dateNum(dateNum) {
       this._datenum = dateNum;
     };
-  
+
     get weekday() {
       return this.daysOfTheWeek[this.numDayOfTheWeek];
     }
@@ -260,7 +260,7 @@ export var _myCalendarSpec = {
       let newDow = this.daysOfTheWeek.indexOf(day);
       if (newDow != -1) this.numDayOfTheWeek = newDow;
     }
-  
+
     getEntity(text, collection, matchRe) {
       if (text && text.startsWith("@")) {
         let macroMatch = text.match(matchRe);
@@ -274,12 +274,12 @@ export var _myCalendarSpec = {
       }
       return null;
     }
-  
+
     findSeason(dateTime) {
       let targetDay = dateTime.days + 1;
       let targetMonth = dateTime.months;
       let abbrevs = this.months.map(m => `${m.abbrev}`); // need text abbreviations here so they can be looked up
-  
+
       // find the first season after today (if there is one) and set the current season to the one before that or the last season if nothing matched.
       let seasonArr = this.seasons;
       seasonArr.sort((lhs, rhs) => {
@@ -310,56 +310,77 @@ export var _myCalendarSpec = {
       }
 
       this.moons.forEach((moon, index) => {
-        if(!moonSet){
-          let percentIncrease = 1/moon.cycleLength * 100;
-          if(moon.isWaxing) {
-            moon.cyclePercent += percentIncrease;
+
+        // Initialize the references to the current settings if they aren't set
+        if (!Number.isFinite(moon.referenceTime)) {
+          moon.referenceTime = game.Gametime.DTNow().toSeconds();
+        }
+
+        if (!Number.isFinite(moon.referencePercent)) {
+          if (Number.isFinite(moon.cyclePercent) && moon.cyclePercent <= 100) {
+            moon.referencePercent = moon.isWaxing ? moon.cyclePercent : 200 - moon.cyclePercent;
           } else {
-            moon.cyclePercent -= percentIncrease;
+            moon.referencePercent = 0;
           }
         }
+
+        // Calculate the difference in days since the reference (with decimal fraction)
+        let daysSinceReference = (game.Gametime.DTNow().toSeconds() - moon.referenceTime) / game.Gametime.DTC.spd;
+
+        // Determine where in the cycle the moon is in its cycle
+        moon.cyclePercent =  moon.referencePercent + ((daysSinceReference / (moon.cycleLength * 2)) % 1 * 200);
+
+        if (moon.cyclePercent > 200) {
+          moon.cyclePercent -= 200
+        }
+
+        moon.isWaxing = true;
+        if (moon.cyclePercent > 100) {
+          moon.cyclePercent = 200 - moon.cyclePercent;
+          moon.isWaxing = false;
+        }
+
         let moonPhase = '';
         let phasePrefix = '';
         let moonSymbol = '';
-        //New Moon
-        if (moon.cyclePercent <= 1) {
-          moonPhase = game.i18n.localize('CWMOON.New');
-          moonSymbol = './modules/calendar-weather/icons/new.svg';
-          moon.cyclePercent = 0;
-          moon.isWaxing = true;
-        } else if (moon.cyclePercent > 1 && moon.cyclePercent <= 33) {
-          moonPhase = game.i18n.localize('CWMOON.Crescent');
-          if (moon.isWaxing) {
-            phasePrefix = game.i18n.localize('CWMOON.IsWaxing');
-            moonSymbol = './modules/calendar-weather/icons/waxingCrescent.svg';
-          } else {
-            phasePrefix = game.i18n.localize('CWMOON.Waning');
-            moonSymbol = './modules/calendar-weather/icons/waningCrescent.svg';
-          }
-        } else if (moon.cyclePercent > 33 && moon.cyclePercent <= 66) {
-          moonPhase = game.i18n.localize('CWMOON.Quarter');
-          if (moon.isWaxing) {
-            phasePrefix = game.i18n.localize('CWMOON.FirstQuarter');
-            moonSymbol = './modules/calendar-weather/icons/firstQuarter.svg';
-          } else {
-            phasePrefix = game.i18n.localize('CWMOON.ThirdQuarter')
-            moonSymbol = './modules/calendar-weather/icons/thirdQuarter.svg'
-          }
-        } else if (moon.cyclePercent > 66 && moon.cyclePercent < 97) {
-          moonPhase = game.i18n.localize('CWMOON.Gibbous');
-          if (moon.isWaxing) {
-            phasePrefix = game.i18n.localize('CWMOON.IsWaxing');
-            moonSymbol = './modules/calendar-weather/icons/waxingGibbous.svg';
-          } else {
-            phasePrefix = game.i18n.localize('CWMOON.Waning')
-            moonSymbol = './modules/calendar-weather/icons/waningGibbous.svg';
-          }
-        } else if (moon.cyclePercent >= 96) {
-          moonPhase = game.i18n.localize('CWMOON.Full');
-          moonSymbol = './modules/calendar-weather/icons/full.svg';
-          moon.cyclePercent = 100;
-          moon.isWaxing = false;
+        let moonSymbolPrefix = '';
+        let moonSymbolSuffix = '';
+
+        if (moon.isWaxing) {
+          phasePrefix = game.i18n.localize('CWMOON.IsWaxing');
+          moonSymbolPrefix = 'waxing';
+        } else {
+          phasePrefix = game.i18n.localize('CWMOON.Waning');
+          moonSymbolPrefix = 'waning';
         }
+
+        if (moon.cyclePercent <= 7) {
+          // New moon 7%
+          moonSymbolPrefix = 'new';
+          moonPhase = game.i18n.localize('CWMOON.New');
+          phasePrefix = ''
+        } else if (moon.cyclePercent <= 43) {
+          // Crescent 36%
+          moonSymbolSuffix = 'Crescent';
+          moonPhase = game.i18n.localize('CWMOON.Crescent');
+        } else if (moon.cyclePercent <= 57) {
+          // Half 14%
+          moonSymbolSuffix = 'Quarter';
+          moonSymbolPrefix = moon.isWaxing ? "first" : "third";
+          phasePrefix = game.i18n.localize(moon.isWaxing ? 'CWMOON.FirstQuarter' : 'CWMOON.ThirdQuarter');
+          moonPhase = game.i18n.localize('CWMOON.Quarter');
+        } else if (moon.cyclePercent <= 93) {
+          // Gibbous 36%
+          moonSymbolSuffix = 'Gibbous';
+          moonPhase = game.i18n.localize('CWMOON.Gibbous');
+        } else {
+          // Full 7%
+          moonSymbolPrefix = 'full';
+          moonPhase = game.i18n.localize('CWMOON.Full');
+          phasePrefix = ''
+        }
+
+        moonSymbol = './modules/calendar-weather/icons/' + moonSymbolPrefix + moonSymbolSuffix + '.svg'
 
         //add moons to display
         if ( !document.getElementById(`calender-moon-symbol-${index}`)) {
@@ -376,7 +397,7 @@ export var _myCalendarSpec = {
             prefix: phasePrefix
           });
         }
-        
+
         this.moons.lastMoons[index] = moonSymbol;
 
         //check solar eclipse
@@ -408,7 +429,7 @@ export var _myCalendarSpec = {
               }
               game.Gametime.doIn({minutes:30}, solarEclipse, moon, index, moonSymbol, moonPhase, phasePrefix);
             }
-            
+
             ChatMessage.create({
               speaker: {
               alias: moon.name,
@@ -443,7 +464,7 @@ export var _myCalendarSpec = {
           }
         }
       });
-      
+
       /* display single/multiple moons */
       if (this.moons.length > 1) {
         document.getElementById('calendar--moon-list').classList.add('hasMoon');
@@ -469,13 +490,13 @@ export var _myCalendarSpec = {
         });
       }
     }
-  
+
     checkEvents() {
       if (!Gametime.isMaster()) return;
-  
+
       let currentMonth = this.currentMonth;
       let combinedDate = (this.months[currentMonth].abbrev) + "-" + (this.day + 1);
-  
+
       // seasons
       let newSeason = this.findSeason(Gametime.DTNow());
       let newTemp = 0;
@@ -513,11 +534,11 @@ export var _myCalendarSpec = {
           }
         }
       }
-  
+
       //Find reoccuring events
       const macroRe = /\@Macro\[(.*)\].*/;
       const journalRe = /\@\@JournalEntry\[(.*)\].*/;
-  
+
       let filtReEvents = this.reEvents.filter(event => event.date.combined === combinedDate);
       filtReEvents.forEach((event) => {
         let macro = this.getEntity(event.text, game.macros, macroRe);
@@ -535,11 +556,11 @@ export var _myCalendarSpec = {
           });
         }
       })
-  
+
       combinedDate += "-" + this.year
       let filtEvents = this.events.filter(event => event.date.combined === combinedDate);
       this.events = this.events.filter(event => event.date.combined !== combinedDate);
-  
+
       filtEvents.forEach((event) => {
         let dt = game.Gametime.DTNow();
         let timeOut = "";
@@ -571,7 +592,7 @@ export var _myCalendarSpec = {
         }
       });
     }
-  
+
     getWeatherObj() {
       return {
         temp: this.weather.temp,
@@ -594,7 +615,7 @@ export var _myCalendarSpec = {
         tempRange: this.weather.tempRange
       }
     }
-  
+
     genAbbrev() {
       let monthNum = 1;
       for (var i = 0, max = this.months.length; i < max; i++) {
@@ -604,7 +625,7 @@ export var _myCalendarSpec = {
         }
       }
     }
-  
+
     setTimeDisp() {
       let dt = game.Gametime.DTNow();
       let hours = dt.hours;
@@ -624,7 +645,7 @@ export var _myCalendarSpec = {
         this.timeDisp = hours + ":" + minutes + ":" + sec + " " + AmOrPm;
       }
     }
-  
+
     genDateWordy() {
       let now = Gametime.DTNow();
       let days = now.days + 1;
@@ -640,12 +661,12 @@ export var _myCalendarSpec = {
       }
       this.dateWordy = days + dayAppendage + " of " +
         this.months[now.months].name + ", " + now.years + " " + this.era;
-  
+
       let abbrev = this.months[now.months] ? this.months[now.months].abbrev : now.months;
-  
+
       this.dateNum = days + "/" + `${abbrev}` + "/" + now.years + " " + this.era;
     }
-  
+
     advanceMonth() {
       Gametime.setAbsolute(Gametime.DTNow().add({
         months: 1

@@ -44,7 +44,7 @@ export class CalendarEvents extends FormApplication {
         if (parseInt(moonCycleLength[i].value) < 1 || moonCycleLength[i].value == NaN) {
           moon['cycleLength'] = 1;
         } else {
-          moon['cycleLength'] = parseInt(moonCycleLength[i].value);
+          moon['cycleLength'] = parseFloat(moonCycleLength[i].value);
         }
 
         // lunar cycle progress in percent
@@ -76,6 +76,9 @@ export class CalendarEvents extends FormApplication {
         } else {
           moon['solarEclipseChance'] = parseFloat(moonSEclipse[i].value);
         }
+
+        moon['referenceTime'] = game.Gametime.DTNow().toSeconds();
+        moon['referencePercent'] = moonWaxing[i].checked ? moon['cyclePercent'] : 200 - moon['cyclePercent'];
 
         // push moon array data to moons array
         savedData.moons.push(moon);

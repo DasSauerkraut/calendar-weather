@@ -1,5 +1,6 @@
 import { _myCalendarSpec, DateTime } from "./dateTime.mjs";
 import { Month } from "./month.mjs";
+import { cwdtData } from "../init.mjs";
 
 export class CalendarForm extends FormApplication {
   data = {};
@@ -215,6 +216,9 @@ export class CalendarForm extends FormApplication {
     const delWeekday = "button[class='calendar-form-weekday-del']";
     const delMonth = "button[class='calendar-form-month-del']";
     const loadDefault = "#calendar-form-load-default";
+    const exportBtn = "#calendar-form-export";
+    const importBtn = "#calendar-form-import";
+
     html.find(submit).click((ev) => {
       ev.preventDefault();
       this.close();
@@ -283,6 +287,69 @@ export class CalendarForm extends FormApplication {
         },
       }).render(true);
     });
+
+    html.find(exportBtn).click((ev) => {
+      ev.preventDefault();
+      let calendarData = JSON.stringify(game.settings.get("calendar-weather", "dateTime"));
+      // console.log(calendarData)
+      const el = document.createElement('textarea');
+      el.value = calendarData;
+      el.setAttribute('readonly', '');
+      el.style.position = 'absolute';
+      el.style.left = '-9999px';
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      console.log('calendar-weather | Calendar data copied')
+      ui.notifications.info(game.i18n.localize("CWEXPORT.copied"));
+    })
+
+    html.find(importBtn).click(ev => {
+      ev.preventDefault();
+      new Dialog({
+        title: "Import Calendar",
+        content: `<p>Paste calendar data into the following input field, then click "Upload Calendar Data"</p><input id="uploadedData" title="Data Here..."></input>`,
+        buttons: {
+          data: {
+            icon: '<i class="fas fa-upload"></i>',
+            label: "Import Calendar Data",
+            callback: async () => {     
+              let data = document.getElementById("uploadedData").value
+              try {
+                data = JSON.parse(data)
+                console.log(data)
+                let now = Gametime.DTNow();
+                if (!cwdtData.dt) cwdtData.dt = new DateTime();
+                cwdtData.dt.months = data.months;
+                cwdtData.dt.daysOfTheWeek = data.daysOfTheWeek;
+                cwdtData.dt.setDayLength(data.dayLength);
+                _myCalendarSpec.first_day = data.first_day;
+                DateTime.updateDTC(); // set the calendar spec for correct date time calculations
+                cwdtData.dt.currentWeekday = cwdtData.dt.daysOfTheWeek[now.dow()];
+                cwdtData.dt.era = data.era;
+                cwdtData.dt.dayLength = Gametime.DTC.hpd;
+                cwdtData.dt.timeDisp = now.shortDate().time;
+                cwdtData.dt.weather = cwdtData.dt.weather.load(data.weather);
+                cwdtData.dt.seasons = data.seasons;
+                cwdtData.dt.reEvents = data.reEvents;
+                cwdtData.dt.events = data.events;
+                cwdtData.dt.moons = data.moons;
+                cwdtData.dt.genDateWordy();
+                this.close();
+                ui.notifications.info(game.i18n.localize("CWIMPORT.success"));
+              } catch (err) {
+                ui.notifications.error(`${game.i18n.localize("CWIMPORT.failure")} ${err}`);
+              }
+            }
+          },
+          close: {
+            icon: '<i class="fas fa-times"></i>', 
+            label: "Cancel",
+          }
+        }
+      }).render(true)
+    })
 
     html.find("*").keydown((ev) => {
       if (ev.which == 13) {

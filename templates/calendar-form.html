@@ -265,11 +265,20 @@
         <i class="fas fa-plus"></i> {{localize 'AddMonth'}}
     </button>
   <footer>
+    
+    <button id="calendar-form-load-default" name="default" title="{{localize 'LoadDefaultCalendar'}}">
+        <i class="fas fa-folder"></i> {{localize 'LoadDefaultCalendar'}}
+    </button>
+    <span class="calendar-form-export-import">
+        <button id="calendar-form-export" name="default" title="{{localize 'ExportCalendarHelp'}}">
+            <i class="fas fa-download"></i> {{localize 'ExportCalendar'}}
+        </button>
+        <button id="calendar-form-import" name="default" title="{{localize 'ImportCalendar'}}">
+            <i class="fas fa-upload"></i> {{localize 'ImportCalendar'}}
+        </button>
+    </span>
     <button id="calendar-form-submit" type="submit" name="submit" title="{{localize 'SaveCalendar'}}">
         <i class="far fa-save"></i> {{localize 'SaveCalendar'}}
-    </button>
-    <button id="calendar-form-load-default" name="default" title="{{localize 'LoadDefaultCalendar'}}">
-        <i class="fal fa-load"></i> {{localize 'LoadDefaultCalendar'}}
     </button>
   </footer>
 </form>

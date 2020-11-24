@@ -152,8 +152,11 @@
   "DeleteMonth": "Delete a month",
   "AddMonth": "Add a new month",
   "DefMonth": "Month 1",
-  "SaveCalendar": "Save Calendar Settings",
-  "LoadDefaultCalendar": "Load default calendar",
+  "SaveCalendar": "Save Calendar",
+  "LoadDefaultCalendar": "Load About-Time Calendar",
+  "ExportCalendar": "Export Calendar/Events/Moons",
+  "ExportCalendarHelp": "Export Calendar/Events/Moons to your clipboard. This will not record the current date however.",
+  "ImportCalendar": "Import Calendar/Events/Moons",
  
   "CWSETTING.CalDispNonGm": "Calendar Display for Non-GM",
   "CWSETTING.CalDispNonGmHelp": "When checked, clients without GM-level permissions will be able to see the calendar displayed",
@@ -170,6 +173,9 @@
   "CWSETTING.useCelcius": "Use Celcius",
   "CWSETTING.useCelciusHelp": "Use Celcius for temperature display.",
   "CWSETTING.playerSeeWeather": "Can Players see the Weather",
-  "CWSETTING.playerSeeWeatherHelp": "When checked, players can toggle the weather form."
+  "CWSETTING.playerSeeWeatherHelp": "When checked, players can toggle the weather form.",
 
+  "CWEXPORT.copied": "Calendar data copied to clipboard!",
+  "CWIMPORT.success": "Calendar data successfully imported!",
+  "CWIMPORT.failure": "Import Failed!"
 }

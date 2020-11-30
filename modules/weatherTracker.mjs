@@ -192,7 +192,7 @@ export class WeatherTracker {
         return "Error: RollTable not found!";
       }
 
-      if (game.modules.get("fxmaster") && game.modules.get("fxmaster").active) {
+      if (game.modules.get("fxmaster")?.active) {
         if(this.showFX || canvas.scene?.getFlag('calendar-weather', 'showFX')){
           fxAvailable = true;
           this.showFX = true;
@@ -700,7 +700,7 @@ export class WeatherTracker {
     }
   
     loadFX() {
-      if (game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX && this.weatherFX)
+      if (game.modules.get("fxmaster")?.active && Gametime.isMaster() && this.showFX && this.weatherFX)
         Hooks.call("updateWeather", this.weatherFX);
     }
   
@@ -807,7 +807,7 @@ export class WeatherTracker {
             })
           }
 
-          if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX && canvas.scene.getFlag('fxmaster', 'filters') && canvas.scene.getFlag('fxmaster', 'filters').bloodMoon){
+          if(game.modules.get("fxmaster")?.active && Gametime.isMaster() && this.showFX && canvas.scene.getFlag('fxmaster', 'filters') && canvas.scene.getFlag('fxmaster', 'filters').bloodMoon){
             Hooks.call("switchFilter", {
               name: "bloodMoon",
               type: "color",
@@ -827,7 +827,7 @@ export class WeatherTracker {
         if (dt.hours == dusk) {
           newDarkness = (dt.minutes * 60 + dt.seconds) * 0.0002778;
           
-          if(game.modules.get("fxmaster").active && Gametime.isMaster() && this.showFX && bloodMoon){
+          if(game.modules.get("fxmaster")?.active && Gametime.isMaster() && this.showFX && bloodMoon){
             Hooks.call("switchFilter", {
               name: "bloodMoon",
               type: "color",

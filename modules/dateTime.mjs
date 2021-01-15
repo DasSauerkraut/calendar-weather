@@ -345,6 +345,7 @@ export var _myCalendarSpec = {
         let moonSymbol = '';
         let moonSymbolPrefix = '';
         let moonSymbolSuffix = '';
+        let sanction = '';
 
         if (moon.isWaxing) {
           phasePrefix = game.i18n.localize('CWMOON.IsWaxing');
@@ -380,6 +381,17 @@ export var _myCalendarSpec = {
           phasePrefix = ''
         }
 
+        //Check Moon Sanctions - which 'quarter of the cycle the moon is in'
+        if(game.settings.get('calendar-weather', 'useSanctions')){
+          if (moon.cyclePercent <= 25) {
+            // Low Sanction
+            sanction = game.i18n.localize('CWMOON.LowSanction')
+          } else if (moon.cyclePercent >= 75) {
+            // High Sanction
+            sanction = game.i18n.localize('CWMOON.HighSanction')
+          }
+        }
+
         moonSymbol = './modules/calendar-weather/icons/' + moonSymbolPrefix + moonSymbolSuffix + '.svg'
 
         //add moons to display
@@ -388,13 +400,14 @@ export var _myCalendarSpec = {
         }
 
         if (this.moons.lastMoons && this.moons.lastMoons[index] != moonSymbol) {
-          updatedMoons += `<div class="calendar-weather-chat"> <img src="${moonSymbol}"> <div class="calendar-weather-chat--description"> <h4>${moon.name}</h4> <p>${phasePrefix} ${moonPhase}</p></div></div>`;
+          updatedMoons += `<div class="calendar-weather-chat"> <img src="${moonSymbol}"> <div class="calendar-weather-chat--description"> <h4>${moon.name}</h4> <p>${phasePrefix} ${moonPhase}${sanction == '' ? '' : `, ${sanction}`}</p></div></div>`;
           moonInfo.push({
             index: index,
             symbol: moonSymbol,
             name: moon.name,
             phase: moonPhase,
-            prefix: phasePrefix
+            prefix: phasePrefix,
+            sanction: sanction
           });
         }
 
@@ -476,7 +489,7 @@ export var _myCalendarSpec = {
 
       moonInfo.forEach((moon) => {
         document.getElementById(`calender-moon-symbol-${moon.index}`).src = moon.symbol;
-        document.getElementById(`calender-moon-symbol-${moon.index}`).title = `${moon.name} | ${moon.prefix} ${moon.phase}`;
+        document.getElementById(`calender-moon-symbol-${moon.index}`).title = `${moon.name} | ${moon.prefix} ${moon.phase}${moon.sanction == '' ? '' : `, ${moon.sanction}`}`;
       });
 
       if (updatedMoons && game.settings.get('calendar-weather', 'moonDisplay')) {

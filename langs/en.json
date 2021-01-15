@@ -77,6 +77,8 @@
   "CWMOON.TotalLEclipse" : "Total Lunar Eclipse",
   "CWMOON.PartialLEclipse" : "Partial Lunar Eclipse",
   "CWMOON.ChatTitle" : "Moon Phases",
+  "CWMOON.LowSanction" : "Low Sanction",
+  "CWMOON.HighSanction" : "High Sanction",
 
   "Events": "Events",
   "ReoccuringEvents": "Reoccuring Events",
@@ -174,6 +176,8 @@
   "CWSETTING.useCelciusHelp": "Use Celcius for temperature display.",
   "CWSETTING.playerSeeWeather": "Can Players see the Weather",
   "CWSETTING.playerSeeWeatherHelp": "When checked, players can toggle the weather form.",
+  "CWSETTING.useSanctions": "Use Lunar Sanctions",
+  "CWSETTING.useSanctionsHelp": "When checked, moons will display if they are at High or Low Sanction. This is useful for settings like Dragonlance.",
 
   "CWEXPORT.copied": "Calendar data copied to clipboard!",
   "CWIMPORT.success": "Calendar data successfully imported!",

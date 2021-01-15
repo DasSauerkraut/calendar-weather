@@ -68,4 +68,12 @@ export const registerSettings = function(calendar) {
     default: false,
     type: Boolean,
   });
+  game.settings.register('calendar-weather', 'useSanctions', {
+    name: game.i18n.localize("CWSETTING.useSanctions"),
+    hint: game.i18n.localize("CWSETTING.useSanctionsHelp"),
+    scope: 'world',
+    config: true,
+    default: false,
+    type: Boolean,
+  });
 }

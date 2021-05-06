@@ -1,4 +1,6 @@
 # calendar-weather
+**This is no longer maintained**
+If someone wants to fork this to continue work/maintanence, feel free.
 A customizable module that accurately tracks and displays dates and time.
 ## Links:
 * Manifest: https://raw.githubusercontent.com/DasSauerkraut/calendar-weather/master/module.json

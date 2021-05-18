@@ -77,6 +77,8 @@
   "CWMOON.TotalLEclipse" : "개기 월식",
   "CWMOON.PartialLEclipse" : "부분 월식",
   "CWMOON.ChatTitle" : "달의 위상",
+  "CWMOON.LowSanction" : "Low Sanction",
+  "CWMOON.HighSanction" : "High Sanction",
 
   "Events": "이벤트",
   "ReoccuringEvents": "이벤트 재발생",
@@ -154,6 +156,9 @@
   "DefMonth": "1월",
   "SaveCalendar": "달력 설정 저장",
   "LoadDefaultCalendar": "기본 달력 불러오기",
+  "ExportCalendar": "달력/이벤트/달 내보내기",
+  "ExportCalendarHelp": "달력/이벤트/달을 클립보드로 내보냅니다. 현재 날짜는 기록되지 않습니다.",
+  "ImportCalendar": "달력/이벤트/달 가져오기",
 
   "CWSETTING.CalDispNonGm": "비 GM 유저에게 달력 표시",
   "CWSETTING.CalDispNonGmHelp": "선택 해제할 경우 GM 권한이 없는 클라이언트는 달력을 볼 수 없음.",
@@ -170,6 +175,11 @@
   "CWSETTING.useCelcius": "섭씨 사용",
   "CWSETTING.useCelciusHelp": "기온 표시에 섭씨를 사용한다.",
   "CWSETTING.playerSeeWeather": "플레이어에게 날씨 표시",
-  "CWSETTING.playerSeeWeatherHelp": "체크시 플레이어들이 날씨를 전환할 수 있다."
+  "CWSETTING.playerSeeWeatherHelp": "체크시 플레이어들이 날씨를 전환할 수 있다.",
+  "CWSETTING.useSanctions": "Lunar Sanctions 사용",
+  "CWSETTING.useSanctionsHelp": "선택시 달이 High/Low Sanction에 있는지 표시된다. 드래곤랜스와 같은 설정에 유용하다.",
 
+  "CWEXPORT.copied": "달력 데이터가 클립보드에 복사되었습니다",
+  "CWIMPORT.success": "달력 데이터를 성공적으로 가져왔습니다!",
+  "CWIMPORT.failure": "가져오기를 실패했습니다!"
 }

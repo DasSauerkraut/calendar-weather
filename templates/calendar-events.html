@@ -1,240 +1,3 @@
-<style style="visibility: hidden;">
-  .calendar-season-container {
-    display: inline-flex;
-    width: 100%;
-  }
-
-  .calendar-season-name {
-    display: block;
-    max-width: 20%;
-  }
-
-  .calendar-season-temp {
-    padding: 1px;
-  }
-
-  .calendar-season-humidity {
-    padding: 1px;
-  }
-
-  .calendar-season-light-container {
-    display: inline-flex;
-    width: 100%;
-  }
-
-  .calendar-dusk{
-    text-align: center;
-    max-width: 25px;
-  }
-  .calendar-dawn{
-    text-align: center;
-    max-width: 25px;
-  }
-
-  .calendar-season-month {
-    padding: 1px;
-  }
-
-  .calendar-season-del {
-    margin-left: auto;
-    width: 40px;
-  }
-
-  /* Season Column Labels */
-  .calendar-season-label-name {
-    grid-row: 1;
-    grid-column: 1;
-  }
-
-  .calendar-season-label-temp {
-    grid-row: 1;
-    grid-column: 2;
-    padding-left: 75px;
-  }
-
-  .calendar-season-label-color {
-    grid-row: 1;
-    grid-column: 3;
-  }
-
-  .calendar-season-label-date {
-    grid-row: 1;
-    grid-column: 4;
-  }
-
-  .calendar-season-label-del {
-    grid-row: 1;
-    grid-column: 5;
-    width: 40px;
-  }
-
-  .calendar-reEvent-item {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    outline-offset: 5px;
-    border-bottom: 1px solid rgb(116, 0, 0);
-  }
-
-  .calendar-reEvent-container {
-    display: grid;
-  }
-
-  .calendar-reEvent-name {
-    grid-row: 1;
-    grid-column: 1;
-  }
-
-  .calendar-reEvent-month {
-    grid-row: 1;
-    grid-column: 2;
-  }
-
-  .calendar-reEvent-del {
-    grid-row: 1;
-    grid-column: 3;
-    justify-self: end;
-    width: 40px;
-  }
-
-  .calendar-event-item {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    outline-offset: 5px;
-    border-bottom: 1px solid rgb(116, 0, 0);
-  }
-
-  .calendar-event-container {
-    display: grid;
-  }
-
-  .calendar-event-name {
-    grid-row: 1;
-    grid-column: 1;
-    width: 33%;
-  }
-
-  .calendar-event-month {
-    grid-row: 1;
-    grid-column: 2;
-    display: inline-flex;
-    height: 25px;
-  }
-
-  .calendar-event-year {
-    width: 50px;
-  }
-
-  .calendar-event-text {
-    margin-top: 3px;
-  }
-
-  .calendar-event-allDay {
-    grid-row: 1;
-    grid-column: 3;
-  }
-
-  .calendar-event-time {
-    grid-row: 1;
-    grid-column: 4;
-    width: 160px;
-    display: inline-flex;
-    vertical-align: middle;
-  }
-
-  .calendar-event-del {
-    grid-row: 1;
-    grid-column: 5;
-    justify-self: end;
-    width: 40px;
-  }
-
-  .calendar-season-text{
-    padding-left: 7px;
-    margin-top: 4px;
-  }
-
-  .calendar-season-listitem{
-    padding-top: 5px;
-    padding-bottom: 5px;
-    outline-offset: 5px;
-    border-bottom: 1px solid rgb(116, 0, 0);
-  }
-
-  .calendar-events-container {
-    background: url(../ui/parchment.jpg) repeat;
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: fit-content;
-  }
-
-  .calendar-moon-top {
-    width: 100%;
-    display: inline-flex;
-    height: fit-content;
-    align-items: center;
-  }
-
-  .calendar-moon-bottom {
-    display: inline-flex;
-  }
-
-  .calendar-moon-name-container {
-    width: 33%;
-  }
-
-  .calendar-moon-name {
-    width: 10px;
-  }
-
-  .calendar-moon-length {
-    width: 40px;
-    margin-right: 10px;
-  }
-
-  .calendar-moon-percent {
-    width: 40px;
-    margin-right: 10px;
-  }
-
-  .calendar-moon-leclipse {
-    width: 60px;
-    margin-right: 10px;
-  }
-  .calendar-moon-seclipse {
-    width: 60px;
-    margin-right: 10px;
-  }
-  .calendar-moon-del {
-    width: 40px;
-    margin-left: auto;
-  }
-
-  .calendar-collapsable{
-    background: none;
-    border: none;
-    border-bottom: 2px solid #782e22;
-    font-size: 1.3em;
-    text-align: left;
-    padding-top: 10px;
-  }
-
-  .calendar-collapsable:hover {
-    box-shadow: inset 0 0 7px black!important;
-  }
-  .calendar-collapsable:active {
-    box-shadow: inset 0 0 7px black!important;
-    background: #755f5b3b;
-  }
-
-  .calendar-collapsable-content{
-    display: none;
-    overflow: hidden;
-  }
-
-  #calendar-events-submit{
-    padding-top: 10px;
-  }
-</style>
 <form id="calendar-events-form" autocomplete="off" onsubmit="event.preventDefault();" class="calendar-events-container">
   <h1>{{localize 'Events'}}</h1>
   <button class="calendar-collapsable" name="moon">+ {{localize 'CWMOON.Title'}}</button>
@@ -507,3 +270,240 @@
     <i class="far fa-save"></i> {{localize 'SaveEvent'}}
   </button>
 </form>
+<style style="visibility: hidden;">
+  .calendar-season-container {
+    display: inline-flex;
+    width: 100%;
+  }
+
+  .calendar-season-name {
+    display: block;
+    max-width: 20%;
+  }
+
+  .calendar-season-temp {
+    padding: 1px;
+  }
+
+  .calendar-season-humidity {
+    padding: 1px;
+  }
+
+  .calendar-season-light-container {
+    display: inline-flex;
+    width: 100%;
+  }
+
+  .calendar-dusk{
+    text-align: center;
+    max-width: 25px;
+  }
+  .calendar-dawn{
+    text-align: center;
+    max-width: 25px;
+  }
+
+  .calendar-season-month {
+    padding: 1px;
+  }
+
+  .calendar-season-del {
+    margin-left: auto;
+    width: 40px;
+  }
+
+  /* Season Column Labels */
+  .calendar-season-label-name {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .calendar-season-label-temp {
+    grid-row: 1;
+    grid-column: 2;
+    padding-left: 75px;
+  }
+
+  .calendar-season-label-color {
+    grid-row: 1;
+    grid-column: 3;
+  }
+
+  .calendar-season-label-date {
+    grid-row: 1;
+    grid-column: 4;
+  }
+
+  .calendar-season-label-del {
+    grid-row: 1;
+    grid-column: 5;
+    width: 40px;
+  }
+
+  .calendar-reEvent-item {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    outline-offset: 5px;
+    border-bottom: 1px solid rgb(116, 0, 0);
+  }
+
+  .calendar-reEvent-container {
+    display: grid;
+  }
+
+  .calendar-reEvent-name {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .calendar-reEvent-month {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .calendar-reEvent-del {
+    grid-row: 1;
+    grid-column: 3;
+    justify-self: end;
+    width: 40px;
+  }
+
+  .calendar-event-item {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    outline-offset: 5px;
+    border-bottom: 1px solid rgb(116, 0, 0);
+  }
+
+  .calendar-event-container {
+    display: grid;
+  }
+
+  .calendar-event-name {
+    grid-row: 1;
+    grid-column: 1;
+    width: 33%;
+  }
+
+  .calendar-event-month {
+    grid-row: 1;
+    grid-column: 2;
+    display: inline-flex;
+    height: 25px;
+  }
+
+  .calendar-event-year {
+    width: 50px;
+  }
+
+  .calendar-event-text {
+    margin-top: 3px;
+  }
+
+  .calendar-event-allDay {
+    grid-row: 1;
+    grid-column: 3;
+  }
+
+  .calendar-event-time {
+    grid-row: 1;
+    grid-column: 4;
+    width: 160px;
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
+  .calendar-event-del {
+    grid-row: 1;
+    grid-column: 5;
+    justify-self: end;
+    width: 40px;
+  }
+
+  .calendar-season-text{
+    padding-left: 7px;
+    margin-top: 4px;
+  }
+
+  .calendar-season-listitem{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    outline-offset: 5px;
+    border-bottom: 1px solid rgb(116, 0, 0);
+  }
+
+  .calendar-events-container {
+    background: url(../ui/parchment.jpg) repeat;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: fit-content;
+  }
+
+  .calendar-moon-top {
+    width: 100%;
+    display: inline-flex;
+    height: fit-content;
+    align-items: center;
+  }
+
+  .calendar-moon-bottom {
+    display: inline-flex;
+  }
+
+  .calendar-moon-name-container {
+    width: 33%;
+  }
+
+  .calendar-moon-name {
+    width: 10px;
+  }
+
+  .calendar-moon-length {
+    width: 40px;
+    margin-right: 10px;
+  }
+
+  .calendar-moon-percent {
+    width: 40px;
+    margin-right: 10px;
+  }
+
+  .calendar-moon-leclipse {
+    width: 60px;
+    margin-right: 10px;
+  }
+  .calendar-moon-seclipse {
+    width: 60px;
+    margin-right: 10px;
+  }
+  .calendar-moon-del {
+    width: 40px;
+    margin-left: auto;
+  }
+
+  .calendar-collapsable{
+    background: none;
+    border: none;
+    border-bottom: 2px solid #782e22;
+    font-size: 1.3em;
+    text-align: left;
+    padding-top: 10px;
+  }
+
+  .calendar-collapsable:hover {
+    box-shadow: inset 0 0 7px black!important;
+  }
+  .calendar-collapsable:active {
+    box-shadow: inset 0 0 7px black!important;
+    background: #755f5b3b;
+  }
+
+  .calendar-collapsable-content{
+    display: none;
+    overflow: hidden;
+  }
+
+  #calendar-events-submit{
+    padding-top: 10px;
+  }
+</style>

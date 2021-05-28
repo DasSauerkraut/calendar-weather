@@ -79,6 +79,8 @@
   "CWMOON.TotalLEclipse" : "Elcipse lunar total",
   "CWMOON.PartialLEclipse" : "Eclipse lunar parcial",
   "CWMOON.ChatTitle" : "Fases lunares",
+  "CWMOON.LowSanction" : "Sanción baja",
+  "CWMOON.HighSanction" : "Sanción alta",
 
   "Events": "Events",
   "ReoccuringEvents": "Eventos recurrentes",
@@ -176,6 +178,8 @@
   "CWSETTING.useCelciusHelp": "Usar grados Celcius para la temperatura",
   "CWSETTING.playerSeeWeather": "Mostrar tiempo a los jugadores",
   "CWSETTING.playerSeeWeatherHelp": "Cuando se marque, los jugadores podrán activar/desactivar el tiempo",
+  "CWSETTING.useSanctions": "Usar sanciones lunares",
+  "CWSETTING.useSanctionsHelp": "Cuando esté activo, se mostrará si las lunas están en sanción alta o baja. Útil en entornos como la Dragonlance",
 
   "CWEXPORT.copied": "¡Se han copiado los datos del calendario al portapapeles!",
   "CWIMPORT.success": "¡Se han importado correctamente los datos del calendario!",

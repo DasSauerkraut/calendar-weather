@@ -1,3 +1,21 @@
+<div id="calendar-weather-container">
+	<h3 id="calendar-weather-hdr">
+    <span id="calendar-weather-temp" title="{{localize 'SwitchFC'}}">{{temp}}</span><span id="calendar-weather-units">{{#if isC}} °C {{else}} °F{{/if}}</span>
+    <select id="calendar-weather-climate" title="{{localize 'SelectClimate'}}" onChange="
+      Hooks.callAll('calendarWeatherClimateSet', this.value);
+    ">
+      <option title="Temp: Neutral, Humidity: Neutral" value="temperate">{{localize 'Temperate'}}</option>
+      <option title="Temp: Cold, Humidity: Neutral" value="tempMountain">{{localize 'TemperateMountain'}}</option>
+      <option title="Temp: Very Hot, Humidity: Very Dry" value="desert">{{localize 'Desert'}}</option>
+      <option title="Temp: Very Cold, Humidity: Neutral" value="tundra">{{localize 'Tundra'}}</option>
+      <option title="Temp: Very Hot, Humidity: Wet" value="tropical">{{localize 'Tropical'}}</option>
+      <option title="Temp: Very Cold, Humidity: Dry" value="taiga">{{localize 'Taiga'}}</option>
+      <option title="Temp: Extremely Hot, Humidity: Volcanic" value="volcanic">{{localize 'Volcanic'}}</option>
+      <option title="Temp: Extremely Cold, Humidity: Neutral. Adjusts Night cycle to be more extreme depending on season's temperature." value="polar">{{localize 'Polar'}}</option>
+    </select>
+  </h3>
+  <p id="calendar-weather-precip" title="Regenerate Weather">{{precipitation}}</p>
+</div>
 <style style="visibility: hidden;">
 	#calendar-weather-container{
   position: fixed;
@@ -58,21 +76,3 @@
     text-shadow: 0 0 8px red;
   }
 </style>
-<div id="calendar-weather-container">
-	<h3 id="calendar-weather-hdr">
-    <span id="calendar-weather-temp" title="{{localize 'SwitchFC'}}">{{temp}}</span><span id="calendar-weather-units">{{#if isC}} °C {{else}} °F{{/if}}</span>
-    <select id="calendar-weather-climate" title="{{localize 'SelectClimate'}}" onChange="
-      Hooks.callAll('calendarWeatherClimateSet', this.value);
-    ">
-      <option title="Temp: Neutral, Humidity: Neutral" value="temperate">{{localize 'Temperate'}}</option>
-      <option title="Temp: Cold, Humidity: Neutral" value="tempMountain">{{localize 'TemperateMountain'}}</option>
-      <option title="Temp: Very Hot, Humidity: Very Dry" value="desert">{{localize 'Desert'}}</option>
-      <option title="Temp: Very Cold, Humidity: Neutral" value="tundra">{{localize 'Tundra'}}</option>
-      <option title="Temp: Very Hot, Humidity: Wet" value="tropical">{{localize 'Tropical'}}</option>
-      <option title="Temp: Very Cold, Humidity: Dry" value="taiga">{{localize 'Taiga'}}</option>
-      <option title="Temp: Extremely Hot, Humidity: Volcanic" value="volcanic">{{localize 'Volcanic'}}</option>
-      <option title="Temp: Extremely Cold, Humidity: Neutral. Adjusts Night cycle to be more extreme depending on season's temperature." value="polar">{{localize 'Polar'}}</option>
-    </select>
-  </h3>
-  <p id="calendar-weather-precip" title="Regenerate Weather">{{precipitation}}</p>
-</div>

@@ -1,3 +1,119 @@
+<form autocomplete="off" onsubmit="event.preventDefault();" class="calendar-form-container">
+    <h1>{{localize 'CalendarSettings'}}</h1>
+    <div id="calendar-form-year">
+        <label>{{localize 'CurrentDay'}}</label><input value="{{day}}" type="number" min="1" placeholder="14" id="calendar-form-cDay-input">
+        <label class="calendar-form-label">Year: </label><input type="number" min="1" value="{{year}}" placeholder="2020" id="calendar-form-year-input">
+        <label class="calendar-form-label">Era: </label><input value="{{era}}" type="text" placeholder="AD" id="calendar-form-era-input" maxlength="3">
+        <label class="calendar-form-label">Time: </label>
+        <input value="{{hours}}" type="text" placeholder="7" id="calendar-form-hour-input" max="24">:
+        <input value="{{minutes}}" type="text" placeholder="15" id="calendar-form-minute-input" max="60">:
+        <input value="{{seconds}}" type="text" placeholder="00" id="calendar-form-second-input" max="60">
+        <select id="calendar-form-ampm">
+            <option value="AM">{{localize 'AM'}}</option>
+            <option value="PM">{{localize 'PM'}}</option>
+        </select>
+    </div>
+    <h2>Weekdays</h2>
+    <div class="calendar-form-weekday-label-container">
+        <span class="calendar-form-weekday-input-label">
+            Name
+        </span>
+        <span class="calendar-form-weekday-radio-label">
+            Current Weekday
+        </span>
+        <span class="calendar-form-weekday-del">
+            Delete
+        </span>
+    </div>
+    <ol>
+        {{#each daysOfTheWeek as |item|}}
+        <li>
+            <div class="calendar-form-weekday-container">
+                <input class="calendar-form-weekday-input" value="{{item}}" name="input-weekday-{{@index}}" type="text" placeholder="{{localize 'exTuesday'}}" id="calendar-form-weekday-{{@index}}">
+                <input class="calendar-form-weekday-radio" type="radio" name="current-weekday" value="{{@index}}" checked>
+                <button class="calendar-form-weekday-del" id="calendar-form-del-weekday-{{@index}}" name="del-weekday-{{@index}}" title="{{localize 'DeleteWeekDay'}}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
+    <button id="calendar-form-add-weekday" name="add-weekday" title="{{localize 'AddNewDay'}}">
+        <i class="fas fa-plus"></i> Add Weekday
+    </button>
+    <h2>Months</h2>
+    <div class="calendar-form-weekday-label-container">
+        <span class="calendar-form-month-input-label">
+            Name
+        </span>
+        <span class="calendar-form-month-length-label">
+            Length
+        </span>
+        <span class="calendar-form-month-radio-label">
+            Current Month
+        </span>
+        <span class="calendar-form-month-isNum-label">
+            Intercalary
+        </span>
+        <span class="calendar-form-month-abbrev-label">
+            Abbreviation
+        </span>
+        <span class="calendar-form-month-del">
+            Delete
+        </span>
+    </div>
+    <ol>
+        {{#each months as |month|}}
+        <li>
+            <div class="calendar-form-month-container">
+                <input class="calendar-form-month-input" value="{{month.name}}" name="input-month-{{@index}}" type="text" placeholder="{{localize 'exOctober'}}" id="calendar-form-month-{{@index}}">
+                <input class="calendar-form-month-length-input" value="{{month.length}}" name="input-month-length-{{@index}}" type="number" id="calendar-form-month-length-{{@index}}">
+                <input class="calendar-form-month-abbrev" title="{{localize 'MonthAbbrevHelp'}}" value="{{month.abbrev}}" id="calendar-form-month-abbrev-{{@index}}" maxlength="3" disabled>
+                <input class="calendar-form-month-isnum" title="{{localize 'MonthDelHelp'}}" type="checkbox" name="is-numbered" value="{{@index}}" onclick="
+                var input = document.getElementById('calendar-form-month-abbrev-{{@index}}');
+                var length = document.getElementById('calendar-form-month-length-{{@index}}');
+                if(this.checked){
+                    input.disabled = false; 
+                    input.focus(); 
+                    input.style.cursor ='auto'
+                    length.disabled = true;
+                    length.style.cursor = 'not-allowed';
+                    length.value = 1;
+                }else{
+                    input.disabled=true; 
+                    input.style.cursor ='not-allowed'
+                    length.disabled = false;
+                    length.style.cursor = 'auto';
+                }">
+                <input class="calendar-form-month-radio" type="radio" name="current-month" value="{{@index}}">
+                <button class="calendar-form-month-del" id="calendar-form-del-month-{{@index}}" name="del-month-{{@index}}" title="{{localize 'DeleteMonth'}}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
+    <button id="calendar-form-add-month" name="add-month" title="{{localize 'AddMonth'}}">
+        <i class="fas fa-plus"></i> {{localize 'AddMonth'}}
+    </button>
+  <footer>
+    
+    <button id="calendar-form-load-default" name="default" title="{{localize 'LoadDefaultCalendar'}}">
+        <i class="fas fa-folder"></i> {{localize 'LoadDefaultCalendar'}}
+    </button>
+    <span class="calendar-form-export-import">
+        <button id="calendar-form-export" name="default" title="{{localize 'ExportCalendarHelp'}}">
+            <i class="fas fa-download"></i> {{localize 'ExportCalendar'}}
+        </button>
+        <button id="calendar-form-import" name="default" title="{{localize 'ImportCalendar'}}">
+            <i class="fas fa-upload"></i> {{localize 'ImportCalendar'}}
+        </button>
+    </span>
+    <button id="calendar-form-submit" type="submit" name="submit" title="{{localize 'SaveCalendar'}}">
+        <i class="far fa-save"></i> {{localize 'SaveCalendar'}}
+    </button>
+  </footer>
+</form>
 <style style="visibility: hidden;">
     .calendar-form-label{
         margin-left: 1%;
@@ -163,122 +279,4 @@
         overflow-y: auto;
         overflow-x: hidden;
     }
-    
-    
 </style>
-<form autocomplete="off" onsubmit="event.preventDefault();" class="calendar-form-container">
-    <h1>{{localize 'CalendarSettings'}}</h1>
-    <div id="calendar-form-year">
-        <label>{{localize 'CurrentDay'}}</label><input value="{{day}}" type="number" min="1" placeholder="14" id="calendar-form-cDay-input">
-        <label class="calendar-form-label">Year: </label><input type="number" min="1" value="{{year}}" placeholder="2020" id="calendar-form-year-input">
-        <label class="calendar-form-label">Era: </label><input value="{{era}}" type="text" placeholder="AD" id="calendar-form-era-input" maxlength="3">
-        <label class="calendar-form-label">Time: </label>
-        <input value="{{hours}}" type="text" placeholder="7" id="calendar-form-hour-input" max="24">:
-        <input value="{{minutes}}" type="text" placeholder="15" id="calendar-form-minute-input" max="60">:
-        <input value="{{seconds}}" type="text" placeholder="00" id="calendar-form-second-input" max="60">
-        <select id="calendar-form-ampm">
-            <option value="AM">{{localize 'AM'}}</option>
-            <option value="PM">{{localize 'PM'}}</option>
-        </select>
-    </div>
-    <h2>Weekdays</h2>
-    <div class="calendar-form-weekday-label-container">
-        <span class="calendar-form-weekday-input-label">
-            Name
-        </span>
-        <span class="calendar-form-weekday-radio-label">
-            Current Weekday
-        </span>
-        <span class="calendar-form-weekday-del">
-            Delete
-        </span>
-    </div>
-    <ol>
-        {{#each daysOfTheWeek as |item|}}
-        <li>
-            <div class="calendar-form-weekday-container">
-                <input class="calendar-form-weekday-input" value="{{item}}" name="input-weekday-{{@index}}" type="text" placeholder="{{localize 'exTuesday'}}" id="calendar-form-weekday-{{@index}}">
-                <input class="calendar-form-weekday-radio" type="radio" name="current-weekday" value="{{@index}}" checked>
-                <button class="calendar-form-weekday-del" id="calendar-form-del-weekday-{{@index}}" name="del-weekday-{{@index}}" title="{{localize 'DeleteWeekDay'}}">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-        </li>
-        {{/each}}
-    </ol>
-    <button id="calendar-form-add-weekday" name="add-weekday" title="{{localize 'AddNewDay'}}">
-        <i class="fas fa-plus"></i> Add Weekday
-    </button>
-    <h2>Months</h2>
-    <div class="calendar-form-weekday-label-container">
-        <span class="calendar-form-month-input-label">
-            Name
-        </span>
-        <span class="calendar-form-month-length-label">
-            Length
-        </span>
-        <span class="calendar-form-month-radio-label">
-            Current Month
-        </span>
-        <span class="calendar-form-month-isNum-label">
-            Intercalary
-        </span>
-        <span class="calendar-form-month-abbrev-label">
-            Abbreviation
-        </span>
-        <span class="calendar-form-month-del">
-            Delete
-        </span>
-    </div>
-    <ol>
-        {{#each months as |month|}}
-        <li>
-            <div class="calendar-form-month-container">
-                <input class="calendar-form-month-input" value="{{month.name}}" name="input-month-{{@index}}" type="text" placeholder="{{localize 'exOctober'}}" id="calendar-form-month-{{@index}}">
-                <input class="calendar-form-month-length-input" value="{{month.length}}" name="input-month-length-{{@index}}" type="number" id="calendar-form-month-length-{{@index}}">
-                <input class="calendar-form-month-abbrev" title="{{localize 'MonthAbbrevHelp'}}" value="{{month.abbrev}}" id="calendar-form-month-abbrev-{{@index}}" maxlength="3" disabled>
-                <input class="calendar-form-month-isnum" title="{{localize 'MonthDelHelp'}}" type="checkbox" name="is-numbered" value="{{@index}}" onclick="
-                var input = document.getElementById('calendar-form-month-abbrev-{{@index}}');
-                var length = document.getElementById('calendar-form-month-length-{{@index}}');
-                if(this.checked){
-                    input.disabled = false; 
-                    input.focus(); 
-                    input.style.cursor ='auto'
-                    length.disabled = true;
-                    length.style.cursor = 'not-allowed';
-                    length.value = 1;
-                }else{
-                    input.disabled=true; 
-                    input.style.cursor ='not-allowed'
-                    length.disabled = false;
-                    length.style.cursor = 'auto';
-                }">
-                <input class="calendar-form-month-radio" type="radio" name="current-month" value="{{@index}}">
-                <button class="calendar-form-month-del" id="calendar-form-del-month-{{@index}}" name="del-month-{{@index}}" title="{{localize 'DeleteMonth'}}">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-        </li>
-        {{/each}}
-    </ol>
-    <button id="calendar-form-add-month" name="add-month" title="{{localize 'AddMonth'}}">
-        <i class="fas fa-plus"></i> {{localize 'AddMonth'}}
-    </button>
-  <footer>
-    
-    <button id="calendar-form-load-default" name="default" title="{{localize 'LoadDefaultCalendar'}}">
-        <i class="fas fa-folder"></i> {{localize 'LoadDefaultCalendar'}}
-    </button>
-    <span class="calendar-form-export-import">
-        <button id="calendar-form-export" name="default" title="{{localize 'ExportCalendarHelp'}}">
-            <i class="fas fa-download"></i> {{localize 'ExportCalendar'}}
-        </button>
-        <button id="calendar-form-import" name="default" title="{{localize 'ImportCalendar'}}">
-            <i class="fas fa-upload"></i> {{localize 'ImportCalendar'}}
-        </button>
-    </span>
-    <button id="calendar-form-submit" type="submit" name="submit" title="{{localize 'SaveCalendar'}}">
-        <i class="far fa-save"></i> {{localize 'SaveCalendar'}}
-    </button>
-  </footer>
-</form>
